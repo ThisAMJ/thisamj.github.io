@@ -94,25 +94,56 @@ async function updateWikiData() {
 	for (let map of maps) {
 		let lines = map.wikicontent.split('\n');
 		map.formattedWiki = [];
+		map.categories = [];
 		for (let i = 0; i < lines.length; i++) {
-			if (lines[i].trim().startsWith("[[Category:")) {
+			let trimmedLine = lines[i].trim();
+			if (trimmedLine.startsWith("[[Category:")) {
 				map.categories.push(lines[i].substring(11, lines[i].length - 2));
 				continue;
 			} 
-			if (lines[i].trim().startsWith("{{")) {
+			if (trimmedLine.trim().startsWith("{{")) {
 				let startI = i;
 				let inside = [];
-				while (!lines[i].trim().endsWith("}}") && i < lines.length) {
+				let indent = 0, goneIn = false;
+				while ((indent > 0 || !goneIn) && i < lines.length) {
+					goneIn = true;
+					indent += (lines[i].match(/\{\{/g) || []).length;
+					indent -= (lines[i].match(/\}\}/g) || []).length;
 					inside.push(lines[i].trim());
 					i++;
 				}
-				console.log(inside)
+				inside = inside.join("\n");
+				inside = inside.substring(2, inside.length - 2);
+				indent = 0;
+				let insideArgs = [];
+				let str = "";
+				for (let j = 0; j < inside.length; j++) {
+					if (inside[j] + inside[j + 1] == "{{") {
+						indent++;
+						j += 2;
+					} else if (inside[j] + inside[j + 1] == "}}") {
+						indent--;
+						j += 2;
+					}
+					if (inside[j] == "|" && indent == 0) {
+						insideArgs.push(str)
+						str = "";
+					} else {
+						str += inside[j];
+					}
+				}
+				insideArgs.push(str)
+				continue;
+			}
+			let j = 0;
+			while (trimmedLine[j] == "=" && trimmedLine[trimmedLine.length - j - 1]) {j++;}
+			if (j > 0) {
+				map.formattedWiki.push(`<h${j}>${trimmedLine.substring(j, trimmedLine.length - j)}</h${j}>`)
 				continue;
 			}
 			map.formattedWiki.push(lines[i])
 		}
 		map.formattedWiki = map.formattedWiki.join("<br>");
-		console.log(map.formattedWiki);
 	}
 }
 
