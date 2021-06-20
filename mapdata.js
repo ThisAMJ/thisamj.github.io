@@ -112,9 +112,8 @@ async function updateWikiData() {
 					inside.push(lines[i].trim());
 					i++;
 				}
-				inside = inside.join("\n");
+				inside = inside.join("\n"), indent = 0;
 				inside = inside.substring(2, inside.length - 2);
-				indent = 0;
 				let insideArgs = [];
 				let str = "";
 				for (let j = 0; j < inside.length; j++) {
