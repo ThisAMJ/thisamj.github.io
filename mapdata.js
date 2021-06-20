@@ -90,6 +90,8 @@ async function updateWikiData() {
 				}
 			}
 		}
+	}
+	for (let map of maps) {
 		let lines = map.wikicontent.split('\n');
 		map.formattedWiki = [];
 		for (let i = 0; i < lines.length; i++) {
