@@ -13,6 +13,7 @@ async function doStuff() {
 	document.body.appendChild(slider);
 
 	pre = document.createElement("pre");
+	pre.style.margin = "none";
 	document.body.appendChild(pre);
 	// pre.innerHTML = maps.map(e => {return e.splitname + "<br>" + e.categories.join(",")}).join("<br><br>")
 

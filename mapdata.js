@@ -96,7 +96,27 @@ async function updateWikiData() {
 		map.formattedWiki = [];
 		map.categories = [];
 		for (let i = 0; i < lines.length; i++) {
+			let b = false;
+			while (lines[i].indexOf("'''") > -1) {
+				if (b) {
+					lines[i] = lines[i].replace("'''", "</b>")
+				} else {
+					lines[i] = lines[i].replace("'''", "<b>")
+				}
+				b = !b;
+			}
+			b = false;
+			while (lines[i].indexOf("''") > -1) {
+				if (b) {
+					lines[i] = lines[i].replace("''", "</i>")
+				} else {
+					lines[i] = lines[i].replace("''", "<i>")
+				}
+				b = !b;
+			}
+
 			let trimmedLine = lines[i].trim();
+
 			if (trimmedLine.startsWith("[[Category:")) {
 				map.categories.push(lines[i].substring(11, lines[i].length - 2));
 				continue;
@@ -132,7 +152,7 @@ async function updateWikiData() {
 					}
 				}
 				insideArgs.push(str);
-
+				console.log(insideArgs)
 				//do stuff with insideArgs
 				switch (insideArgs[0]) {
 					case "P2_Video":
@@ -160,7 +180,6 @@ async function updateWikiData() {
 			}
 
 			if (trimmedLine.startsWith("*")) {
-				console.log(map.splitname)
 				map.formattedWiki.push("<ul>");
 				while (trimmedLine.startsWith("*") && i < lines.length) {
 					map.formattedWiki.push(`<li>${trimmedLine.substring(1)}</li>`)
@@ -178,7 +197,7 @@ async function updateWikiData() {
 			}
 			map.formattedWiki.push(lines[i])
 		}
-		map.formattedWiki = map.formattedWiki.join("\n");
+		map.formattedWiki = map.formattedWiki.join("<br>");
 	}
 }
 
