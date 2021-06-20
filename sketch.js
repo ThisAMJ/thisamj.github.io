@@ -1,32 +1,29 @@
-let maps = [], slider, p;
+let maps = [], slider, pre;
 
 async function doStuff() {
+
 	await addMaps();
 	await updateWikiData();
+
+
 	slider = document.createElement("input")
 	slider.type = "range", slider.min = "0";
 	slider.max = (maps.length - 1).toString();
-	slider.oninput = function() {p.innerHTML = maps[slider.value].wikicontent.replaceAll("\n", "<br>");}
+	slider.oninput = function() {pre.innerHTML = maps[slider.value].formattedWiki;}
 	document.body.appendChild(slider);
-	p = document.createElement("p");
-	// p.innerHTML = maps.map(e => {return e.splitname + "<br>" + e.categories.join(",")}).join("<br><br>")
-	document.body.appendChild(p);
+
+	pre = document.createElement("pre");
+	document.body.appendChild(pre);
+	// pre.innerHTML = maps.map(e => {return e.splitname + "<br>" + e.categories.join(",")}).join("<br><br>")
+
 	slider.oninput();
+
 	console.log("loaded");
-	let selfStrs = [];
-	for (let map of maps) {
-		selfStrs.push(`maps.push(${map.selfStr(true, false)});`)
-	}
+	
+
 	console.log("self creation string:");
-	console.log(selfStrs.join("\n"));
+	console.log(maps.map(e => {return `maps.push(${e.selfStr(true, false)});`}).join("\n"))
 
-
-	maps.forEach(e => {
-	    e.categories = [];
-	    e.wikicontent.split("\n").forEach(f => {
-	        if (f.startsWith("[[Category:")) e.categories.push(f.substring(11, f.length - 2));
-	    });
-	});
 }
 
 doStuff();
