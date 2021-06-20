@@ -90,6 +90,27 @@ async function updateWikiData() {
 				}
 			}
 		}
+		let lines = map.wikicontent.split('\n');
+		map.formattedWiki = [];
+		for (let i = 0; i < lines.length; i++) {
+			if (lines[i].trim().startsWith("[[Category:")) {
+				map.categories.push(lines[i].substring(11, lines[i].length - 2));
+				continue;
+			} 
+			if (lines[i].trim().startsWith("{{")) {
+				let startI = i;
+				let inside = [];
+				while (!lines[i].trim().endsWith("}}") && i < lines.length) {
+					inside.push(lines[i].trim());
+					i++;
+				}
+				console.log(inside)
+				continue;
+			}
+			map.formattedWiki.push(lines[i])
+		}
+		map.formattedWiki = map.formattedWiki.join("<br>");
+		console.log(map.formattedWiki);
 	}
 }
 
