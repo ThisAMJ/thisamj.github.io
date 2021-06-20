@@ -131,7 +131,43 @@ async function updateWikiData() {
 						str += inside[j];
 					}
 				}
-				insideArgs.push(str)
+				insideArgs.push(str);
+
+				//do stuff with insideArgs
+				switch (insideArgs[0]) {
+					case "P2_Video":
+						//youtube embed
+						break;
+					case "P2_Infobox":
+						//page title
+						map.formattedWiki.push(`<h1 style="font-size:5em;text-align:center;">${insideArgs[1]}</h1>`);
+						break;
+				}
+
+				continue;
+			}
+
+			if (trimmedLine.startsWith("#")) {
+				map.formattedWiki.push("<ol>");
+				while (trimmedLine.startsWith("#") && i < lines.length) {
+					map.formattedWiki.push(`<li>${trimmedLine.substring(1)}</li>`)
+					i++;
+					trimmedLine = lines[i].trim();
+				}
+				i--;
+				map.formattedWiki.push("</ol>");
+				continue;
+			}
+
+			if (trimmedLine.startsWith("*")) {
+				console.log(map.splitname)
+				map.formattedWiki.push("<ul>");
+				while (trimmedLine.startsWith("*") && i < lines.length) {
+					map.formattedWiki.push(`<li>${trimmedLine.substring(1)}</li>`)
+					i++;
+					trimmedLine = lines[i].trim();
+				}
+				map.formattedWiki.push("</ul>");
 				continue;
 			}
 			let j = 0;
@@ -142,7 +178,7 @@ async function updateWikiData() {
 			}
 			map.formattedWiki.push(lines[i])
 		}
-		map.formattedWiki = map.formattedWiki.join("<br>");
+		map.formattedWiki = map.formattedWiki.join("\n");
 	}
 }
 
