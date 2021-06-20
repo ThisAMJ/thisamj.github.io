@@ -9,7 +9,14 @@ async function doStuff() {
 	slider = document.createElement("input")
 	slider.type = "range", slider.min = "0";
 	slider.max = (maps.length - 1).toString();
-	slider.oninput = function() {pre.innerHTML = maps[slider.value].formattedWiki;}
+	slider.oninput = function() {
+		let map = maps[slider.value]
+		let desired = [];
+		desired.push("Categories: " + map.categories.join(", "));
+		desired.push("Mtriggers:<br>" + map.triggers.join("<br>"));
+		desired.push(map.formattedWiki);
+		pre.innerHTML = desired.join("<br><br>");
+	}
 	document.body.appendChild(slider);
 
 	pre = document.createElement("pre");
