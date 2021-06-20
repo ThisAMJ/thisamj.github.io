@@ -152,7 +152,6 @@ async function updateWikiData() {
 					}
 				}
 				insideArgs.push(str);
-				console.log(insideArgs)
 				//do stuff with insideArgs
 				switch (insideArgs[0]) {
 					case "P2_Video":
