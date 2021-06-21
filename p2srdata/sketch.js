@@ -4,6 +4,14 @@ async function doStuff() {
 
 	slider = document.createElement("input")
 	slider.type = "range", slider.min = "0", slider.value = "0";
+	document.body.appendChild(slider);
+
+	pre = document.createElement("pre");
+	pre.style.margin = "none";
+	document.body.appendChild(pre);
+
+	pre.innerHTML = "loading maps..."
+	await addMaps();
 	slider.oninput = function() {
 		let map = maps[slider.value]
 		let desired = [];
@@ -15,14 +23,6 @@ async function doStuff() {
 					  <a href="https://wiki.portal2.sr/index.php?title=${map.wikiname}&action=history">View history of this page</a>`)
 		pre.innerHTML = desired.join("<br><br>");
 	}
-	document.body.appendChild(slider);
-
-	pre = document.createElement("pre");
-	pre.style.margin = "none";
-	document.body.appendChild(pre);
-
-	pre.innerHTML = "loading maps..."
-	await addMaps();
 	slider.max = (maps.length - 1).toString();
 	pre.innerHTML = "loading wiki..."
 	await updateWikiData();
