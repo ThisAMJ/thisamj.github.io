@@ -59,6 +59,7 @@ class MapFile {
 			if (line.startsWith('"')) this.triggers.push(line);
 		}
 		this.addGenericTriggers();
+		this.fixTriggers();
 		return this.triggers;
 	}
 
@@ -79,6 +80,34 @@ class MapFile {
 		if (this.triggers[this.triggers.length - 1] == `"Flags" flags action=stop`) {this.triggers.splice(this.triggers.length - 1, 1)};
 		if (this.triggers[this.triggers.length - 1] == `"Flags 2" flags "ccafter=Flags 1" action=stop`) {this.triggers.splice(this.triggers.length - 1, 1)};
 		if (this.triggers[this.triggers.length - 1] == `"Flags 1" flags`) {this.triggers.splice(this.triggers.length - 1, 1)};
+	}
+
+	fixTriggers() {
+		for (let index in this.triggers) {
+			let trigger = this.triggers[index];
+			let name = trigger.substring(0, trigger.indexOf('"', 1) + 1);
+			let args = trigger.substring(trigger.indexOf('"', 1) + 2).split(" ");
+			for (let i = 1; i < args.length; i++) {
+				let property = args[i].split("=");
+				if (property.length > 0 && ["center", "size", "angle"].indexOf(property[0]) > -1) {
+					let values = property[1].split(",");
+					for (let j = 0; j < values.length; j++) {
+						if (values[j].indexOf(".") > -1) {
+							// remove trailing zeroes
+							while (values[j].endsWith("0")) {
+								values[j] = values[j].substring(0,values[j].length - 1);
+							}
+							if (values[j].endsWith(".")) {
+								values[j] = values[j].substring(0,values[j].length - 1);
+							}
+						}
+					}
+					property[1] = values.join(",");
+				}
+				args[i] = property.join("=");
+			}
+			this.triggers[index] = name + " " + args.join(" ");
+		}
 	}
 }
 
@@ -230,8 +259,9 @@ async function updateMtriggers() {
 		let time = new Date();
 		let response = await queryAPI(url);
 		if (response != "404 NOT FOUND") {
-			console.log(`got mtriggers for ${maps[i].wikiname} (${formatBytes(response.length)}), took ${new Date() - time}ms`);
-			console.log(maps[i].triggersFromTxt(response).join("\n"));
+			let t = maps[i].triggersFromTxt(response);
+			// console.log(`got mtriggers for ${maps[i].wikiname} (${formatBytes(response.length)}), took ${new Date() - time}ms`);
+			// console.log(t.join("\n"));
 		} else {
 			// probably a cutscene map
 			maps[i].triggers = [];
