@@ -1,4 +1,4 @@
-let maps = [], slider, pre;
+var maps = [], slider, pre;
 
 async function doStuff() {
 
@@ -9,8 +9,8 @@ async function doStuff() {
 	slider = document.createElement("input")
 	slider.type = "range", slider.min = "0", slider.max = (maps.length - 1).toString(), slider.value = "0";
 	slider.oninput = function() {
-		let map = maps[slider.value]
-		let desired = [];
+		var map = maps[slider.value]
+		var desired = [];
 		desired.push("Categories: " + map.categories.join(", "));
 		desired.push("Mtriggers:<br>" + map.triggers.join("<br>"));
 		desired.push("Fade: " + map.fade);
@@ -29,9 +29,10 @@ async function doStuff() {
 
 	console.log("loaded");
 
-	// console.log("self creation string:");
-	// console.log(maps.map(e => {return `maps.push(${e.selfStr(true, false)});`}).join("\n"))
+}
 
+function creationString(readable, includeWiki) {
+	console.log(maps.map(e => {return `maps.push(${e.selfStr(readable, includeWiki)});`}).join("\n"));
 }
 
 doStuff();

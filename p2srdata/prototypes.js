@@ -1,6 +1,5 @@
 String.prototype.padByDelim = function(d) {
-  var target = this;
-  let out = [], split = [], maxes = [];
+  var target = this, out = [], split = [], maxes = [];
   this.split("\n").forEach(s => {split.push(s.split(d))});
   split.forEach(e => {
     if (e.length == 1) return;
@@ -24,7 +23,7 @@ String.prototype.padByDelim = function(d) {
 }
 
 String.prototype.replaceAll = function(s, r) {
-  var target = this; return this.split(s).join(r);
+  let target = this; return this.split(s).join(r);
 }
 
 String.prototype.clip = function() {
@@ -37,7 +36,7 @@ String.prototype.clip = function() {
 }
 function formatBytes(a, b = 2) {
   if (0 === a) return "0 Bytes";
-  const c = 0 > b ? 0 : b, d = Math.floor(Math.log(a) / Math.log(1024));
+  let c = 0 > b ? 0 : b, d = Math.floor(Math.log(a) / Math.log(1024));
   return parseFloat((a / Math.pow(1024, d)).toFixed(c)) + " " + ["","K","M","G","T","P","E","Z","Y"][d] + "B"
 }
 function queryAPI(url) {
@@ -49,6 +48,9 @@ function queryAPI(url) {
       if (this.readyState == 4 && this.status == 200) {
         resolve(this.response);
       } else {
+        if (this.status == 404) {
+          resolve("404 NOT FOUND");
+        }
         reject({
           status: this.status,
           statusText: xhr.statusText
