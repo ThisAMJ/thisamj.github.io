@@ -16,6 +16,7 @@ async function doStuff() {
 		desired.push("Mtriggers:<br>" + map.triggers.join("<br>"));
 		desired.push("Fade: " + map.fade);
 		desired.push(map.formattedWiki);
+		desired.push("<a href=\"https://wiki.portal2.sr/index.php?title=map.wikiname&action=edit\">Edit This Page</a>")
 		pre.innerHTML = desired.join("<br><br>");
 	}
 	document.body.appendChild(slider);
