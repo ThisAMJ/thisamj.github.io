@@ -98,7 +98,7 @@ async function updateWikiData() {
 				bold = !bold;
 			}
 			while (lines[i].indexOf("''") > -1) {
-				lines[i] = lines[i].replace("''", italic ? "</i>" : "<i>")
+				lines[i] = lines[i].replace("''", italic ? "</i>" : "<i>");
 				italic = !italic;
 			}
 
@@ -178,11 +178,11 @@ async function updateWikiData() {
 				let j = 0;
 				while (trimmedLine[j] + trimmedLine[trimmedLine.length - j - 1] == '==') {j++;}
 				if (j > 0) {
-					map.formattedWiki.push(`<h${j}>${trimmedLine.substring(j, trimmedLine.length - j)}</h${j}>`)
+					map.formattedWiki.push(`<h${j}>${trimmedLine.substring(j, trimmedLine.length - j)}</h${j}>`);
 					continue;
 				}
 			}
-			map.formattedWiki.push(lines[i])
+			map.formattedWiki.push(lines[i]);
 		}
 		map.formattedWiki = map.formattedWiki.join('<br>');
 	}
@@ -255,7 +255,7 @@ function mapsFromChapter(chapter, isCoop) {
 	var mapsInChapter = [];
 	for (let map of maps) {
 		if (map.coop == isCoop && map.chapter == chapter) {
-			mapsInChapter.push(map)
+			mapsInChapter.push(map);
 		}
 	}
 	return mapsInChapter;

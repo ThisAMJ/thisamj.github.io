@@ -37,7 +37,7 @@ String.prototype.clip = function() {
 function formatBytes(a, b = 2) {
   if (0 === a) return "0 Bytes";
   let c = 0 > b ? 0 : b, d = Math.floor(Math.log(a) / Math.log(1024));
-  return parseFloat((a / Math.pow(1024, d)).toFixed(c)) + " " + ["","K","M","G","T","P","E","Z","Y"][d] + "B"
+  return parseFloat((a / Math.pow(1024, d)).toFixed(c)) + " " + ["","K","M","G","T","P","E","Z","Y"][d] + "B";
 }
 function queryAPI(url) {
   // thank you https://stackoverflow.com/a/48969580/13192876
