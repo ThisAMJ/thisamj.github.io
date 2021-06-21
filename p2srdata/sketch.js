@@ -29,8 +29,8 @@ async function doStuff() {
 
 	console.log("loaded");
 
-	console.log("self creation string:");
-	console.log(maps.map(e => {return `maps.push(${e.selfStr(true, false)});`}).join("\n"))
+	// console.log("self creation string:");
+	// console.log(maps.map(e => {return `maps.push(${e.selfStr(true, false)});`}).join("\n"))
 
 }
 
