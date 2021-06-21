@@ -220,7 +220,7 @@ async function updateWikiContent() {
 }
 
 async function updateMtriggers() {
-	var titles = maps.map(e => {return `${e.coop ? "Coop" : "SP"}/${e.coop ? "Course" : "Chapter"}${e.chapter}/${e.filename}.cfg`});
+	var titles = maps.map(e => {return `${e.coop ? "Coop/Course" : "SP/Chapter"}${e.chapter}/${e.filename}.cfg`});
 	for (let i = 0; i < titles.length; i++) {
 		// github good website, didn't take me 2 hours to figure out :D
 		let url = `https://raw.githubusercontent.com/p2sr/portal2-mtriggers/master/${titles[i]}`;
