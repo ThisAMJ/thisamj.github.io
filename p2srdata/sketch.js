@@ -14,6 +14,7 @@ async function doStuff() {
 		let desired = [];
 		desired.push("Categories: " + map.categories.join(", "));
 		desired.push("Mtriggers:<br>" + map.triggers.join("<br>"));
+		desired.push("Fade: " + map.fade);
 		desired.push(map.formattedWiki);
 		pre.innerHTML = desired.join("<br><br>");
 	}
