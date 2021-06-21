@@ -190,7 +190,7 @@ async function updateWikiData() {
 
 async function updateWikiContent() {
 	var titles = maps.map(e => {return e.wikiname});
-	//m aximum titles count is 50, split them into chunks
+	// maximum titles count is 50, split them into chunks
 	for (let i = 0; i < titles.length; i += 50) {
 		let titleChunk = titles.slice(i, i + 50).join("|");
 		// api query from fucking hell. took me 2 hours to find the origin option
