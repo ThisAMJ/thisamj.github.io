@@ -3,7 +3,7 @@ var maps = [], slider, pre;
 async function doStuff() {
 
 	slider = document.createElement("input")
-	slider.type = "range", slider.min = "0", slider.max = (maps.length - 1).toString(), slider.value = "0";
+	slider.type = "range", slider.min = "0", slider.value = "0";
 	slider.oninput = function() {
 		let map = maps[slider.value]
 		let desired = [];
@@ -23,6 +23,7 @@ async function doStuff() {
 
 	pre.innerHTML = "loading maps..."
 	await addMaps();
+	slider.max = (maps.length - 1).toString()
 	pre.innerHTML = "loading wiki..."
 	await updateWikiData();
 
