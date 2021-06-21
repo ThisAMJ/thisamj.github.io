@@ -23,7 +23,7 @@ async function doStuff() {
 
 	pre.innerHTML = "loading maps..."
 	await addMaps();
-	slider.max = (maps.length - 1).toString()
+	slider.max = (maps.length - 1).toString();
 	pre.innerHTML = "loading wiki..."
 	await updateWikiData();
 
