@@ -136,14 +136,17 @@ async function updateWikiData() {
 					}
 				}
 				insideArgs.push(str);
-				//do stuff with insideArgs
+				// do stuff with insideArgs
 				switch (insideArgs[0]) {
 					case 'P2_Video':
-						//youtube embed
+						// youtube embed
 						break;
 					case 'P2_Infobox':
-						//page title
+						// page title
 						map.formattedWiki.push(`<h1 style="font-size:5em;text-align:center;">${insideArgs[1]}</h1>`);
+						break;
+					case 'P2 Image':
+						// image (no underscore for some dumb fucking reason)
 						break;
 				}
 
