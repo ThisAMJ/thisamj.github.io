@@ -7,8 +7,7 @@ async function doStuff() {
 
 
 	slider = document.createElement("input")
-	slider.type = "range", slider.min = "0";
-	slider.max = (maps.length - 1).toString();
+	slider.type = "range", slider.min = "0", slider.max = (maps.length - 1).toString(), slider.value = "0";
 	slider.oninput = function() {
 		let map = maps[slider.value]
 		let desired = [];
@@ -16,7 +15,7 @@ async function doStuff() {
 		desired.push("Mtriggers:<br>" + map.triggers.join("<br>"));
 		desired.push("Fade: " + map.fade);
 		desired.push(map.formattedWiki);
-		desired.push("<a href=\"https://wiki.portal2.sr/index.php?title=map.wikiname&action=edit\">Edit This Page</a>")
+		desired.push(`<a href="https://wiki.portal2.sr/index.php?title=${map.wikiname}&action=edit">Edit This Page</a>`)
 		pre.innerHTML = desired.join("<br><br>");
 	}
 	document.body.appendChild(slider);
