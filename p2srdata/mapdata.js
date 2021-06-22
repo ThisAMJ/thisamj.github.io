@@ -222,7 +222,7 @@ async function updateWikiData() {
 				let j = 0;
 				while (lines[i][j] + trimmedLine[trimmedLine.length - j - 1] == '==') {j++;}
 				if (j > 0) {
-					map.formattedWiki.push(`<h${j}>${trimmedLine.substring(j, trimmedLine.length - j)}</h${j}>`);
+					map.formattedWiki.push(`<h${j}>${lines[i].substring(j, trimmedLine.length - j)}</h${j}>`);
 					continue;
 				}
 			}
