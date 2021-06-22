@@ -135,10 +135,10 @@ async function updateWikiData() {
 			let trimmedLine = lines[i].trim();
 
 			if (trimmedLine.startsWith('[[Category:') && trimmedLine.endsWith(']]')) {
-				map.categories.push(lines[i].substring(11, lines[i].length - 2));
+				map.categories.push(trimmedLine.substring(11, trimmedLine.length - 2));
 				continue;
 			} 
-			if (trimmedLine.trim().startsWith('{{')) {
+			if (trimmedLine.startsWith('{{')) {
 				let startI = i, inside = [], indent = 0, goneIn = false;
 				while ((indent > 0 || !goneIn) && i < lines.length) {
 					goneIn = true;
