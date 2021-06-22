@@ -180,11 +180,16 @@ async function updateWikiData() {
 					case 'P2_Infobox':
 						// page title
 						map.formattedWiki.push(`<h1 class="p2title">${insideArgs[1]}</h1>`);
-						let arr = insideArgs[3].split("\n");
-						for (let i = 0; i < arr.length; i++) {
-							if (arr[i].indexOf("Native to Challenge Mode") > -1) {
-								let part = arr[i].split(" ");
-								map.cmNative = part[part.length - 1] == "Yes";
+						if (map.coop) {
+							// the only coop map not cm native is calibration
+							map.cmNative = map.splitname != "Calibration";
+						} else {
+							let arr = insideArgs[3].split("\n");
+							for (let i = 0; i < arr.length; i++) {
+								if (arr[i].indexOf("Native to Challenge Mode") > -1) {
+									let part = arr[i].split(" ");
+									map.cmNative = part[part.length - 1] == "Yes";
+								}
 							}
 						}
 						break;
