@@ -22,6 +22,10 @@ String.prototype.padByDelim = function(d) {
   return out.join("\n");
 }
 
+String.prototype.encases = function(s, e) {
+  let target = this; return this.startsWith(s) && this.endsWith(e);
+}
+
 String.prototype.replaceAll = function(s, r) {
   let target = this; return this.split(s).join(r);
 }

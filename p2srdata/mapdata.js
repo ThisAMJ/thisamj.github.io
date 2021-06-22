@@ -98,6 +98,7 @@ class MapFile {
 							while (values[j].endsWith("0")) {
 								values[j] = values[j].substring(0,values[j].length - 1);
 							}
+							// remove trailing full stop
 							if (values[j].endsWith(".")) {
 								values[j] = values[j].substring(0,values[j].length - 1);
 							}
@@ -131,10 +132,15 @@ async function updateWikiData() {
 				lines[i] = lines[i].replace("''", italic ? "</i>" : "<i>");
 				italic = !italic;
 			}
+			let openWikiURL = lines[i].indexOf("[[")
+			while (lines[i].indexOf("[[") > -1 && lines[i].indexOf("]]") > -1) {
+				break; //not yet implemented
+			}
+
 
 			let trimmedLine = lines[i].trim();
 
-			if (trimmedLine.startsWith('[[Category:') && trimmedLine.endsWith(']]')) {
+			if (trimmedLine.encases('[[Category:', ']]')) {
 				map.categories.push(trimmedLine.substring(11, trimmedLine.length - 2));
 				continue;
 			} 
@@ -190,33 +196,31 @@ async function updateWikiData() {
 				continue;
 			}
 
-			if (trimmedLine.startsWith('#')) {
+			if (lines[i].startsWith('#')) {
 				map.formattedWiki.push('<ol>');
-				while (trimmedLine.startsWith('#') && i < lines.length) {
-					map.formattedWiki.push(`<li>${trimmedLine.substring(1)}</li>`);
+				while (lines[i].startsWith('#') && i < lines.length) {
+					map.formattedWiki.push(`<li>${lines[i].substring(1)}</li>`);
 					i++;
-					trimmedLine = lines[i].trim();
 				}
 				i--;
 				map.formattedWiki.push('</ol>');
 				continue;
 			}
 
-			if (trimmedLine.startsWith('*')) {
+			if (lines[i].startsWith('*')) {
 				map.formattedWiki.push('<ul>');
-				while (trimmedLine.startsWith('*') && i < lines.length) {
-					map.formattedWiki.push(`<li>${trimmedLine.substring(1)}</li>`);
+				while (lines[i].startsWith('*') && i < lines.length) {
+					map.formattedWiki.push(`<li>${lines[i].substring(1)}</li>`);
 					i++;
-					trimmedLine = lines[i].trim();
 				}
 				i--;
 				map.formattedWiki.push('</ul>');
 				continue;
 			}
 
-			{
+			{ // headings
 				let j = 0;
-				while (trimmedLine[j] + trimmedLine[trimmedLine.length - j - 1] == '==') {j++;}
+				while (lines[i][j] + trimmedLine[trimmedLine.length - j - 1] == '==') {j++;}
 				if (j > 0) {
 					map.formattedWiki.push(`<h${j}>${trimmedLine.substring(j, trimmedLine.length - j)}</h${j}>`);
 					continue;
