@@ -93,16 +93,8 @@ class MapFile {
 				if (property.length > 0 && ["center", "size", "angle"].indexOf(property[0]) > -1) {
 					let values = property[1].split(",");
 					for (let j = 0; j < values.length; j++) {
-						if (values[j].indexOf(".") > -1) {
-							// remove trailing zeroes
-							while (values[j].endsWith("0")) {
-								values[j] = values[j].substring(0,values[j].length - 1);
-							}
-							// remove trailing full stop
-							if (values[j].endsWith(".")) {
-								values[j] = values[j].substring(0,values[j].length - 1);
-							}
-						}
+						//toString() removes trailing zeros from a number
+						values[j] = parseFloat(values[j]).toString();
 					}
 					property[1] = values.join(",");
 				}
