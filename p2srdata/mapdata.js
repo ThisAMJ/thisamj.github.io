@@ -235,8 +235,7 @@ async function updateWikiContent() {
 		let titleChunk = titles.slice(i, i + 50).join("|");
 		// api query from fucking hell. took me 2 hours to find the origin option
 		let url = `https://wiki.portal2.sr/api.php?action=query&format=json&origin=*&prop=revisions&rvprop=content&rvslots=main&titles=${titleChunk}`;
-		let time = new Date();
-		let response = await queryAPI(url);
+		let time = new Date(), response = await queryAPI(url);
 		console.log(`got wikitext for maps ${i}-${Math.min(maps.length - 1, i + 50)} (${formatBytes(response.length)}), took ${new Date() - time}ms`);
 		let json = JSON.parse(response).query.pages;
 		for (let key in json) {
@@ -264,8 +263,7 @@ async function updateMtriggers() {
 	for (let i = 0; i < titles.length; i++) {
 		// github good website, didn't take me 2 hours to figure out :D
 		let url = `https://raw.githubusercontent.com/p2sr/portal2-mtriggers/master/${titles[i]}`;
-		let time = new Date();
-		let response = await queryAPI(url);
+		let time = new Date(), response = await queryAPI(url);
 		if (response != "404 NOT FOUND") {
 			let t = maps[i].triggersFromTxt(response);
 			count++;
