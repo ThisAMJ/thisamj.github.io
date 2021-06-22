@@ -260,7 +260,7 @@ async function updateWikiContent() {
 }
 
 async function updateMtriggers() {
-	var titles = maps.map(e => {return `${e.coop ? "Coop/Course" : "SP/Chapter"}${e.chapter}/${e.filename}.cfg`});
+	var titles = maps.map(e => {return `${e.coop ? "Coop/Course" : "SP/Chapter"}${e.chapter}/${e.filename}.cfg`}), count = 0;
 	for (let i = 0; i < titles.length; i++) {
 		// github good website, didn't take me 2 hours to figure out :D
 		let url = `https://raw.githubusercontent.com/p2sr/portal2-mtriggers/master/${titles[i]}`;
@@ -268,6 +268,7 @@ async function updateMtriggers() {
 		let response = await queryAPI(url);
 		if (response != "404 NOT FOUND") {
 			let t = maps[i].triggersFromTxt(response);
+			count++;
 			// console.log(`got mtriggers for ${maps[i].wikiname} (${formatBytes(response.length)}), took ${new Date() - time}ms`);
 			// console.log(t.join("\n"));
 		} else {
@@ -275,6 +276,7 @@ async function updateMtriggers() {
 			maps[i].triggers = [];
 		}
 	}
+	console.log(`got mtriggers for ${count} maps, ${titles.length - count} not found`);
 }
 
 function mapWithFileName(str) {
