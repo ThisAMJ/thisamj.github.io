@@ -33,10 +33,10 @@ class MapFile {
 
 		if (readable) {
 			triggers = (triggers.length > 0 ? "\n\t" : "") + triggers.join(",\n\t");
-			return `new MapFile('${this.filename}', '${this.splitname}', ${this.chapter}, ${this.coop}${includeMtriggers ? `, [${triggers}]` : ''},\n\t\`${this.fade}\`${includeWiki ? `,\n\`${this.wikicontent}\``: ''})`;
+			return `new MapFile('${this.filename}', '${this.splitname}', ${this.chapter}, ${this.coop}, [${includeMtriggers ? `${triggers}],\n\t` : '], '}\`${this.fade}\`${includeWiki ? `,\n\`${this.wikicontent}\``: ''})`;
 		} else {
 			triggers = triggers.join(",");
-			return `new MapFile('${this.filename}','${this.splitname}',${this.chapter},${this.coop}${includeMtriggers ? `,[${triggers}]` : ''},\`${this.fade}\`${includeWiki ? `,\`${this.wikicontent}\`` : ''})`;
+			return `new MapFile('${this.filename}','${this.splitname}',${this.chapter},${this.coop},[${includeMtriggers ? triggers : ''}],\`${this.fade}\`${includeWiki ? `,\`${this.wikicontent}\`` : ''})`;
 		}
 	}
 
@@ -490,7 +490,7 @@ function addMaps() {
 		`"End Room" entity targetname=@music_sp_a2_bts3_b5 inputname=PlaySound`],
 		``));
 	maps.push(new MapFile('sp_a2_bts4', 'Turret Sabotage', 5, false, [
-		`"Second Coneyor" entity targetname=light_01 inputname=TurnOn`,
+		`"Second Conveyor" entity targetname=light_01 inputname=TurnOn`,
 		`"Second Room" entity targetname=proxy inputname=OnProxyRelay1`,
 		`"Hallway" entity targetname=dim_wheatley_flashlight inputname=Enable`,
 		`"Classroom" entity targetname=lookat_fair_doorway_relay inputname=Trigger`,
@@ -634,8 +634,6 @@ function addMaps() {
 		`"Last Room" entity targetname=light_shadowed_05 inputname=TurnOn`],
 		``));
 	maps.push(new MapFile('sp_a4_finale3', 'Finale 3', 9, false, [
-		`"Button Press" entity targetname=bomb_1_button_relay inputname=Trigger`,
-		`"Pipe Burst" entity targetname=practice_paint_sprayer inputname=Start`,
 		`"Door Trigger" entity targetname=airlock_door2_brush inputname=Disable`,
 		`"Gel Portal Entry" entity targetname=light_shadowed_02 inputname=TurnOn`,
 		`"Funnel" entity targetname=column_smash_a inputname=SetAnimation`,
@@ -919,7 +917,7 @@ function addMaps() {
 		``));
 	maps.push(new MapFile('mp_coop_paint_crazy_box', 'Crazier Box', 6, true, [
 		`"Panels Trigger" entity targetname=exit_button_clips inputname=Disable`,
-		`"Cube Receptical" entity targetname=team_trigger_door inputname=Enable`,
+		`"Cube Receptacle" entity targetname=team_trigger_door inputname=Enable`,
 		`"Door Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
 		`"Door Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3`,
 		`"Blind Shot" entity targetname=bts_wall_undamaged inputname=Disable`],
