@@ -26,8 +26,6 @@ class MapFile {
 	}
 
 	selfStr(readable, includeMtriggers, includeWiki) {
-		let temp = this.triggers.length > 0 ? '`' : '';
-
 		let triggers = [];
 		this.triggers.forEach(e => {if (!e.startsWith('"Start"') && !e.startsWith('"Flags')) triggers.push(`'${e}'`)});
 
