@@ -25,10 +25,10 @@ async function doStuff() {
 		pre.innerHTML = desired.join("<br><br>");
 	}
 	slider.max = (maps.length - 1).toString();
-	pre.innerHTML = "loading wiki...";
-	await updateWikiData();
-	pre.innerHTML = "loading mtriggers...";
-	await updateMtriggers();
+	// pre.innerHTML = "loading wiki...";
+	// await updateWikiData();
+	// pre.innerHTML = "loading mtriggers...";
+	// await updateMtriggers();
 
 
 	// pre.innerHTML = maps.map(e => {return e.splitname + "<br>" + e.categories.join(",")}).join("<br><br>")

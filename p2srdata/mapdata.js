@@ -278,7 +278,6 @@ async function updateMtriggers() {
 			maps[i].triggers = [];
 			if (maps[i].cmNative) {
 				// hey wait this aint a cutscene map it just has no triggers
-				console.log(maps[i]);
 				maps[i].addGenericTriggers();
 			}
 		}
