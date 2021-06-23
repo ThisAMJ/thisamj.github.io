@@ -43,9 +43,9 @@ class MapFile {
 	createMtriggerString() {
 		if (this.triggers.length == 0) return '';
 		return `
-		sar_speedrun_cc_start "${this.splitname}" map=${this.filename} action=split
-		${this.triggers.map(t => {return `sar_speedrun_cc_rule ${t}`}).join('\n')}
-		sar_speedrun_cc_finish
+		mt_s "${this.splitname}" map=${this.filename} action=split
+		${this.triggers.map(t => {return `mt_r ${t}`}).join('\n')}
+		mt_e
 		`.replaceAll('\t','').trim();
 	}
 

@@ -45,19 +45,33 @@ function creationString(readable, includeMtriggers, includeWiki) {
 
 function exportAll() {
 	let t = [];
+	{
+		t = maps.map(e => {return e.createMtriggerString()}).filter(e => e != '').join('\n\n').padByDelim('"');
+		t = "sar_alias mt_s sar_speedrun_cc_start\n" + t;
+		t = "sar_alias mt_r sar_speedrun_cc_rule\n" + t;
+		t = "sar_alias mt_e sar_speedrun_cc_finish\n\n" + t;
+		t = t + "\n\nsar_alias mt_s nop\n";
+		t = t + "sar_alias mt_r nop\n";
+		t = t + "sar_alias mt_e nop\n";
 
-	t = maps.map(e => {return e.createMtriggerString()}).filter(e => e != '').join('\n\n').padByDelim('"');
-	t.clip(); // copy categories to clipboard
-	alert("Paste into cfg/sar/mtriggers");
+		t.clip(); // copy categories to clipboard
+		alert("Paste into cfg/sar/mtriggers");
+	}
 
-	t = maps.map(e => {return e.triggers.length > 0 ? `cond "var:mtriggers=1 & cm & map=${e.filename}" sar_speedrun_category "${e.splitname}"` : ''});
-	t = t.filter(e => e != '').join('\n').padByDelim('"');
-	t.clip();
-	alert("Paste into cfg/sar/onloads/mtriggers");
+	{
+		t = maps.filter(e => e.triggers.length > 0).map(e => {return `cond map=${e.filename} sar_speedrun_category "${e.splitname}"`});
+		t = t.join('\n').padByDelim('"');
 
-	t = maps.filter(e => e.fade != '').map(e => {return `cond map=${e.filename} sar_toast_create fade "${e.fade}"`}).join('\n').padByDelim("sar_toast_create");
-	t.clip();
-	alert("Paste into cfg/sar/onloads/fades")
+		t.clip();
+		alert("Paste into cfg/sar/onloads/mtriggers");
+	}
+
+	{
+		t = maps.filter(e => e.fade != '').map(e => {return `cond map=${e.filename} sar_toast_create fade "${e.fade}"`}).join('\n').padByDelim("sar_toast_create");
+		t.clip();
+		alert("Paste into cfg/sar/onloads/fades");
+	}
+	
 }
 
 doStuff();
