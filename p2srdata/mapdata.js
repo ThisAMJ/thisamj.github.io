@@ -284,6 +284,12 @@ async function updateMtriggers() {
 		let url = `https://raw.githubusercontent.com/p2sr/portal2-mtriggers/master/${titles[i]}`;
 		let time = new Date(), response = await queryAPI(url);
 		if (response != "404 NOT FOUND") {
+			for (let j = 0; j < response.split('\n').length; j++) {
+				if (response.split('\n')[j].trim().startsWith("//")) {
+					console.log(maps[i].splitname)
+					console.log(response.split('\n')[j])
+				}
+			}
 			let t = maps[i].triggersFromTxt(response);
 			count++;
 			// console.log(`got mtriggers for ${maps[i].wikiname} (${formatBytes(response.length)}), took ${new Date() - time}ms`);
