@@ -15,11 +15,11 @@ async function doStuff() {
 	slider.oninput = function() {
 		let map = maps[slider.value];
 		let desired = [];
-		desired.push("Categories: " + map.categories.join(", "));
+		// desired.push("Categories: " + map.categories.join(", "));
 		desired.push("Mtriggers:<br>" + map.triggers.join("<br>"));
 		desired.push("Fade: " + map.fade);
-		desired.push("Native to CM: " + (map.cmNative ? "Yes" : "No"));
-		desired.push(map.formattedWiki);
+		// desired.push("Native to CM: " + (map.cmNative ? "Yes" : "No"));
+		// desired.push(map.formattedWiki);
 		desired.push(`<a href="https://wiki.portal2.sr/index.php?title=${map.wikiname}&action=edit">Edit this page</a><br>
 					  <a href="https://wiki.portal2.sr/index.php?title=${map.wikiname}&action=history">View history of this page</a>`);
 		pre.innerHTML = desired.join("<br><br>");
