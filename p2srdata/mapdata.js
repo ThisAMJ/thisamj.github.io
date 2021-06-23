@@ -41,11 +41,12 @@ class MapFile {
 	}
 
 	createMtriggerString() {
+		if (this.triggers.length == 0) return '';
 		return `
 		sar_speedrun_cc_start "${this.splitname}" map=${this.filename} action=split
 		${this.triggers.map(t => {return `sar_speedrun_cc_rule ${t}`}).join('\n')}
 		sar_speedrun_cc_finish
-		`.replaceAll("\t",""). trim();
+		`.replaceAll('\t','').trim();
 	}
 
 	pushTriggers(arr) {
@@ -275,6 +276,11 @@ async function updateMtriggers() {
 		} else {
 			// probably a cutscene map
 			maps[i].triggers = [];
+			if (maps[i].cmNative) {
+				// hey wait this aint a cutscene map it just has no triggers
+				console.log(maps[i]);
+				maps[i].addGenericTriggers();
+			}
 		}
 	}
 	console.log(`got mtriggers for ${count} maps, ${titles.length - count} not found`);

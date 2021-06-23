@@ -4,8 +4,12 @@ String.prototype.padByDelim = function(d) {
   split.forEach(e => {
     if (e.length == 1) return;
     for (let i = 0; i < e.length; i++) {
-      let k = e[i].length;
-      maxes[i] = maxes.length < i + 1 ? k : Math.max(maxes[i], k);
+      if (i < e.length - 1) {
+        let k = e[i].length;
+        maxes[i] = maxes.length < i + 1 ? k : Math.max(maxes[i], k);
+      } else {
+        maxes[i] = Math.max(maxes[i], 0);
+      }
     }
   }); // get maximums
   split.forEach(e => {
@@ -38,11 +42,14 @@ String.prototype.clip = function() {
   document.execCommand("copy");
   document.body.removeChild(dummy);
 }
+
 function formatBytes(a, b = 2) {
+  // Modified version of https://stackoverflow.com/a/18650828/13192876
   if (0 === a) return "0 Bytes";
   let c = 0 > b ? 0 : b, d = Math.floor(Math.log(a) / Math.log(1024));
   return parseFloat((a / Math.pow(1024, d)).toFixed(c)) + " " + ["","K","M","G","T","P","E","Z","Y"][d] + "B";
 }
+
 function queryAPI(url) {
   // thank you https://stackoverflow.com/a/48969580/13192876
   return new Promise(function(resolve, reject) {

@@ -43,5 +43,21 @@ function creationString(readable, includeMtriggers, includeWiki) {
 	console.log(maps.map(e => {return `maps.push(${e.selfStr(readable, includeMtriggers, includeWiki)});`}).join("\n"));
 }
 
+function exportAll() {
+	let t = maps.map(e => {return e.createMtriggerString()}), o = [];
+	t.forEach(e => {if (e != '') o.push(e)}); //remove blank lines
+	o = o.join('\n\n').padByDelim('"');
+	console.log(o);
+	o.clip(); // copy categories to clipboard
+	alert("Paste into a cfg linked to autoexec");
+	t = maps.map(e => {return e.triggers.length > 0 ? `cond "var:mtriggers=1 & cm & map=${e.filename}" sar_speedrun_category "${e.splitname}"` : ''});
+	o = [];
+	t.forEach(e => {if (e != '') o.push(e)});
+	o = o.join('\n').padByDelim('"');
+	console.log(o);
+	o.clip();
+	alert("Paste into onload cfg");
+}
+
 doStuff();
 
