@@ -3,10 +3,10 @@ class MapFile {
 		this.filename = filename;
 		this.splitname = splitname;
 		switch (this.splitname) {
-			case 'Funnel Catch':
+			case 'Funnel Catch (SP)':
 				this.wikiname = 'Funnel Catch (singleplayer)';
 				break;
-			case 'Funnel Catch Coop':
+			case 'Funnel Catch (MP)':
 				this.wikiname = 'Funnel Catch';
 				break;
 			case 'Jailbreak':
@@ -25,17 +25,18 @@ class MapFile {
 		this.cmNative = false;
 	}
 
-	selfStr(readable, includeWiki) {
+	selfStr(readable, includeMtriggers, includeWiki) {
 		let temp = this.triggers.length > 0 ? '`' : '';
+
 		let triggers = [];
 		this.triggers.forEach(e => {if (!e.startsWith(`"Start"`) && !e.startsWith(`"Flags`)) triggers.push(`\`${e}\``)});
 
 		if (readable) {
 			triggers = (triggers.length > 0 ? "\n\t" : "") + triggers.join(",\n\t");
-			return `new MapFile('${this.filename}', '${this.splitname}', ${this.chapter}, ${this.coop}, [${triggers}],\n\t\`${this.fade}\`${includeWiki ? `,\n\`${this.wikicontent}\``: ''})`;
+			return `new MapFile('${this.filename}', '${this.splitname}', ${this.chapter}, ${this.coop}${includeMtriggers ? `, [${triggers}]` : ''},\n\t\`${this.fade}\`${includeWiki ? `,\n\`${this.wikicontent}\``: ''})`;
 		} else {
 			triggers = triggers.join(",");
-			return `new MapFile('${this.filename}','${this.splitname}',${this.chapter},${this.coop},[${triggers}],\`${this.fade}\`${includeWiki ? `,\`${this.wikicontent}\`` : ''})`;
+			return `new MapFile('${this.filename}','${this.splitname}',${this.chapter},${this.coop}${includeMtriggers ? `,[${triggers}]` : ''},\`${this.fade}\`${includeWiki ? `,\`${this.wikicontent}\`` : ''})`;
 		}
 	}
 
@@ -68,8 +69,8 @@ class MapFile {
 		if (this.triggers[0] != `"Start" load action=force_start`) this.triggers.splice(0, 0, `"Start" load action=force_start`);
 		if (this.coop) {
 			if (this.triggers[this.triggers.length - 1] != `"Flags 2" flags "ccafter=Flags 1" action=stop`) {
-			this.triggers.push(`"Flags 1" flags`);
-			this.triggers.push(`"Flags 2" flags "ccafter=Flags 1" action=stop`);
+				this.triggers.push(`"Flags 1" flags`);
+				this.triggers.push(`"Flags 2" flags "ccafter=Flags 1" action=stop`);
 			}
 		} else if (this.triggers[this.triggers.length - 1] != `"Flags" flags action=stop`) {
 			this.triggers.push(`"Flags" flags action=stop`);
@@ -84,6 +85,7 @@ class MapFile {
 	}
 
 	fixTriggers() {
+		// all this does is remove trailing zeros
 		for (let index in this.triggers) {
 			let trigger = this.triggers[index];
 			let name = trigger.substring(0, trigger.indexOf('"', 1) + 1);
@@ -594,7 +596,7 @@ function addMaps() {
 		`"Panels Trigger" entity targetname=falling_tile_1_relay inputname=Trigger`,
 		`"Crouch Fly" fly`],
 		``));
-	maps.push(new MapFile('sp_a4_tb_catch', 'Funnel Catch', 8, false, [
+	maps.push(new MapFile('sp_a4_tb_catch', 'Funnel Catch (SP)', 8, false, [
 		`"Door Entry" entity targetname=light_shadowed_01 inputname=TurnOn`,
 		`"Button Press" entity targetname=indicator_lights_flicker_rl inputname=Trigger`,
 		`"Door Activation" entity targetname=puzzle_completed_relay inputname=Trigger`],
@@ -794,7 +796,7 @@ function addMaps() {
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
 		`"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3`],
 		`There. [I've] said it`));
-	maps.push(new MapFile('mp_coop_tbeam_catch_grind_1', 'Funnel Catch Coop', 4, true, [
+	maps.push(new MapFile('mp_coop_tbeam_catch_grind_1', 'Funnel Catch (MP)', 4, true, [
 		`"Wall Portal" zone center=-477.97,-1759.98,-192.2 size=0,127.23,127.38 angle=0`,
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
 		`"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay2`],

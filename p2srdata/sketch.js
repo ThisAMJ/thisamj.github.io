@@ -13,7 +13,7 @@ async function doStuff() {
 	pre.innerHTML = "loading maps..."
 	await addMaps();
 	slider.oninput = function() {
-		let map = maps[slider.value]
+		let map = maps[slider.value];
 		let desired = [];
 		desired.push("Categories: " + map.categories.join(", "));
 		desired.push("Mtriggers:<br>" + map.triggers.join("<br>"));
@@ -21,12 +21,14 @@ async function doStuff() {
 		desired.push("Native to CM: " + (map.cmNative ? "Yes" : "No"));
 		desired.push(map.formattedWiki);
 		desired.push(`<a href="https://wiki.portal2.sr/index.php?title=${map.wikiname}&action=edit">Edit this page</a><br>
-					  <a href="https://wiki.portal2.sr/index.php?title=${map.wikiname}&action=history">View history of this page</a>`)
+					  <a href="https://wiki.portal2.sr/index.php?title=${map.wikiname}&action=history">View history of this page</a>`);
 		pre.innerHTML = desired.join("<br><br>");
 	}
 	slider.max = (maps.length - 1).toString();
-	pre.innerHTML = "loading wiki..."
+	pre.innerHTML = "loading wiki...";
 	await updateWikiData();
+	pre.innerHTML = "loading mtriggers...";
+	await updateMtriggers();
 
 
 	// pre.innerHTML = maps.map(e => {return e.splitname + "<br>" + e.categories.join(",")}).join("<br><br>")
@@ -37,8 +39,8 @@ async function doStuff() {
 
 }
 
-function creationString(readable, includeWiki) {
-	console.log(maps.map(e => {return `maps.push(${e.selfStr(readable, includeWiki)});`}).join("\n"));
+function creationString(readable, includeMtriggers, includeWiki) {
+	console.log(maps.map(e => {return `maps.push(${e.selfStr(readable, includeMtriggers, includeWiki)});`}).join("\n"));
 }
 
 doStuff();
