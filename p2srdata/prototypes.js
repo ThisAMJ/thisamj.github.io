@@ -27,11 +27,16 @@ String.prototype.padByDelim = function(d) {
 }
 
 String.prototype.encases = function(s, e) {
-  let target = this; return this.startsWith(s) && this.endsWith(e);
+  return this.startsWith(s) && this.endsWith(e);
 }
 
-String.prototype.replaceAll = function(s, r) {
-  let target = this; return this.split(s).join(r);
+String.prototype.replaceEvery = function(s, r) {
+  let string = this.valueOf(), checker = 0;
+  if (r.indexOf(s) > -1) return string;
+  while (string.indexOf(s) > -1) {
+    string = string.replaceAll(s,r);
+  }
+  return string;
 }
 
 String.prototype.clip = function() {

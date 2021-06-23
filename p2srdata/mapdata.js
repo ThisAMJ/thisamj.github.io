@@ -44,7 +44,20 @@ class MapFile {
 		if (this.triggers.length == 0) return '';
 		return `
 		mt_s "${this.splitname}" map=${this.filename} action=split
-		${this.triggers.map(t => {return `mt_r ${t}`}).join('\n')}
+		${this.triggers.map(t => {
+			switch (t.replaceEvery("  ", " ")) {
+				case '"Start" load action=force_start':
+					return 'mt_st';
+				case '"Flags" flags action=stop':
+					return 'mt_f';
+				case '"Flags 1" flags':
+					return 'mt_f1';
+				case '"Flags 2" flags "ccafter=Flags 1" action=stop':
+					return 'mt_f2';
+				default:
+					return `mt_r ${t}`
+			}
+		}).join('\n')}
 		mt_e
 		`.replaceAll('\t','').trim();
 	}
@@ -59,6 +72,8 @@ class MapFile {
 			line = line.trim();
 			if (line.startsWith('sar_speedrun_category_rule_create ')) this.triggers.push(line.substring(34));
 			if (line.startsWith('sar_speedrun_cc_rule ')) this.triggers.push(line.substring(21));
+			if (line.startsWith('mt_r ')) this.triggers.push(line.substring(5));
+			if (line == "mt_st") this.triggers.push('"Start" load action=force_start');
 			if (line.startsWith('"')) this.triggers.push(line);
 		}
 		this.addGenericTriggers();
