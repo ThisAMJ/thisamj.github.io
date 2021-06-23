@@ -29,10 +29,10 @@ class MapFile {
 		let temp = this.triggers.length > 0 ? '`' : '';
 
 		let triggers = [];
-		this.triggers.forEach(e => {if (!e.startsWith(`"Start"`) && !e.startsWith(`"Flags`)) triggers.push(`\`${e}\``)});
+		this.triggers.forEach(e => {if (!e.startsWith('"Start"') && !e.startsWith('"Flags')) triggers.push(`'${e}'`)});
 
 		if (readable) {
-			triggers = (triggers.length > 0 ? "\n\t" : "") + triggers.join(",\n\t");
+			triggers = (triggers.length > 0 ? '\n\t' : '') + triggers.join(',\n\t');
 			return `new MapFile('${this.filename}', '${this.splitname}', ${this.chapter}, ${this.coop}, [${includeMtriggers ? `${triggers}],\n\t` : '], '}\`${this.fade}\`${includeWiki ? `,\n\`${this.wikicontent}\``: ''})`;
 		} else {
 			triggers = triggers.join(",");
@@ -82,22 +82,22 @@ class MapFile {
 	}
 
 	addGenericTriggers() {
-		if (this.triggers[0] != `"Start" load action=force_start`) this.triggers.splice(0, 0, `"Start" load action=force_start`);
+		if (this.triggers[0] != '"Start" load action=force_start') this.triggers.splice(0, 0, '"Start" load action=force_start');
 		if (this.coop) {
-			if (this.triggers[this.triggers.length - 1] != `"Flags 2" flags "ccafter=Flags 1" action=stop`) {
-				this.triggers.push(`"Flags 1" flags`);
-				this.triggers.push(`"Flags 2" flags "ccafter=Flags 1" action=stop`);
+			if (this.triggers[this.triggers.length - 1] != '"Flags 2" flags "ccafter=Flags 1" action=stop') {
+				this.triggers.push('"Flags 1" flags');
+				this.triggers.push('"Flags 2" flags "ccafter=Flags 1" action=stop');
 			}
-		} else if (this.triggers[this.triggers.length - 1] != `"Flags" flags action=stop`) {
-			this.triggers.push(`"Flags" flags action=stop`);
+		} else if (this.triggers[this.triggers.length - 1] != '"Flags" flags action=stop') {
+			this.triggers.push('"Flags" flags action=stop');
 		}
 	}
 
 	removeGenericTriggers() {
-		if (this.triggers[0] == `"Start" load action=force_start`) {this.triggers.splice(0,1)};
-		if (this.triggers[this.triggers.length - 1] == `"Flags" flags action=stop`) {this.triggers.splice(this.triggers.length - 1, 1)};
-		if (this.triggers[this.triggers.length - 1] == `"Flags 2" flags "ccafter=Flags 1" action=stop`) {this.triggers.splice(this.triggers.length - 1, 1)};
-		if (this.triggers[this.triggers.length - 1] == `"Flags 1" flags`) {this.triggers.splice(this.triggers.length - 1, 1)};
+		if (this.triggers[0] == '"Start" load action=force_start') {this.triggers.splice(0,1)};
+		if (this.triggers[this.triggers.length - 1] == '"Flags" flags action=stop') {this.triggers.splice(this.triggers.length - 1, 1)};
+		if (this.triggers[this.triggers.length - 1] == '"Flags 2" flags "ccafter=Flags 1" action=stop') {this.triggers.splice(this.triggers.length - 1, 1)};
+		if (this.triggers[this.triggers.length - 1] == '"Flags 1" flags') {this.triggers.splice(this.triggers.length - 1, 1)};
 	}
 
 	fixTriggers() {
