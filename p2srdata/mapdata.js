@@ -337,7 +337,7 @@ function addMaps() {
 		`"Second Room" entity targetname=drop_box_rl inputname=Trigger`,
 		`"Fizzler" entity targetname=departure_elevator-logic_source_elevator_door_open inputname=Trigger`,
 		`"End" entity targetname=departure_elevator-elevator_doorclose_playerclip inputname=Enable`],
-		`in a dire e[mer]gency`));
+		`In a dire e[mer]gency`));
 	maps.push(new MapFile('sp_a1_intro2', 'Portal Carousel', 1, false, [
 		`"Cube Room" zone center=-31.5,415.97,-12.66 size=66.8,20,102.39 angle=0`,
 		`"Button Room" zone center=-429.57,511.69,-11.92 size=36.8,64.07,110.17 angle=0`,
@@ -411,7 +411,7 @@ function addMaps() {
 		`"Wall Portal" zone center=-32.28,-1382.97,-159.77 size=448.43,113.99,320.45 angle=0`,
 		`"Door Passthrough" entity targetname=departure_elevator-blocked_elevator_tube_anim inputname=Trigger`,
 		`"Elevator Entry" entity targetname=departure_elevator-elevator_doorclose_playerclip inputname=Enable`],
-		`Room full of fair [for] the rest of your life`));
+		`Room full of air [for] the rest of your life`));
 	maps.push(new MapFile('sp_a2_trust_fling', 'Trust Fling', 2, false, [
 		`"Panels Trigger" entity targetname=wall_panel_1-proxy inputname=OnProxyRelay1`,
 		`"Catapult Trigger" entity targetname=flingroom_1_circular_catapult_1_wav_1 inputname=PlaySound`,
