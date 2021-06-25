@@ -53,7 +53,7 @@ class MapFile {
 				case '"Flags 2" flags "ccafter=Flags 1" action=stop':
 					return 'mt_f2';
 				default:
-					return `mt_r ${t}`
+					return `mt_r ${t}`;
 			}
 		}).join('\n')}
 		mt_e
@@ -745,7 +745,7 @@ function addMaps() {
 		`"Cube Button" entity targetname=dropper2-proxy inputname=OnProxyRelay1`,
 		`"Catapult" entity targetname=cat4-proxy inputname=OnProxyRelay1`,
 		`"Door Activation" entity targetname=button3-proxy inputname=OnProxyRelay2`],
-		`Looming consequence of [death]`));
+		`Looming consequence of [d]eath`));
 	maps.push(new MapFile('mp_coop_fling_crushers', 'Fling Crushers', 2, true, [
 		`"Door Activaton" entity targetname=transition_exit_doorway_1 inputname=Open`,
 		`"Catapult" entity targetname=faithplate_crushers-proxy inputname=OnProxyRelay3`,
@@ -822,20 +822,20 @@ function addMaps() {
 		`"Wall Portal" zone center=-477.97,-1759.98,-192.2 size=0,127.23,127.38 angle=0`,
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
 		`"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay2`],
-		`Not sure I trust the two of you [together]`));
+		`I'm not sur[e] I trust the two of you together`));
 	maps.push(new MapFile('mp_coop_tbeam_laser_1', 'Funnel Laser', 4, true, [
 		`"Catapult" entity targetname=faithplate-proxy inputname=OnProxyRelay1`,
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
 		`"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3`],
-		`Doing that just to [aggravate] me`));
+		`Doing that just to aggra[v]ate me`));
 	maps.push(new MapFile('mp_coop_tbeam_polarity', 'Cooperative Polarity', 4, true, [
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
 		`"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3`],
-		`I trust [you]. You are my favorite`));
+		`I trust y[ou]. You are my favorite`));
 	maps.push(new MapFile('mp_coop_tbeam_polarity2', 'Funnel Hop', 4, true, [
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
 		`"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3`],
-		`If [Orange] had said those things about me`));
+		`If [O]range had said those things about me`));
 	maps.push(new MapFile('mp_coop_tbeam_polarity3', 'Advanced Polarity', 4, true, [
 		`"Panel Trigger" entity targetname=platform_exit-proxy inputname=OnProxyRelay1`,
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
@@ -852,7 +852,7 @@ function addMaps() {
 	maps.push(new MapFile('mp_coop_paint_come_along', 'Repulsion Jumps', 5, true, [
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
 		`"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3`],
-		`The best cooperative [testing] team`));
+		`The best cooperative tes[t]ing team`));
 	maps.push(new MapFile('mp_coop_paint_redirect', 'Double Bounce', 5, true, [
 		`"Gel Drop" entity targetname=paint_sprayer inputname=Start`,
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
@@ -862,18 +862,18 @@ function addMaps() {
 		`"Death" zone center=445.29,-681.97,-192.98 size=383.15,1056,120.86 angle=0`,
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
 		`"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3`],
-		`You will need him for the [final] track`));
+		`You will need him for the f[i]nal track`));
 	maps.push(new MapFile('mp_coop_paint_walljumps', 'Wall Repulsion', 5, true, [
 		`"Middle Room Blue" entity targetname=airlock_1-relay_blue_in inputname=Trigger`,
 		`"Middle Room Orange" entity targetname=airlock_1-relay_orange_in inputname=Trigger`,
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
 		`"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3`],
-		`If they ever write a [historical] document of my heroic rescue`));
+		`If they ever write a historica[l] document of my heroic rescue`));
 	maps.push(new MapFile('mp_coop_paint_speed_fling', 'Propulsion Crushers', 5, true, [
 		`"Button Activation" entity targetname=paint_sprayer1_start inputname=Trigger`,
 		`"Shot" zone center=965.34,886.51,-855.54 size=530.44,684.95,77.25 angle=0`,
 		`"Door Activation" entity targetname=ball_button-proxy inputname=OnProxyRelay2`],
-		`If that doesn't [motivate] you`));
+		`If that doesn't moti[v]ate you`));
 	maps.push(new MapFile('mp_coop_paint_red_racer', 'Turret Ninja', 5, true, [
 		`"Cube Drop" entity targetname=cube_dropper inputname=Trigger`,
 		`"Floor Platform" zone center=-1552.37,515.37,-467.6 size=125.8,134.19,88.74 angle=0`,
@@ -899,14 +899,14 @@ function addMaps() {
 		`"Sphere Drop" entity targetname=dispenser_2-proxy inputname=OnProxyRelay1`,
 		`"Button Activation" entity targetname=orange_door_2-proxy inputname=OnProxyRelay1`,
 		`"End Wall" zone center=2816.02,-3135.98,64.44 size=383.9,127.98,128.66 angle=0`],
-		``));
+		`For as long as you [d]id`));
 	maps.push(new MapFile('mp_coop_tripleaxis', 'Triple Axis', 6, true, [
 		`"Crusher" entity targetname=crusher_sequence_start_rl inputname=Trigger`],
-		``));
+		`Solving things in the future, but we [d]on't`));
 	maps.push(new MapFile('mp_coop_catapult_catch', 'Catapult Catch', 6, true, [
 		`"Cube Area" zone center=1103.59,-639.85,-192.12 size=96.77,255.5,127.69 angle=0`,
 		`"Door Activation" entity targetname=exit_door-proxy inputname=OnProxyRelay1`],
-		``));
+		`I'm marking this art [a]ppreciated`));
 	maps.push(new MapFile('mp_coop_2paints_1bridge', 'Bridge Gels', 6, true, [
 		`"Middle Trigger Blue" entity targetname=entry_airlock-relay_blue_in inputname=Trigger`,
 		`"Middle Trigger Orange" entity targetname=entry_airlock-relay_orange_in inputname=Trigger`,
@@ -928,7 +928,7 @@ function addMaps() {
 		`"Bridge Activation" entity targetname=laser_socketed inputname=SetValue`,
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
 		`"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3`],
-		``));
+		`Just to get the scheming juices [f]lowing`));
 	maps.push(new MapFile('mp_coop_laser_tbeam', 'Double Lift', 6, true, [
 		`"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1`,
 		`"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3`],
@@ -938,7 +938,7 @@ function addMaps() {
 		`"Cube Button" entity targetname=cube_dropper_01-proxy inputname=OnProxyRelay1`,
 		`"Slanted Portal" zone center=575.95,95.71,577.8 size=127.83,56.84,114.41 angle=0`,
 		`"Door Activation" entity targetname=@exit_door inputname=Open`],
-		``));
+		`If I don't see you on the other side, [t]hanks for nothing`));
 	maps.push(new MapFile('mp_coop_paint_crazy_box', 'Crazier Box', 6, true, [
 		`"Panels Trigger" entity targetname=exit_button_clips inputname=Disable`,
 		`"Cube Receptacle" entity targetname=team_trigger_door inputname=Enable`,
