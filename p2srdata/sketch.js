@@ -94,5 +94,36 @@ function exportAll() {
 	
 }
 
+function allTriggersByUsage() {
+	let allTriggers = maps.map(e => {return e.triggers.join('\n')}).join('\n').split('\n').sort();
+	let str = allTriggers[0], count = 0, strs = [], counts = [];
+	// count occurences
+	for (let i = 0; i < allTriggers.length; i++) {
+		if (str == allTriggers[i]) {
+			count++;
+		} else {
+			strs.push(str);
+			counts.push(count);
+			count = 1;
+		}
+
+		str = allTriggers[i];
+	}
+	strs.push(str);
+	counts.push(count);
+	// jank as fuck insertion sort
+	// cbf doing this properly
+	for (let i = 0; i < strs.length; i++) {
+		strs[i] = `${counts[i]} occurrence(s) - ${strs[i]}`
+		for (let j = i; j > 0; j--) {
+			if (counts[j] > counts[j - 1]) {
+				[strs[j], strs[j - 1]] = [strs[j - 1], strs[j]];
+				[counts[j], counts[j - 1]] = [counts[j - 1], counts[j]];
+			} else continue;
+		}
+	}
+	console.log(strs.join('\n'));
+}
+
 doStuff();
 
