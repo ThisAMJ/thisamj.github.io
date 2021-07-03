@@ -128,6 +128,14 @@ function saveSplits() {
             }
          } // get runs
 
+         {
+            let pb = [], segments = splits.Run.Segments.Segment;
+            for (let i = 0; i < segments.length; i++) {
+               pb.push(convertTime(segments[i].SplitTimes.SplitTime.GameTime, 1));
+            }
+            zip.file("pb", pb.join("\n"));
+         } // get pb
+
          break;
       default:
          
