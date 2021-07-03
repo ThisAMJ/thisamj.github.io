@@ -94,6 +94,64 @@ function exportAll() {
 	
 }
 
+function allTriggerWordsByUsage() {
+	let allTriggerWords = maps.map(e => {
+		return e.triggers.map(f => {
+			return f.replaceAll(" ", '\n');
+		}).join('\n');
+	}).join('\n').split('\n').sort();
+	//sort by length, descending
+	let a = function(f) {
+		let ret = f;
+		ret = ret.replaceAll("targetname=", "");
+		ret = ret.replaceAll("inputname=", "");
+		ret = ret.replaceAll("center=", "");
+		ret = ret.replaceAll("size=", "");
+		ret = ret.replaceAll("angle=0", "");
+		ret = ret.replaceAll("entity", "");
+		ret = ret.replaceAll("zone", "");
+		ret = ret.replaceAll("portal", "");
+		ret = ret.replaceAll("load", "");
+		return ret;
+	}
+	for (let i = 0; i < allTriggerWords.length; i++) {
+		for (let j = i; j > 0; j--) {
+			let l1 = a(allTriggerWords[j]);
+			let l2 = a(allTriggerWords[j - 1]);
+
+			if (l1.length > l2.length) {
+				[allTriggerWords[j], allTriggerWords[j - 1]] = [allTriggerWords[j - 1], allTriggerWords[j]];
+			} else continue;
+		}
+	}
+	let str = allTriggerWords[0], count = 0, strs = [], counts = [];
+	// count occurrences
+	for (let i = 0; i < allTriggerWords.length; i++) {
+		count = 1
+		while (allTriggerWords[i] == str) {
+			count++;
+			i++;
+		}
+		strs.push(str);
+		counts.push(count);
+		str = allTriggerWords[i];
+	}
+	strs.push(str);
+	counts.push(count);
+	// jank as fuck insertion sort
+	// cbf doing this properly
+	for (let i = 0; i < strs.length; i++) {
+		strs[i] = `${counts[i]} occurrence(s) - ${strs[i]}`
+		for (let j = i; j > 0; j--) {
+			if (counts[j] > counts[j - 1]) {
+				[strs[j], strs[j - 1]] = [strs[j - 1], strs[j]];
+				[counts[j], counts[j - 1]] = [counts[j - 1], counts[j]];
+			} else continue;
+		}
+	}
+	console.log(strs.join('\n'));
+}
+
 function allTriggersByUsage() {
 	let allTriggers = maps.map(e => {return e.triggers.join('\n')}).join('\n').split('\n').sort();
 	let str = allTriggers[0], count = 0, strs = [], counts = [];
