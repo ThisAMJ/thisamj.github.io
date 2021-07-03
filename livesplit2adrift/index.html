@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Livesplit Splits Converter</title>
+		<script src="FileSaver.js"></script>
+		<script src="jszip.js"></script>
+		<script src="xml2json.js"></script>
+		<script src="livesplitconv.js"></script>
+	</head>
+	
+	<body>
+		<input id="file-input" type="file" accept=".lss" onchange="fileSelect(event)"/>
+		<button onclick="saveSplits()">Export Splits</button>
+		<select name="target" id="target">
+			<option value="0">Adrift</option>
+		</select>
+	</body>
+</html>
