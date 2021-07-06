@@ -5,10 +5,10 @@ function compile() {
 
 
 	aliases = [], functions = []
-	let varCount = 0, allowedChars = "1!2@3#4$5%6^7&8*9(0)-_=+qwertyuiop[{]}\\|asdfghjkl:'zxcvbnm,<.>/?";
+	let varCount = 0, allowedChars = "`~1!2@3#4$5%6^7&8*90-_=+qwertyuiop[{]}\\|asdfghjkl:'zxcvbnm,<.>/?";
 	// if you run out of characters, it'll just break :(
 	
-	let txt = ['sar_alias ` sar_alias', '` ~ sar_function'];
+	let txt = ['sar_alias(sar_alias', '()sar_function'];
 	cached = document.querySelector("#txt").value;
 	localStorage.setItem('readableHeader', cached);
 	txt = txt.concat(cached.split("\n"));
@@ -25,18 +25,18 @@ function compile() {
 	{
 		for (let i = 0; i < txt.length; i++) {
 			if (txt[i].startsWith("alias ")) {
-				txt[i] = txt[i].replace("alias ", "` ");
-				let variableName = txt[i].substring(2, txt[i].indexOf(" ", 2));
+				txt[i] = txt[i].replace("alias ", "(");
+				let variableName = txt[i].substring(1, txt[i].indexOf(" "));
 				aliases.push([variableName, allowedChars[varCount]]);
 				varCount++;
 			}
 			if (txt[i].startsWith("funct ")) {
-				txt[i] = txt[i].replace("funct ", "~ ");
-				let variableName = txt[i].substring(2, txt[i].indexOf(" ", 2));
+				txt[i] = txt[i].replace("funct ", ")");
+				let variableName = txt[i].substring(1, txt[i].indexOf(" "));
 				functions.push([variableName, allowedChars[varCount]]);
 				varCount++;
 			}
-			txt[i] = compileVariables(txt[i]).replaceAll(" funct ", " ~ ");
+			txt[i] = compileVariables(txt[i]).replaceAll(" funct ", ")");
 
 
 			let inFunction = functions.filter(e => txt[i].startsWith(e[1] + ' '));
@@ -1131,13 +1131,13 @@ function compile() {
 	if (document.querySelector("#includeFooter").checked) {
 		let footer = [];
 		for (let i = 0; i < aliases.length; i++) {
-			if (footer.indexOf(`\` ${aliases[i][1]}"`) == -1) footer.push(`\` ${aliases[i][1]}"`);
+			if (footer.indexOf(`(${aliases[i][1]}"`) == -1) footer.push(`(${aliases[i][1]}"`);
 		}
 		for (let i = 0; i < functions.length; i++) {
-			if (footer.indexOf(`~ ${functions[i][1]}"`) == -1) footer.push(`~ ${functions[i][1]}"`);
+			if (footer.indexOf(`)${functions[i][1]}"`) == -1) footer.push(`)${functions[i][1]}"`);
 		}
-		footer.push('` ~"');
-		footer.push('` `"');
+		footer.push('()"');
+		footer.push('(("');
 		txt.push(footer.join(";"))
 	} //undefine aliases and functions
 
