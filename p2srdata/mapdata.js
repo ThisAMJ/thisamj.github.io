@@ -23,6 +23,8 @@ class MapFile {
 		this.fade = fade;
 		this.wikicontent = wikicontent;
 		this.cmNative = false;
+		this.addGenericTriggers();
+		this.addTrailingZeroes();
 	}
 
 	selfStr(readable, includeMtriggers, includeWiki) {
@@ -62,18 +64,21 @@ class MapFile {
 			if (line.startsWith('"')) this.triggers.push(line);
 		}
 		this.addGenericTriggers();
+		this.addTrailingZeroes();
 		return this.triggers;
 	}
 
 	addGenericTriggers() {
-		if (this.triggers[0] != '"Start" load action=force_start') this.triggers.splice(0, 0, '"Start" load action=force_start');
-		if (this.coop) {
-			if (this.triggers[this.triggers.length - 1] != '"Flags 2" flags "ccafter=Flags 1" action=stop') {
-				this.triggers.push('"Flags 1" flags');
-				this.triggers.push('"Flags 2" flags "ccafter=Flags 1" action=stop');
+		if (this.triggers.length > 0) {
+			if (this.triggers[0] != '"Start" load action=force_start') this.triggers.splice(0, 0, '"Start" load action=force_start');
+			if (this.coop) {
+				if (this.triggers[this.triggers.length - 1] != '"Flags 2" flags "ccafter=Flags 1" action=stop') {
+					this.triggers.push('"Flags 1" flags');
+					this.triggers.push('"Flags 2" flags "ccafter=Flags 1" action=stop');
+				}
+			} else if (this.triggers[this.triggers.length - 1] != '"Flags" flags action=stop') {
+				this.triggers.push('"Flags" flags action=stop');
 			}
-		} else if (this.triggers[this.triggers.length - 1] != '"Flags" flags action=stop') {
-			this.triggers.push('"Flags" flags action=stop');
 		}
 	}
 
@@ -97,6 +102,27 @@ class MapFile {
 					for (let j = 0; j < values.length; j++) {
 						//toString() removes trailing zeros from a number
 						values[j] = parseFloat(values[j]).toString();
+					}
+					property[1] = values.join(",");
+				}
+				args[i] = property.join("=");
+			}
+			this.triggers[index] = name + " " + args.join(" ");
+		}
+	}
+
+	addTrailingZeroes() {
+		for (let index in this.triggers) {
+			let trigger = this.triggers[index];
+			let name = trigger.substring(0, trigger.indexOf('"', 1) + 1);
+			let args = trigger.substring(trigger.indexOf('"', 1) + 2).split(" ");
+			for (let i = 1; i < args.length; i++) {
+				let property = args[i].split("=");
+				if (property.length > 0 && ["center", "size", "angle"].indexOf(property[0]) > -1) {
+					let values = property[1].split(",");
+					for (let j = 0; j < values.length; j++) {
+						//toString() removes trailing zeros from a number
+						values[j] = parseFloat(values[j]).toFixed(2).toString();
 					}
 					property[1] = values.join(",");
 				}
@@ -950,7 +976,4 @@ function addMaps() {
 		'"Door Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3',
 		'"Blind Shot" entity targetname=bts_wall_undamaged inputname=Disable'],
 		``));
-	for (let map of maps) {
-		map.addGenericTriggers();
-	}
 }
