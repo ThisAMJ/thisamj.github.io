@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Sandbox</title>
+    <meta charset="utf-8" />
+    <script src="prototypes.js"></script>
+    <link rel="shortcut icon" type="image/png" href="https://avatars.githubusercontent.com/u/69196954">
+    <style>
+    	body, textarea {
+    		background: black;
+    		color: white;
+    	}
+      label {
+        margin-left: 100px;
+      }
+	</style>
+  </head>
+  <body>
+  	<b id="txtpre">Readable Header:</b><br>
+
+  	<textarea id="txt" style="width:100%;" rows="34" oninput="txtUpdate()"></textarea><br>
+
+  	<b id="outpre"></b>
+
+    <label for="liveUpdate">Compile live?</label>
+    <input type="checkbox" id="liveUpdate" name="liveUpdate" checked onclick="toggleLiveUpdate()">
+    
+    <button type="button" onclick="compile()" style="visibility:hidden;">Compile</button>
+
+    <label for="includeHeader">Include header?</label>
+    <input type="checkbox" id="includeHeader" name="includeHeader" checked onclick="compile()">
+
+    <label for="includeContent">Include content?</label>
+    <input type="checkbox" id="includeContent" name="includeContent" checked onclick="compile()">
+
+    <label for="includeFooter">Include footer?</label>
+    <input type="checkbox" id="includeFooter" name="includeFooter" checked onclick="compile()"><br>
+
+  	<textarea id="out" readonly style="width:100%;" rows="33"></textarea>
+
+    <script src="sketch.js"></script>
+  </body>
+</html>
