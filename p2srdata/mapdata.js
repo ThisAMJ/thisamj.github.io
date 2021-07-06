@@ -413,8 +413,8 @@ function addMaps() {
 	maps.push(new MapFile('sp_a2_trust_fling', 'Trust Fling', 2, false, [
 		'"Panels Trigger" entity targetname=wall_panel_1-proxy inputname=OnProxyRelay1',
 		'"Catapult Trigger" entity targetname=flingroom_1_circular_catapult_1_wav_1 inputname=PlaySound',
-		'"Button Press" zone center=-107.03,-832.06,383.4 size=41.87,255.82,254.02 angle=0',
-		'"Portal Passthrough" entity targetname=first_press_relay inputname=Trigger',
+		'"Button Press" entity targetname=first_press_relay inputname=Trigger',
+		'"Portal Passthrough" zone center=-107.03,-832.06,383.4 size=41.87,255.82,254.02 angle=0',
 		'"Button Activation" entity targetname=button_1-proxy inputname=OnProxyRelay2'],
 		``));
 	maps.push(new MapFile('sp_a2_pit_flings', 'Pit Flings', 2, false, [
@@ -748,14 +748,18 @@ function addMaps() {
 		'"Door Activation" entity targetname=button3-proxy inputname=OnProxyRelay2'],
 		`Looming consequence of [d]eath`));
 	maps.push(new MapFile('mp_coop_fling_crushers', 'Fling Crushers', 2, true, [
-		'"Door Activaton" entity targetname=transition_exit_doorway_1 inputname=Open',
+		'"Door Activation" entity targetname=transition_exit_doorway_1 inputname=Open',
 		'"Catapult" entity targetname=faithplate_crushers-proxy inputname=OnProxyRelay3',
 		'"Wall Button" entity targetname=relay_crusher_timer_close_solve inputname=Trigger',
 		'"Door Button" entity targetname=transition_exit_doorway_2 inputname=Open',
 		'"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1',
 		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3'],
 		`Earned a break [from] the official testing courses`));
-	maps.push(new MapFile('mp_coop_fan', 'Industrial Fan', 2, true, [],
+	maps.push(new MapFile('mp_coop_fan', 'Industrial Fan', 2, true, [
+		'"Fan Deactivation" entity targetname=@relay_loop_sound_stop inputname=Trigger',
+		'"Door Activation" entity targetname=door-proxy inputname=OnProxyRelay2',
+		'"Final Room Blue" zone center=-640.33,1087.46,233.03 size=8,60.08,114 angle=0 player=0',
+		'"Final Room Orange" zone center=-640.33,1087.46,233.03 size=8,60.08,114 angle=0 player=1'],
 		``));
 	maps.push(new MapFile('mp_coop_wall_intro', 'Cooperative Bridges', 3, true, [
 		'"Starting Wall" zone center=-95.84,-2366.62,-255.72 size=191.61,130.69,254.67 angle=0',
@@ -795,7 +799,8 @@ function addMaps() {
 		'"Door Activation" entity targetname=button-proxy inputname=OnProxyRelay2'],
 		`Reconfigured it from my original [p]lans`));
 	maps.push(new MapFile('mp_coop_turret_ball', 'Turret Assassin', 3, true, [
-		'"Catapult" entity targetname=faith_plate_player-proxy inputname=OnProxyRelay3',
+		'"Catapult Orange" entity targetname=faith_plate_player-relay_up inputname=Trigger',
+		'"Catapult Blue" entity targetname=faith_plate_player-proxy inputname=OnProxyRelay3 "ccafter=Catapult Orange"',
 		'"Middle Trigger Blue" entity targetname=airlock-relay_blue_in inputname=Trigger',
 		'"Middle Trigger Orange" entity targetname=airlock-relay_orange_in inputname=Trigger',
 		'"Portal Entry Blue" zone center=68.67,1440.08,645.06 size=54.6,191.79,185.48 angle=0 player=0',
@@ -845,7 +850,12 @@ function addMaps() {
 		'"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1',
 		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3'],
 		`So I can trust [you] one hundred percent`));
-	maps.push(new MapFile('mp_coop_tbeam_maze', 'Funnel Maze', 4, true, [],
+	maps.push(new MapFile('mp_coop_tbeam_maze', 'Funnel Maze', 4, true, [
+		'"Crouch Fly" fly',
+		'"Cube Grab" entity targetname=cube_dropper_box inputname=Use',
+		'"Button Activation" entity targetname=button_2-proxy inputname=OnProxyRelay2',
+		'"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1',
+		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3'],
 		`Before we can go any further, [*] I will need you to complete`));
 	maps.push(new MapFile('mp_coop_tbeam_end', 'Turret Warehouse', 4, true, [
 		'"Conveyor Hop" zone center=440.75,-105.61,105.85 size=142.44,434.3,203.13 angle=0',
