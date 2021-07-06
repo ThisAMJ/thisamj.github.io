@@ -41,22 +41,9 @@ class MapFile {
 	createMtriggerString() {
 		if (this.triggers.length == 0) return '';
 		return `
-		mt_s "${this.splitname}" map=${this.filename} action=split
-		${this.triggers.map(t => {
-			switch (t.replaceEvery("  ", " ")) {
-				case '"Start" load action=force_start':
-					return 'mt_st';
-				case '"Flags" flags action=stop':
-					return 'mt_f';
-				case '"Flags 1" flags':
-					return 'mt_f1';
-				case '"Flags 2" flags "ccafter=Flags 1" action=stop':
-					return 'mt_f2';
-				default:
-					return `mt_r ${t}`;
-			}
-		}).join('\n')}
-		mt_e
+		sar_speedrun_cc_start "${this.splitname}" map=${this.filename} action=split
+		${this.triggers.map(t => 'sar_speedrun_cc_rule ' + t).join('\n')}
+		sar_speedrun_cc_finish
 		`.replaceAll('\t','').trim();
 	}
 
@@ -75,7 +62,6 @@ class MapFile {
 			if (line.startsWith('"')) this.triggers.push(line);
 		}
 		this.addGenericTriggers();
-		this.fixTriggers();
 		return this.triggers;
 	}
 
@@ -98,7 +84,7 @@ class MapFile {
 		if (this.triggers[this.triggers.length - 1] == '"Flags 1" flags') {this.triggers.splice(this.triggers.length - 1, 1)};
 	}
 
-	fixTriggers() {
+	remTrailingZeroes() {
 		// all this does is remove trailing zeros
 		for (let index in this.triggers) {
 			let trigger = this.triggers[index];
@@ -337,15 +323,15 @@ function addMaps() {
 		'"End" entity targetname=departure_elevator-elevator_doorclose_playerclip inputname=Enable'],
 		`In a dire e[mer]gency`));
 	maps.push(new MapFile('sp_a1_intro2', 'Portal Carousel', 1, false, [
-		'"Cube Room" zone center=-31.5,415.97,-12.66 size=66.8,20,102.39 angle=0',
-		'"Button Room" zone center=-429.57,511.69,-11.92 size=36.8,64.07,110.17 angle=0',
-		'"Ending Room" zone center=-699.63,96.04,-3.06 size=8.68,64.14,107.93 angle=0',
-		'"Exit Door" zone center=-319.62,624.13,-0.38 size=127.17,30.4,127.17 angle=0',
+		'"Cube Room" zone center=-31.50,415.97,-12.66 size=66.80,20.00,102.39 angle=0.00',
+		'"Button Room" zone center=-429.57,511.69,-11.92 size=36.80,64.07,110.17 angle=0.00',
+		'"Ending Room" zone center=-699.63,96.04,-3.06 size=8.68,64.14,107.93 angle=0.00',
+		'"Exit Door" zone center=-319.62,624.13,-0.38 size=127.17,30.40,127.17 angle=0.00',
 		'"End" entity targetname=departure_elevator-close inputname=Trigger'],
 		`Aperture Science Reintegration [As]sociate`));
 	maps.push(new MapFile('sp_a1_intro3', 'Portal Gun', 1, false, [
 		'"Drop Trigger" entity targetname=podium_collapse inputname=EnableRefire',
-		'"Portal Entry" zone center=94.68,2260.19,-192.3 size=103.55,70.96,127.34 angle=0',
+		'"Portal Entry" zone center=94.68,2260.19,-192.30 size=103.55,70.96,127.34 angle=0.00',
 		'"Orange Portal Trigger" entity targetname=room_1_portal_deactivate_rl inputname=Trigger',
 		'"Door Trigger" entity targetname=door_3-proxy inputname=OnProxyRelay2'],
 		`I'm just gonna [wait] for you up ahead`));
@@ -406,7 +392,7 @@ function addMaps() {
 		'"Cube Push" entity targetname=hallway_sim_go inputname=Trigger',
 		'"Catapult Trigger" entity targetname=catapult_target_relay inputname=Trigger',
 		'"Second Catapult Trigger" entity targetname=launch_sound2b inputname=PlaySound',
-		'"Wall Portal" zone center=-32.28,-1382.97,-159.77 size=448.43,113.99,320.45 angle=0',
+		'"Wall Portal" zone center=-32.28,-1382.97,-159.77 size=448.43,113.99,320.45 angle=0.00',
 		'"Door Passthrough" entity targetname=departure_elevator-blocked_elevator_tube_anim inputname=Trigger',
 		'"Elevator Entry" entity targetname=departure_elevator-elevator_doorclose_playerclip inputname=Enable'],
 		`Room full of air [for] the rest of your life`));
@@ -414,7 +400,7 @@ function addMaps() {
 		'"Panels Trigger" entity targetname=wall_panel_1-proxy inputname=OnProxyRelay1',
 		'"Catapult Trigger" entity targetname=flingroom_1_circular_catapult_1_wav_1 inputname=PlaySound',
 		'"Button Press" entity targetname=first_press_relay inputname=Trigger',
-		'"Portal Passthrough" zone center=-107.03,-832.06,383.4 size=41.87,255.82,254.02 angle=0',
+		'"Portal Passthrough" zone center=-107.03,-832.06,383.40 size=41.87,255.82,254.02 angle=0.00',
 		'"Button Activation" entity targetname=button_1-proxy inputname=OnProxyRelay2'],
 		``));
 	maps.push(new MapFile('sp_a2_pit_flings', 'Pit Flings', 2, false, [
@@ -434,14 +420,14 @@ function addMaps() {
 		'"Door Trigger" entity targetname=entry_music inputname=PlaySound',
 		'"Cube Area" entity targetname=juggled_cube_music inputname=PlaySound',
 		'"Catapult Trigger" entity targetname=floor_catapult_1_sound inputname=PlaySound',
-		'"Ending Area" zone center=3357.7,1088.05,-63.97 size=123.03,383.85,895.99 angle=0'],
+		'"Ending Area" zone center=3357.70,1088.05,-63.97 size=123.03,383.85,895.99 angle=0.00'],
 		`I [did] see some humans`));
 	maps.push(new MapFile('sp_a2_bridge_intro', 'Bridge Intro', 3, false, [
 		'"Door Trigger" entity targetname=door_52-proxy inputname=OnProxyRelay2',
 		'"Button Press" entity targetname=autosave inputname=SaveDangerous',
 		'"Cube Portal Passthrough" entity targetname=box_dropper_01-proxy inputname=OnProxyRelay1',
-		'"Player Portal Passthrough" zone center=756.05,63.97,-385.04 size=23.84,127.87,253.99 angle=0',
-		'"End Wall" zone center=192.03,560.02,128.3 size=127.88,31.91,254.69 angle=0'],
+		'"Player Portal Passthrough" zone center=756.05,63.97,-385.04 size=23.84,127.87,253.99 angle=0.00',
+		'"End Wall" zone center=192.03,560.02,128.30 size=127.88,31.91,254.69 angle=0.00'],
 		`Did you guess 'sharks'? Because [that's] wrong`));
 	maps.push(new MapFile('sp_a2_bridge_the_gap', 'Bridge The Gap', 3, false, [
 		'"Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2',
@@ -451,26 +437,26 @@ function addMaps() {
 	maps.push(new MapFile('sp_a2_turret_intro', 'Turret Intro', 3, false, [
 		'"Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2',
 		'"Door Passthrough" entity targetname=aud_VFX.LightFlicker inputname=PlaySound',
-		'"First Portal" zone center=587.4,-1697.66,-75.02 size=22.61,130.61,105.89 angle=0',
-		'"Second Portal" zone center=640.03,-1262.09,-64.1 size=128.01,28.11,127.27 angle=0',
-		'"Floor Portal" zone center=1071.63,-1311.99,-116.33 size=160.02,127.95,23.27 angle=0',
-		'"Cube Room Entry" zone center=332.35,-896.12,128.29 size=24.63,191.52,255.35 angle=0',
-		'"Cube Room Wall" zone center=927.96,-972.34,127.68 size=447.37,39.25,255.3 angle=0',
-		'"Ending Room" zone center=1131.03,-192.36,127.65 size=41.88,382.56,255.23 angle=0'],
+		'"First Portal" zone center=587.40,-1697.66,-75.02 size=22.61,130.61,105.89 angle=0.00',
+		'"Second Portal" zone center=640.03,-1262.09,-64.10 size=128.01,28.11,127.27 angle=0.00',
+		'"Floor Portal" zone center=1071.63,-1311.99,-116.33 size=160.02,127.95,23.27 angle=0.00',
+		'"Cube Room Entry" zone center=332.35,-896.12,128.29 size=24.63,191.52,255.35 angle=0.00',
+		'"Cube Room Wall" zone center=927.96,-972.34,127.68 size=447.37,39.25,255.30 angle=0.00',
+		'"Ending Room" zone center=1131.03,-192.36,127.65 size=41.88,382.56,255.23 angle=0.00'],
 		``));
 	maps.push(new MapFile('sp_a2_laser_relays', 'Laser Relays', 3, false, [
 		'"Floor Panels Trigger" entity targetname=animset01_start_rl inputname=Trigger',
 		'"Laser Switch Glitch" entity targetname=relay3_powered_branch inputname=SetValue',
-		'"Door Entry" zone center=-320.25,-1071.59,63.66 size=127.88,32.77,127.25 angle=0'],
+		'"Door Entry" zone center=-320.25,-1071.59,63.66 size=127.88,32.77,127.25 angle=0.00'],
 		`Technically, it's a [medical] experiment`));
 	maps.push(new MapFile('sp_a2_turret_blocker', 'Turret Blocker', 3, false, [
 		'"Door Trigger" entity targetname=info_sign-proxy inputname=OnProxyRelay1',
 		'"Button Activation" entity targetname=button_1-proxy inputname=OnProxyRelay9'],
 		`A man [and] a woman`));
 	maps.push(new MapFile('sp_a2_laser_vs_turret', 'Laser Vs Turret', 3, false, [
-		'"OOB" zone center=153.49,-234.07,540.65 size=178.91,159.9,87.15 angle=0',
-		'"Lower Landing" zone center=336.95,-264.22,287.42 size=61.89,111.5,122.08 angle=0',
-		'"Re-Entry" zone center=360.34,-359.72,135.35 size=303.26,81.36,46.63 angle=0'],
+		'"OOB" zone center=153.49,-234.07,540.65 size=178.91,159.90,87.15 angle=0.00',
+		'"Lower Landing" zone center=336.95,-264.22,287.42 size=61.89,111.50,122.08 angle=0.00',
+		'"Re-Entry" zone center=360.34,-359.72,135.35 size=303.26,81.36,46.63 angle=0.00'],
 		`[second high note]`));
 	maps.push(new MapFile('sp_a2_pull_the_rug', 'Pull The Rug', 3, false, [
 		'"Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2',
@@ -480,24 +466,24 @@ function addMaps() {
 		`After all [these] years`));
 	maps.push(new MapFile('sp_a2_column_blocker', 'Column Blocker', 4, false, [
 		'"Cutscene Trigger" entity targetname=blackout_lights_off_fade inputname=Fade',
-		'"Observation Room" zone center=-848.5,-33.1,352.35 size=126.94,61.49,190.99 angle=0'],
+		'"Observation Room" zone center=-848.50,-33.10,352.35 size=126.94,61.49,190.99 angle=0.00'],
 		``));
 	maps.push(new MapFile('sp_a2_laser_chaining', 'Laser Chaining', 4, false, [
 		'"Door Entry" entity targetname=music.sp_a2_laser_chaining_b1 inputname=PlaySound',
-		'"Wall Portal" zone center=-367.28,-637.15,640.2 size=33.38,377.5,255.54 angle=0',
+		'"Wall Portal" zone center=-367.28,-637.15,640.20 size=33.38,377.50,255.54 angle=0.00',
 		'"Door Activation" entity targetname=relay_02_indicator inputname=Check',
-		'"Catapult" zone center=548.04,63.63,-11.47 size=151.87,142.84,104.99 angle=0'],
+		'"Catapult" zone center=548.04,63.63,-11.47 size=151.87,142.84,104.99 angle=0.00'],
 		``));
 	maps.push(new MapFile('sp_a2_triple_laser', 'Triple Laser', 4, false, [
 		'"Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2',
-		'"Portal Entry" zone center=7197.16,-5336.25,137.26 size=58.26,123.87,237.42 angle=0',
+		'"Portal Entry" zone center=7197.16,-5336.25,137.26 size=58.26,123.87,237.42 angle=0.00',
 		'"Switch Glitch" entity targetname=@exit_door-testchamber_door inputname=Open'],
 		`Look at things objectively, [see] what you don't need`));
 	maps.push(new MapFile('sp_a2_bts1', 'Jailbreak', 4, false, [
-		'"First Portal Entry" zone center=-9743.78,-479.05,449.45 size=96.38,126.04,129.56 angle=0',
-		'"Railing" zone center=-2825,-1679.5,45 size=62,297,110 angle=0',
-		'"Stairboost" zone center=-465.07,-635.72,72 size=118.08,161.22,239.94 angle=0',
-		'"Last Corner" zone center=818,-989,-11 size=68,132,106 angle=0'],
+		'"First Portal Entry" zone center=-9743.78,-479.05,449.45 size=96.38,126.04,129.56 angle=0.00',
+		'"Railing" zone center=-2825.00,-1679.50,45.00 size=62.00,297.00,110.00 angle=0.00',
+		'"Stairboost" zone center=-465.07,-635.72,72.00 size=118.08,161.22,239.94 angle=0.00',
+		'"Last Corner" zone center=818.00,-989.00,-11.00 size=68.00,132.00,106.00 angle=0.00'],
 		``));
 	maps.push(new MapFile('sp_a2_bts2', 'Escape', 4, false, [
 		'"Turret Trigger" entity targetname=player_clip inputname=Enable',
@@ -506,7 +492,7 @@ function addMaps() {
 		``));
 	maps.push(new MapFile('sp_a2_bts3', 'Turret Factory', 5, false, [
 		'"Landing" entity targetname=lookat_entryhall_target_rl inputname=Trigger',
-		'"Brown Conveyor" zone center=6913.03,884.54,185.12 size=253.88,150.73,77.71 angle=0',
+		'"Brown Conveyor" zone center=6913.03,884.54,185.12 size=253.88,150.73,77.71 angle=0.00',
 		'"Railing" entity targetname=lookat_drop_to_panel_ride_rl inputname=Trigger',
 		'"Tube Room Drop" entity targetname=laser_cutter_room_kill_relay inputname=Trigger',
 		'"Portal Room" entity targetname=@music_sp_a2_bts3_b3 inputname=StopSound',
@@ -548,18 +534,18 @@ function addMaps() {
 		'"Second Button Press" entity targetname=timer1b-TimerStart inputname=OnProxyRelay2'],
 		``));
 	maps.push(new MapFile('sp_a3_03', 'Cave Johnson', 6, false, [
-		'"Catwalk Portal Entry" zone center=-6107.5,279.05,-4800.82 size=72.95,300.99,382.31 angle=0',
-		'"Portal Stand" zone center=-4976.03,1113.87,-2644.6 size=103.94,37.67,138.07 angle=0'],
+		'"Catwalk Portal Entry" zone center=-6107.50,279.05,-4800.82 size=72.95,300.99,382.31 angle=0.00',
+		'"Portal Stand" zone center=-4976.03,1113.87,-2644.60 size=103.94,37.67,138.07 angle=0.00'],
 		``));
 	maps.push(new MapFile('sp_a3_jump_intro', 'Repulsion Intro', 6, false, [
 		'"Lights Trigger" entity targetname=@dark_column_flicker_start inputname=Trigger',
 		'"First Room" entity targetname=ambient_sp_a3_jump_intro_b1 inputname=PlaySound',
 		'"Dropper Activation" entity targetname=room_1_cube_dropper-proxy inputname=OnProxyRelay1',
-		'"Second Floor" zone center=-1172.3,1152,1311.71 size=168.45,255.94,254.77 angle=0',
-		'"Last Portal Passthrough" zone center=-1631.89,797.21,1634.26 size=162.59,58.36,157.63 angle=0'],
+		'"Second Floor" zone center=-1172.30,1152.00,1311.71 size=168.45,255.94,254.77 angle=0.00',
+		'"Last Portal Passthrough" zone center=-1631.89,797.21,1634.26 size=162.59,58.36,157.63 angle=0.00'],
 		`Here's some advice the lab boys gave me [*] do not`));
 	maps.push(new MapFile('sp_a3_bomb_flings', 'Bomb Flings', 6, false, [
-		'"Railing" zone center=-256.1,335.97,-1281.08 size=255.42,351.87,253.79 angle=0',
+		'"Railing" zone center=-256.10,335.97,-1281.08 size=255.42,351.87,253.79 angle=0.00',
 		'"Gel Drop" entity targetname=trigger_to_drop inputname=Trigger'],
 		`Slight chance the [calcium] could harden`));
 	maps.push(new MapFile('sp_a3_crazy_box', 'Crazy Box', 6, false, [
@@ -578,8 +564,8 @@ function addMaps() {
 		'"Ending Portal Entry" zone center=-38.72,-639.96,896.17 size=58.49,127.75,127.29 angle=0'],
 		`With your help, we're gonna change [the] world`));
 	maps.push(new MapFile('sp_a3_speed_flings', 'Propulsion Flings', 7, false, [
-		'"Blue Gel Bounce" zone center=2815.6,-109.17,-303.28 size=192.37,153.96,97.37 angle=0',
-		'"Ramp" zone center=3358.64,1153,127.56 size=61.32,253.94,378.9 angle=0'],
+		'"Blue Gel Bounce" zone center=2815.60,-109.17,-303.28 size=192.37,153.96,97.37 angle=0.00',
+		'"Ramp" zone center=3358.64,1153.00,127.56 size=61.32,253.94,378.90 angle=0.00'],
 		`I mentioned earlier. [Again]: all you gotta do`));
 	maps.push(new MapFile('sp_a3_portal_intro', 'Conversion Intro', 7, false, [
 		'"First Room" entity targetname=1970s_door1door_lower inputname=Close',
@@ -588,11 +574,11 @@ function addMaps() {
 		'"Second Door Open" entity targetname=liftshaft_entrance_door-door_open inputname=Trigger'],
 		``));
 	maps.push(new MapFile('sp_a3_end', 'Three Gels', 7, false, [
-		'"Fling" zone center=-1105.75,256.12,-3879.9 size=99.12,191.69,127.73 angle=0',
+		'"Fling" zone center=-1105.75,256.12,-3879.90 size=99.12,191.69,127.73 angle=0.00',
 		'"Ending Fling" entity targetname=helper01 inputname=Disable'],
 		``));
 	maps.push(new MapFile('sp_a4_intro', 'Test', 8, false, [
-		'"Start Dialogue" zone center=-992,-480,320 size=128,128,192 angle=0',
+		'"Start Dialogue" zone center=-992.00,-480.00,320.00 size=128.00,128.00,192.00 angle=0.00',
 		'"Cube Throw" entity targetname=@exit_door1-player_in_door_trigger inputname=Enable',
 		'"Enter Elevator" entity targetname=test_chamber1_slow_relay inputname=Trigger',
 		'"First Solve" entity targetname=@exit_door2-proxy inputname=OnProxyRelay1',
@@ -601,8 +587,8 @@ function addMaps() {
 		`Paradox idea didn't work. [And] it almost killed me`));
 	maps.push(new MapFile('sp_a4_tb_intro', 'Funnel Intro', 8, false, [
 		'"First Room" entity targetname=arrival_elevator-signs_off inputname=Trigger',
-		'"Zone" zone center=2015.92,733.66,-258.67 size=64.1,580.63,506.26 angle=0',
-		'"Reportal" zone center=1312.19,384.22,415.43 size=64.33,256.38,253.77 angle=0',
+		'"Zone" zone center=2015.92,733.66,-258.67 size=64.10,580.63,506.26 angle=0.00',
+		'"Reportal" zone center=1312.19,384.22,415.43 size=64.33,256.38,253.77 angle=0.00',
 		'"Door Activation" entity targetname=button_1_pressed inputname=Trigger'],
 		`The good [news] is... well, none so far`));
 	maps.push(new MapFile('sp_a4_tb_trust_drop', 'Ceiling Button', 8, false, [
@@ -631,15 +617,15 @@ function addMaps() {
 		`No. [No]. That was the solution`));
 	maps.push(new MapFile('sp_a4_laser_catapult', 'Laser Catapult', 8, false, [
 		'"Test Start" entity targetname=diag_laser_catapult_test_start inputname=Trigger',
-		'"Floor Portal Passthrough" zone center=-255.88,-319.92,40.65 size=127.91,127.98,65.24 angle=0'],
+		'"Floor Portal Passthrough" zone center=-255.88,-319.92,40.65 size=127.91,127.98,65.24 angle=0.00'],
 		`Maintain any of the [crucial] functions required`));
 	maps.push(new MapFile('sp_a4_laser_platform', 'Laser Platform', 8, false, [
 		'"Button Press" entity targetname=box_drop_relay inputname=Trigger',
 		'"Door Activation" entity targetname=exit_check inputname=Check'],
 		``));
 	maps.push(new MapFile('sp_a4_speed_tb_catch', 'Propulsion Catch', 8, false, [
-		'"Chamber Trigger" zone center=-608.05,1675.93,-127.98 size=287.79,104.09,127.98 angle=0',
-		'"Ramp" zone center=-977.54,1322.84,153.57 size=48.93,362.86,193.93 angle=0'],
+		'"Chamber Trigger" zone center=-608.05,1675.93,-127.98 size=287.79,104.09,127.98 angle=0.00',
+		'"Ramp" zone center=-977.54,1322.84,153.57 size=48.93,362.86,193.93 angle=0.00'],
 		`Gonna love it, to [*] death`));
 	maps.push(new MapFile('sp_a4_jump_polarity', 'Repulsion Polarity', 8, false, [
 		'"Pipe Trigger" entity targetname=diag_jump_polarity_sorry inputname=Trigger',
@@ -672,8 +658,8 @@ function addMaps() {
 	maps.push(new MapFile('mp_coop_start', 'Calibration', 0, true, [],
 		``));
 	maps.push(new MapFile('mp_coop_doors', 'Doors', 1, true, [
-		'"Portal" portal center=-10272.05,-544.03,64.15 size=127.9,1,127.99 angle=0',
-		'"Portal Entry" zone center=-10272.05,-574.78,64.15 size=127.9,61.5,127.99 angle=0',
+		'"Portal" portal center=-10272.05,-544.03,64.15 size=127.90,1.00,127.99 angle=0.00',
+		'"Portal Entry" zone center=-10272.05,-574.78,64.15 size=127.90,61.50,127.99 angle=0.00',
 		'"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1',
 		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3'],
 		``));
@@ -695,11 +681,11 @@ function addMaps() {
 		`One of you is doing very [v]ery well`));
 	maps.push(new MapFile('mp_coop_rat_maze', 'Rat Maze', 1, true, [
 		'"Maze" entity targetname=blue_player_points_rl inputname=Enable',
-		'"End Portal" zone center=-254.71,-223.75,-416.04 size=66.51,127.81,127.51 angle=0',
+		'"End Portal" zone center=-254.71,-223.75,-416.04 size=66.51,127.81,127.51 angle=0.00',
 		'"Door Activation" entity targetname=@exit_door inputname=Open'],
 		`Reflected in your final [sc]ore`));
 	maps.push(new MapFile('mp_coop_laser_crusher', 'Laser Crusher', 1, true, [
-		'"End Hop" zone center=2630.95,-1135.87,80.33 size=77.85,287.33,161.4 angle=0',
+		'"End Hop" zone center=2630.95,-1135.87,80.33 size=77.85,287.33,161.40 angle=0.00',
 		'"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1',
 		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3'],
 		`Not just flattery, you are gre[a]t at science`));
@@ -708,11 +694,11 @@ function addMaps() {
 		'"Lever 2" entity targetname=lever_2-proxy inputname=OnProxyRelay3'],
 		``));
 	maps.push(new MapFile('mp_coop_fling_3', 'Flings', 2, true, [
-		'"Blue Start" zone center=223.69,911.99,288 size=64.44,415.94,319.94 angle=0 player=0',
-		'"Orange Start" zone center=223.69,911.99,288 size=64.44,415.94,319.94 angle=0 player=1',
+		'"Blue Start" zone center=223.69,911.99,288.00 size=64.44,415.94,319.94 angle=0.00 player=0',
+		'"Orange Start" zone center=223.69,911.99,288.00 size=64.44,415.94,319.94 angle=0.00 player=1',
 		'"Middle Trigger Blue" entity targetname=airlock_2-relay_blue_in inputname=Trigger',
 		'"Middle Trigger Orange" entity targetname=airlock_2-relay_orange_in inputname=Trigger',
-		'"Wall Portal Exit" zone center=297.39,-384.02,704 size=41.16,127.86,127.93 angle=0',
+		'"Wall Portal Exit" zone center=297.39,-384.02,704.00 size=41.16,127.86,127.93 angle=0.00',
 		'"Door Activation" entity targetname=button_ball-proxy inputname=OnProxyRelay2'],
 		`Exactly fit an edgeless safet[y] cube`));
 	maps.push(new MapFile('mp_coop_infinifling_train', 'Infinifling', 2, true, [
@@ -724,18 +710,18 @@ function addMaps() {
 	maps.push(new MapFile('mp_coop_come_along', 'Team Retrieval', 2, true, [
 		'"Panels" entity targetname=button1-proxy inputname=OnProxyRelay1',
 		'"Sphere Button" entity targetname=trigger_slimeroom_drop_ball-proxy inputname=OnProxyRelay1',
-		'"Floor Portal" zone center=1023.93,1696.03,-352 size=127.74,127.57,155.94 angle=0',
+		'"Floor Portal" zone center=1023.93,1696.03,-352.00 size=127.74,127.57,155.94 angle=0.00',
 		'"Door Activation" entity targetname=button2-proxy inputname=OnProxyRelay1'],
 		``));
 	maps.push(new MapFile('mp_coop_fling_1', 'Vertical Flings', 2, true, [
-		'"Portal Entry" zone center=607.94,63.93,-123.93 size=127.81,127.8,68.05 angle=0',
+		'"Portal Entry" zone center=607.94,63.93,-123.93 size=127.81,127.80,68.05 angle=0.00',
 		'"Button 1" entity targetname=race_button_1_checkmark inputname=Start',
 		'"Button 2" entity targetname=race_button_2_checkmark inputname=Start',
 		'"Door Activation" entity targetname=ball_button-proxy inputname=OnProxyRelay2'],
 		``));
 	maps.push(new MapFile('mp_coop_catapult_1', 'Catapults', 2, true, [
 		'"Catapult" entity targetname=catapult_3-proxy inputname=OnProxyRelay3',
-		'"Re-Entry" zone center=830.52,288.26,511.57 size=252.98,190.4,127.08 angle=0',
+		'"Re-Entry" zone center=830.52,288.26,511.57 size=252.98,190.40,127.08 angle=0.00',
 		'"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1',
 		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3'],
 		``));
@@ -758,11 +744,11 @@ function addMaps() {
 	maps.push(new MapFile('mp_coop_fan', 'Industrial Fan', 2, true, [
 		'"Fan Deactivation" entity targetname=@relay_loop_sound_stop inputname=Trigger',
 		'"Door Activation" entity targetname=door-proxy inputname=OnProxyRelay2',
-		'"Final Room Blue" zone center=-640.33,1087.46,233.03 size=8,60.08,114 angle=0 player=0',
-		'"Final Room Orange" zone center=-640.33,1087.46,233.03 size=8,60.08,114 angle=0 player=1'],
+		'"Final Room Blue" zone center=-640.33,1087.46,233.03 size=8.00,60.08,114.00 angle=0.00 player=0',
+		'"Final Room Orange" zone center=-640.33,1087.46,233.03 size=8.00,60.08,114.00 angle=0.00 player=1'],
 		``));
 	maps.push(new MapFile('mp_coop_wall_intro', 'Cooperative Bridges', 3, true, [
-		'"Starting Wall" zone center=-95.84,-2366.62,-255.72 size=191.61,130.69,254.67 angle=0',
+		'"Starting Wall" zone center=-95.84,-2366.62,-255.72 size=191.61,130.69,254.67 angle=0.00',
 		'"Middle Trigger Blue" entity targetname=airlock_1-relay_blue_in inputname=Trigger',
 		'"Middle Trigger Orange" entity targetname=airlock_1-relay_orange_in inputname=Trigger',
 		'"Catapult" entity targetname=faith_plate-proxy inputname=OnProxyRelay3',
@@ -803,8 +789,8 @@ function addMaps() {
 		'"Catapult Blue" entity targetname=faith_plate_player-proxy inputname=OnProxyRelay3 "ccafter=Catapult Orange"',
 		'"Middle Trigger Blue" entity targetname=airlock-relay_blue_in inputname=Trigger',
 		'"Middle Trigger Orange" entity targetname=airlock-relay_orange_in inputname=Trigger',
-		'"Portal Entry Blue" zone center=68.67,1440.08,645.06 size=54.6,191.79,185.48 angle=0 player=0',
-		'"Portal Entry Orange" zone center=68.67,1440.08,645.06 size=54.6,191.79,185.48 angle=0 player=1'],
+		'"Portal Entry Blue" zone center=68.67,1440.08,645.06 size=54.60,191.79,185.48 angle=0.00 player=0',
+		'"Portal Entry Orange" zone center=68.67,1440.08,645.06 size=54.60,191.79,185.48 angle=0.00 player=1'],
 		`You would've never completed them. So [a]gain`));
 	maps.push(new MapFile('mp_coop_wall_5', 'Bridge Testing', 3, true, [
 		'"First Room" entity targetname=Ptemplate_ball_training inputname=ForceSpawn',
@@ -825,8 +811,8 @@ function addMaps() {
 		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3'],
 		`There. [I've] said it`));
 	maps.push(new MapFile('mp_coop_tbeam_catch_grind_1', 'Funnel Catch (MP)', 4, true, [
-		'"Portal" portal center=-384,-1151.25,250 size=127.38,127.38,25 angle=0',
-		'"Wall Portal Exit" zone center=-472.97,-1759.98,-192.2 size=10,127.23,127.38 angle=0',
+		'"Portal" portal center=-384.00,-1151.25,250.00 size=127.38,127.38,25.00 angle=0.00',
+		'"Wall Portal Exit" zone center=-472.97,-1759.98,-192.20 size=10.00,127.23,127.38 angle=0.00',
 		'"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1',
 		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay2'],
 		`I'm not sur[e] I trust the two of you together`));
@@ -858,8 +844,8 @@ function addMaps() {
 		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3'],
 		`Before we can go any further, [*] I will need you to complete`));
 	maps.push(new MapFile('mp_coop_tbeam_end', 'Turret Warehouse', 4, true, [
-		'"Conveyor Hop" zone center=440.75,-105.61,105.85 size=142.44,434.3,203.13 angle=0',
-		'"Wall Portal Exit" zone center=1760.36,188.87,160 size=319.23,134.2,127.33 angle=0',
+		'"Conveyor Hop" zone center=440.75,-105.61,105.85 size=142.44,434.30,203.13 angle=0.00',
+		'"Wall Portal Exit" zone center=1760.36,188.87,160.00 size=319.23,134.20,127.33 angle=0.00',
 		'"Blue Funnel Exit" entity targetname=relay_blue_in inputname=Trigger',
 		'"Orange Funnel Exit" entity targetname=relay_orange_in inputname=Trigger'],
 		``));
@@ -873,7 +859,7 @@ function addMaps() {
 		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3'],
 		`The number one request? [*] Less deadly tests`));
 	maps.push(new MapFile('mp_coop_paint_bridge', 'Bridge Repulsion', 5, true, [
-		'"Long Shot" portal center=-635,-192,575 size=10,128,128 angle=0',
+		'"Long Shot" portal center=-635.00,-192.00,575.00 size=10.00,128.00,128.00 angle=0.00',
 		'"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1',
 		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3'],
 		`You will need him for the f[i]nal track`));
@@ -885,26 +871,26 @@ function addMaps() {
 		`If they ever write a historica[l] document of my heroic rescue`));
 	maps.push(new MapFile('mp_coop_paint_speed_fling', 'Propulsion Crushers', 5, true, [
 		'"Button Activation" entity targetname=paint_sprayer1_start inputname=Trigger',
-		'"Portal" portal center=-897.5,127.23,-321.72 size=10,128,128 angle=0',
+		'"Portal" portal center=-897.50,127.23,-321.72 size=10.00,128.00,128.00 angle=0.00',
 		'"Door Activation" entity targetname=ball_button-proxy inputname=OnProxyRelay2'],
 		`If that doesn't moti[v]ate you`));
 	maps.push(new MapFile('mp_coop_paint_red_racer', 'Turret Ninja', 5, true, [
 		'"Cube Drop" entity targetname=cube_dropper inputname=Trigger',
-		'"Floor Platform" zone center=-1552.37,515.37,-467.6 size=125.8,134.19,88.74 angle=0',
-		'"Gravity Trigger" zone center=-1308,512,346 size=616,128,28 angle=0',
+		'"Floor Platform" zone center=-1552.37,515.37,-467.60 size=125.80,134.19,88.74 angle=0.00',
+		'"Gravity Trigger" zone center=-1308.00,512.00,346.00 size=616.00,128.00,28.00 angle=0.00',
 		'"Door Activation" entity targetname=team_trigger_door inputname=Enable',
 		'"End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1',
 		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3'],
 		`Are you [as] excited as I am?`));
 	maps.push(new MapFile('mp_coop_paint_speed_catch', 'Propulsion Retrieval', 5, true, [
 		'"Gel Drop" entity targetname=paint_sprayer2_start inputname=Trigger',
-		'"Slanted Portal Exit" zone center=704,566.96,347.91 size=126.93,63.65,110.27 angle=0',
+		'"Slanted Portal Exit" zone center=704.00,566.96,347.91 size=126.93,63.65,110.27 angle=0.00',
 		'"Panels" entity targetname=platform_button inputname=Press',
 		'"Cube Drop" entity targetname=box_buttons inputname=Press',
 		'"Door Activation" entity targetname=sphere_button-proxy inputname=OnProxyRelay2'],
 		`The ratio of humans to monsters is about [*] a million to one.`));
 	maps.push(new MapFile('mp_coop_paint_longjump_intro', 'Vault Entrance', 5, true, [
-		'"Second Room" zone center=304,-4547.79,961.06 size=287.95,120.36,125.74 angle=0',
+		'"Second Room" zone center=304.00,-4547.79,961.06 size=287.95,120.36,125.74 angle=0.00',
 		'"Gel Drop" entity targetname=relay_paint_start_2 inputname=Trigger'],
 		``));
 	maps.push(new MapFile('mp_coop_separation_1', 'Separation', 6, true, [
@@ -912,7 +898,7 @@ function addMaps() {
 		'"Door Activation" entity targetname=camera_triggers inputname=Enable',
 		'"Sphere Drop" entity targetname=dispenser_2-proxy inputname=OnProxyRelay1',
 		'"Button Activation" entity targetname=orange_door_2-proxy inputname=OnProxyRelay1',
-		'"End Wall" zone center=2816.02,-3135.98,64.44 size=383.9,127.98,128.66 angle=0'],
+		'"End Wall" zone center=2816.02,-3135.98,64.44 size=383.90,127.98,128.66 angle=0.00'],
 		`For as long as you [d]id`));
 	maps.push(new MapFile('mp_coop_tripleaxis', 'Triple Axis', 6, true, [
 		'"Crusher" entity targetname=crusher_sequence_start_rl inputname=Trigger',
@@ -920,7 +906,7 @@ function addMaps() {
 		'"Crouch Fly Orange" fly player=1'],
 		`Solving things in the future, but we [d]on't`));
 	maps.push(new MapFile('mp_coop_catapult_catch', 'Catapult Catch', 6, true, [
-		'"Cube Area" zone center=1103.59,-639.85,-192.12 size=96.77,255.5,127.69 angle=0',
+		'"Cube Area" zone center=1103.59,-639.85,-192.12 size=96.77,255.50,127.69 angle=0.00',
 		'"Door Activation" entity targetname=exit_door-proxy inputname=OnProxyRelay1'],
 		`I'm marking this art [a]ppreciated`));
 	maps.push(new MapFile('mp_coop_2paints_1bridge', 'Bridge Gels', 6, true, [
@@ -931,14 +917,14 @@ function addMaps() {
 		'"End Trigger Orange" entity targetname=chamber_exit_door-team_proxy inputname=OnProxyRelay3'],
 		``));
 	maps.push(new MapFile('mp_coop_paint_conversion', 'Maintenance', 6, true, [
-		'"Portal Room" zone center=-1378.28,3262.04,182.64 size=187.19,316.02,124.72 angle=0',
-		'"Elevator" zone center=-1873.3,4928.08,-1312.67 size=1054.17,127.79,318.6 angle=0',
+		'"Portal Room" zone center=-1378.28,3262.04,182.64 size=187.19,316.02,124.72 angle=0.00',
+		'"Elevator" zone center=-1873.30,4928.08,-1312.67 size=1054.17,127.79,318.60 angle=0.00',
 		'"Fall" entity targetname=disassembler_start_relay inputname=Trigger',
 		'"End Area" entity targetname=paint_sprayer_white inputname=Start',
 		'"Stairs" entity targetname=ramp_up_relay inputname=Trigger'],
 		``));
 	maps.push(new MapFile('mp_coop_bridge_catch', 'Bridge Catch', 6, true, [
-		'"Button" zone center=146.89,1343.92,14.03 size=37.33,127.5,12 angle=0',
+		'"Button" zone center=146.89,1343.92,14.03 size=37.33,127.50,12.00 angle=0.00',
 		'"Laser Catapult" entity targetname=catapult_1_wav inputname=PlaySound',
 		'"Catapult" entity targetname=catapult_1_wav2 inputname=PlaySound',
 		'"Bridge Activation" entity targetname=laser_socketed inputname=SetValue',
@@ -952,9 +938,9 @@ function addMaps() {
 		'"End Trigger Orange" entity targetname=team_door-team_proxy inputname=OnProxyRelay3'],
 		``));
 	maps.push(new MapFile('mp_coop_paint_rat_maze', 'Gel Maze', 6, true, [
-		'"Portal Entry" zone center=-573.35,-0.1,703.71 size=69.24,255.73,127.07 angle=0',
+		'"Portal Entry" zone center=-573.35,-0.10,703.71 size=69.24,255.73,127.07 angle=0.00',
 		'"Cube Button" entity targetname=cube_dropper_01-proxy inputname=OnProxyRelay1',
-		'"Slanted Portal" zone center=575.95,95.71,577.8 size=127.83,56.84,114.41 angle=0',
+		'"Slanted Portal" zone center=575.95,95.71,577.80 size=127.83,56.84,114.41 angle=0.00',
 		'"Door Activation" entity targetname=@exit_door inputname=Open'],
 		`If I don't see you on the other side, [t]hanks for nothing`));
 	maps.push(new MapFile('mp_coop_paint_crazy_box', 'Crazier Box', 6, true, [

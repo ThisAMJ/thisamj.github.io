@@ -43,32 +43,14 @@ function creationString(readable, includeMtriggers, includeWiki) {
 	console.log(maps.map(e => {return `maps.push(${e.selfStr(readable, includeMtriggers, includeWiki)});`}).join("\n"));
 }
 
+function removeAllTrailingZeroes() {
+	maps.forEach(e => e.remTrailingZeroes());
+}
+
 function exportAll() {
 	let t = [];
 	{
-		t = maps.map(e => {return e.createMtriggerString()}).filter(e => e != '').join('\n\n').padByDelim('"');
-		
-		t = t.replaceAll("\nmt_st", "; mt_st");
-		t = t.replaceAll("mt_f\nmt_e", "mt_f; mt_e");
-		t = t.replaceAll("mt_f1\nmt_f2\nmt_e", "mt_f1; mt_f2; mt_e");
-
-		t = `
-		sar_alias mt_s  sar_speedrun_cc_start
-		sar_alias mt_r  sar_speedrun_cc_rule
-		sar_alias mt_st mt_r "Start" load action=force_start
-		sar_alias mt_f  mt_r "Flags" flags action=stop
-		sar_alias mt_f1 mt_r "Flags 1" flags
-		sar_alias mt_f2 mt_r "Flags 2" flags "ccafter=Flags 1" action=stop
-		sar_alias mt_e  sar_speedrun_cc_finish
-		`.replaceAll('\t','').trim() + '\n\n' + t + '\n\n' + `
-		sar_alias mt_s  nop
-		sar_alias mt_st nop
-		sar_alias mt_r  nop
-		sar_alias mt_f  nop
-		sar_alias mt_f1 nop
-		sar_alias mt_f2 nop
-		sar_alias mt_e  nop
-		`.replaceAll('\t','').trim();
+		t = maps.map(e => e.createMtriggerString()).filter(e => e != '').join('\n\n').padByDelim('"');
 
 		console.log(t);
 		t.clip(); // copy categories to clipboard
