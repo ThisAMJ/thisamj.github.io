@@ -1,6 +1,7 @@
 let aliases = [], functions = [];
+let targetnames = [], inputnames = [], trigEnds = [];
 function compile() {
-
+	targetnames = [], inputnames = [], trigEnds = [];
 
 
 	aliases = [], functions = []
@@ -1022,6 +1023,43 @@ function compile() {
 							} // Middle Trigger Blue/Orange
 
 
+							//You can try to shuffle these around to optimise the usage better, I think I've done pretty well
+							let shortcuts = [
+							["%TargetNamePlayerClip%"   , ""             , "departure_elevator-elevator_doorclose_playerclip", ""             ],
+							["%TargetNameAirlockOrange%", ""             , "airlock_1-relay_orange_in"                       , ""             ],
+							["%InputNameOnProxyRelay1%" , ""             , ""                                                , "OnProxyRelay1"],
+							["%InputNameOnProxyRelay2%" , ""             , ""                                                , "OnProxyRelay2"],
+							["%InputNamePlaySound%"     , ""             , ""                                                , "PlaySound"    ],
+							["%InputNameTrigger%"       , ""             , ""                                                , "Trigger"      ],
+							["%NameEndsWithActivation%" , " Activation\"", ""                                                , ""             ],
+							["%InputNameOnProxyRelay3%" , ""             , ""                                                , "OnProxyRelay3"],
+							["%InputNameEnable%"        , ""             , ""                                                , "Enable"       ],
+							["%InputNameStart%"         , ""             , ""                                                , "Start"        ],
+							["%InputNameTurnOn%"        , ""             , ""                                                , "TurnOn"       ],
+							["%InputNameDisable%"       , ""             , ""                                                , "Disable"      ],
+							["%NameEndsWithRoom%"       , " Room\""      , ""                                                , ""             ],
+							["%InputNameOpen%"          , ""             , ""                                                , "Open"         ],
+							]
+							for (let j = 0; j < shortcuts.length; j++) {
+								let i1 = 1;
+								while (shortcuts[j][i1] == "") i1++;
+
+								ind = i1 == 1 ? 1 : i1 + 1;
+								if (ind < args.length) {
+									if (args[ind].endsWith(shortcuts[j][i1])) {
+										args[0] = shortcuts[j][0];
+										args[ind] = "";
+									}
+								}
+							}
+							if (args[0] == "%entityRule%") {
+								targetnames.push(args[3]);
+								inputnames.push(args[4]);
+								let s = args[1].split(" ");
+								if (s.length > 1) {
+									trigEnds.push(s[s.length - 1])
+								}
+							}
 
 							break;
 						case "zone":
@@ -1105,6 +1143,26 @@ function compile() {
 
 	document.querySelector("#out").value = txt.join("\n");
 	document.querySelector("#outpre").innerHTML = `Compiled: (${txt.join("\n").length} bytes)`;
+
+	console.clear();
+	console.log("Trigger ending words:\n" + sortByOccurrences(trigEnds));
+	console.log("Targetnames:\n" + sortByOccurrences(targetnames));
+	console.log("Inputnames:\n" + sortByOccurrences(inputnames));
+}
+
+function sortByOccurrences(arr) {
+	let a = arr.sort(), b = [], t = a[0], count = 0;
+	for (let i = 0; i < a.length; i++) {
+		if (a[i] == t) {
+			count++;
+		} else {
+			b.push([t, (count - 1) * t.length]);
+			count = 1;
+		}
+		t = a[i];
+	}
+	b.sort((a, b) => {return b[1] - a[1]});
+	return b.map(e => `${e[1]} weight : ${e[0]}`).filter(e => parseInt(e.split(" ")[0]) > 1).join("\n");
 }
 
 function cV(txt) {
