@@ -24,9 +24,19 @@ function compile() {
 	let varCount = [0, 0];
 	
 	let txt = ['sar_alias(sar_alias', '()sar_function'];
-	cached = document.querySelector("#txt").value;
-	localStorage.setItem('readableHeader', cached);
-	txt = txt.concat(cached.split("\n"));
+
+	localStorage.setItem('readableHeader', document.querySelector("#txt").value);
+	localStorage.setItem('compileLive',    document.querySelector("#liveUpdate").checked);
+	localStorage.setItem('includeHeader',  document.querySelector("#includeHeader").checked);
+	localStorage.setItem('includeContent', document.querySelector("#includeContent").checked);
+	localStorage.setItem('includeFooter',  document.querySelector("#includeFooter").checked);
+	localStorage.setItem('flattenHeader',  document.querySelector("#flattenHeader").checked);
+	localStorage.setItem('flattenContent', document.querySelector("#flattenContent").checked);
+	localStorage.setItem('flattenFooter',  document.querySelector("#flattenFooter").checked);
+	localStorage.setItem('regularChars',   document.querySelector("#regulChars").value);
+	localStorage.setItem('breakChars',     document.querySelector("#breakChars").value);
+
+	txt = txt.concat(document.querySelector("#txt").value.split("\n"));
 
 	{
 		for (let i = 0; i < txt.length; i++) {
@@ -1319,7 +1329,21 @@ function toggleLiveUpdate() {
 	document.querySelector("button").style.visibility = document.querySelector("#liveUpdate").checked ? "hidden" : "visible";
 }
 
-let cached = localStorage.getItem('readableHeader');
-if (cached == null) document.querySelector("#txt").value = "// Readable header goes here!";
-else document.querySelector("#txt").value = cached;
+function readStorage(key, fallback) {
+	let storage = localStorage.getItem(key);
+	return storage == null ? fallback : storage;
+}
+
+document.querySelector("#txt").value              = readStorage('readableHeader', '// Readable header goes here!');
+document.querySelector("#liveUpdate").checked     = readStorage('compileLive',    'true') == 'true';
+document.querySelector("#includeHeader").checked  = readStorage('includeHeader',  'true') == 'true';
+document.querySelector("#includeContent").checked = readStorage('includeContent', 'true') == 'true';
+document.querySelector("#includeFooter").checked  = readStorage('includeFooter',  'true') == 'true';
+document.querySelector("#flattenHeader").checked  = readStorage('flattenHeader',  'true') == 'true';
+document.querySelector("#flattenContent").checked = readStorage('flattenContent', 'true') == 'true';
+document.querySelector("#flattenFooter").checked  = readStorage('flattenFooter',  'true') == 'true';
+document.querySelector("#regulChars").value       = readStorage('regularChars',   '[]');
+document.querySelector("#breakChars").value       = readStorage('breakChars',     '{}');
+	
+
 compile();
