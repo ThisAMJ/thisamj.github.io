@@ -1,12 +1,27 @@
-let aliases = [], functions = [];
-let targetnames = [], inputnames = [], trigEnds = [];
+//Todo: Find most commonly used functions and use breakset automatically
+
+var aliases = [], functions = [];
+var targetnames = [], inputnames = [], trigEnds = [];
+var allowedChars = [
+		"!#$%&*+,-./0123456789<=>?@[\\]^_`abcdefghijklmnopqrstuvwxyz|~", // regular variable names
+		"{}:'"]; // break set (separate arguments, use on 4 most high traffic variables)
+var canvas = document.querySelector("canvas");;
+
 function compile() {
-	targetnames = [], inputnames = [], trigEnds = [];
+	let flattenHeader = document.querySelector("#flattenHeader").checked;
+	let flattenContent = document.querySelector("#flattenContent").checked;
+	let flattenFooter = document.querySelector("#flattenFooter").checked;
+	document.querySelector("label[for=\"flattenHeader\"]").style.display = document.querySelector("#includeHeader").checked ? "inline" : "none";
+	document.querySelector("label[for=\"flattenContent\"]").style.display = document.querySelector("#includeContent").checked ? "inline" : "none";
+	document.querySelector("label[for=\"flattenFooter\"]").style.display = document.querySelector("#includeFooter").checked ? "inline" : "none";
+	document.querySelector("#flattenHeader").style.display = document.querySelector("#includeHeader").checked ? "inline" : "none";
+	document.querySelector("#flattenContent").style.display = document.querySelector("#includeContent").checked ? "inline" : "none";
+	document.querySelector("#flattenFooter").style.display = document.querySelector("#includeFooter").checked ? "inline" : "none";
 
 
 	aliases = [], functions = []
-	let varCount = 0, allowedChars = "`~1!2@3#4$5%6^7&8*90-_=+qwertyuiop[{]}\\|asdfghjkl:'zxcvbnm,<.>/?";
-	// if you run out of characters, it'll just break :(
+	targetnames = [], inputnames = [], trigEnds = [];
+	let varCount = [0, 0];
 	
 	let txt = ['sar_alias(sar_alias', '()sar_function'];
 	cached = document.querySelector("#txt").value;
@@ -27,27 +42,47 @@ function compile() {
 			if (txt[i].startsWith("alias ")) {
 				txt[i] = txt[i].replace("alias ", "(");
 				let variableName = txt[i].substring(1, txt[i].indexOf(" "));
-				aliases.push([variableName, allowedChars[varCount]]);
-				varCount++;
-			}
-			if (txt[i].startsWith("funct ")) {
+				let bChars = document.querySelector("#breakChars").value;
+				if (variableName.encases(bChars[0], bChars[1])) {
+					// labeled as important variable, use break set
+					aliases.push([variableName, allowedChars[1][varCount[1]]]);
+					varCount[1]++;
+				} else {
+					// use any character
+					aliases.push([variableName, allowedChars[0][varCount[0]]]);
+					varCount[0]++;
+				}
+			} else if (txt[i].startsWith("funct ")) {
 				txt[i] = txt[i].replace("funct ", ")");
 				let variableName = txt[i].substring(1, txt[i].indexOf(" "));
-				functions.push([variableName, allowedChars[varCount]]);
-				varCount++;
+				let bChars = document.querySelector("#breakChars").value;
+				if (variableName.encases(bChars[0], bChars[1])) {
+					functions.push([variableName, allowedChars[1][varCount[1]]]);
+					varCount[1]++;
+				} else {
+					functions.push([variableName, allowedChars[0][varCount[0]]]);
+					varCount[0]++;
+				}
 			}
 			txt[i] = compileVariables(txt[i]).replaceAll(" funct ", ")");
 
 
 			let inFunction = functions.filter(e => txt[i].startsWith(e[1] + ' '));
 			if (inFunction.length > 0) { // if this line starts with a function reference
-				let variableName = txt[i].split(" ")[1];
-				let char = allowedChars[varCount];
+				let variableName = txt[i].split(" ")[1], char;
 				if (i < txt.length - 2 && !txt[i + 1].startsWith(inFunction[0][0] + ' ')) {
 					char = inFunction[0][1];
 				} else {
-					varCount++;
+					let bChars = document.querySelector("#breakChars").value;
+					if (variableName.encases(bChars[0], bChars[1])) {
+						char = allowedChars[1][varCount[1]];
+						varCount[1]++;
+					} else {
+						char = allowedChars[0][varCount[0]];
+						varCount[0]++;
+					}
 				}
+				
 				functions.push([variableName, char]);
 				txt[i] = txt[i].replace(variableName, char);
 			}
@@ -56,7 +91,9 @@ function compile() {
 	
 
 	txt = txt.map(e => squishCommand(e));
-	txt = [txt.join(";")]; // join header into single line
+	if (flattenHeader) {
+		txt = [txt.join(";")]; // join header into single line
+	}
 
 	if (!document.querySelector("#includeHeader").checked) {
 		txt = [];
@@ -985,60 +1022,68 @@ function compile() {
 
 			switch (args[0]) {
 				case "sar_speedrun_cc_start":
-					args[2] = args[2].replace('map=', '');
-					args[3] = args[3].replace('action=split', '');
 					let coop = args[2].indexOf('mp_coop_') > -1;
-					args[0] = coop ? '%startMP%' : '%startSP%';
-					args[2] = args[2].replace('sp_a', '').replace('mp_coop_', '');
+					if (vIsDef('start' + (coop ? 'MP' : 'SP'))) {
+						args[0] = v('start' + (coop ? 'MP' : 'SP'));
+						args[2] = args[2].replace('map=', '');
+						args[2] = args[2].replace('sp_a', '').replace('mp_coop_', '');
+						args[3] = args[3].replace('action=split', '');
+					}
 					break;
 				case "sar_speedrun_cc_rule":
 					switch (args[2]) {
 						case "load":
-							args = ["%genericStartRule%"];
+							args = setIfDef(args, "genericStartRule");
 							break;
 						case "entity":
-							args[0] = "%entityRule%";
-							args[2] = "";
-							args[3] = args[3].replace('targetname=', '');
-							args[4] = args[4].replace('inputname=', '');
+							if (vIsDef("entityRule")) {
+								args[0] = v("entityRule");
+								args[2] = "";
+								args[3] = args[3].replace('targetname=', '');
+								args[4] = args[4].replace('inputname=', '');
+							}
 
 							{
-								if (args.join(" ") == '%entityRule% "End Trigger Blue"  team_door-team_proxy OnProxyRelay1') {
-									args = ["%endTriggerBlue%"];
-								} else if (args.join(" ") == '%entityRule% "End Trigger Orange"  team_door-team_proxy OnProxyRelay3') {
-									args = ["%endTriggerOrange%"];
+								if (args[1] == '"End Trigger Blue"' && args[3] == "team_door-team_proxy" && args[4] == "OnProxyRelay1") {
+									args = setIfDef(args, "endTriggerBlue");
+								} else if (args[1] == '"End Trigger Orange"' && args[3] == "team_door-team_proxy" && args[4] == "OnProxyRelay3") {
+									args = setIfDef(args, "endTriggerOrange");
 								}
 							} // End Trigger Blue/Orange
 							
 							{
 								if (args[1] == `"Middle Trigger Blue"` && args[4] == "Trigger") {
-									args[0] = "%midTriggerBlue%";
-									args[1] = "";
-									args[4] = "";
+									if (vIsDef("midTriggerBlue")) {
+										args[0] = v("midTriggerBlue");
+										args[1] = "";
+										args[4] = "";
+									}
 								} else if (args[1] == `"Middle Trigger Orange"` && args[4] == "Trigger") {
-									args[0] = "%midTriggerOrange%";
-									args[1] = "";
-									args[4] = "";
+									if (vIsDef("midTriggerOrange")) {
+										args[0] = v("midTriggerOrange");
+										args[1] = "";
+										args[4] = "";
+									}
 								}
 							} // Middle Trigger Blue/Orange
 
 
 							//You can try to shuffle these around to optimise the usage better, I think I've done pretty well
 							let shortcuts = [
-							["%TargetNamePlayerClip%"   , ""             , "departure_elevator-elevator_doorclose_playerclip", ""             ],
-							["%TargetNameAirlockOrange%", ""             , "airlock_1-relay_orange_in"                       , ""             ],
-							["%InputNameOnProxyRelay1%" , ""             , ""                                                , "OnProxyRelay1"],
-							["%InputNameOnProxyRelay2%" , ""             , ""                                                , "OnProxyRelay2"],
-							["%InputNamePlaySound%"     , ""             , ""                                                , "PlaySound"    ],
-							["%InputNameTrigger%"       , ""             , ""                                                , "Trigger"      ],
-							["%NameEndsWithActivation%" , " Activation\"", ""                                                , ""             ],
-							["%InputNameOnProxyRelay3%" , ""             , ""                                                , "OnProxyRelay3"],
-							["%InputNameEnable%"        , ""             , ""                                                , "Enable"       ],
-							["%InputNameStart%"         , ""             , ""                                                , "Start"        ],
-							["%InputNameTurnOn%"        , ""             , ""                                                , "TurnOn"       ],
-							["%InputNameDisable%"       , ""             , ""                                                , "Disable"      ],
-							["%NameEndsWithRoom%"       , " Room\""      , ""                                                , ""             ],
-							["%InputNameOpen%"          , ""             , ""                                                , "Open"         ],
+								["TargetNamePlayerClip"   , ""             , "departure_elevator-elevator_doorclose_playerclip", ""             ],
+								["TargetNameAirlockOrange", ""             , "airlock_1-relay_orange_in"                       , ""             ],
+								["InputNameOnProxyRelay1" , ""             , ""                                                , "OnProxyRelay1"],
+								["InputNameOnProxyRelay2" , ""             , ""                                                , "OnProxyRelay2"],
+								["InputNamePlaySound"     , ""             , ""                                                , "PlaySound"    ],
+								["InputNameTrigger"       , ""             , ""                                                , "Trigger"      ],
+								["NameEndsWithActivation" , " Activation\"", ""                                                , ""             ],
+								["InputNameOnProxyRelay3" , ""             , ""                                                , "OnProxyRelay3"],
+								["InputNameEnable"        , ""             , ""                                                , "Enable"       ],
+								["InputNameStart"         , ""             , ""                                                , "Start"        ],
+								["InputNameTurnOn"        , ""             , ""                                                , "TurnOn"       ],
+								["InputNameDisable"       , ""             , ""                                                , "Disable"      ],
+								["NameEndsWithRoom"       , " Room\""      , ""                                                , ""             ],
+								["InputNameOpen"          , ""             , ""                                                , "Open"         ],
 							]
 							for (let j = 0; j < shortcuts.length; j++) {
 								let i1 = 1;
@@ -1046,85 +1091,112 @@ function compile() {
 
 								ind = i1 == 1 ? 1 : i1 + 1;
 								if (ind < args.length) {
-									if (args[ind].endsWith(shortcuts[j][i1])) {
-										args[0] = shortcuts[j][0];
-										args[ind] = "";
+									if (args[ind].endsWith(shortcuts[j][i1]) && vIsDef(shortcuts[j][0])) {
+										args[0] = v(shortcuts[j][0]);
+										args[ind] = args[ind].replace(shortcuts[j][i1], '');
+										if (shortcuts[j][i1].endsWith('"')) {
+											args[ind] += '"';
+										}
 									}
 								}
 							}
-							if (args[0] == "%entityRule%") {
-								targetnames.push(args[3]);
-								inputnames.push(args[4]);
-								let s = args[1].split(" ");
-								if (s.length > 1) {
-									trigEnds.push(s[s.length - 1])
-								}
-							}
+							// if (args[0] == v("entityRule")) {
+							// 	targetnames.push(args[3]);
+							// 	inputnames.push(args[4]);
+							// 	let s = args[1].split(" ");
+							// 	if (s.length > 1) {
+							// 		trigEnds.push(s[s.length - 1])
+							// 	}
+							// }
 
 							break;
 						case "zone":
-							args[0] = "%zoneRule%";
-							// console.log(args[1]) // promising filesave later?
-							args[2] = "";
-							args[3] = args[3].replace('center=', '');
-							args[3] = args[3].split(',').map(e => parseFloat(e).toString()).join(',')
-							args[4] = args[4].replace('size=', '');
-							args[4] = args[4].split(',').map(e => parseFloat(e).toString()).join(',')
-							args[5] = args[5].replace('angle=0.00', '');
+							args[3] = "center=" + args[3].replace('center=', '').split(',').map(e => parseFloat(e).toString()).join(',');
+							args[4] = "size="   + args[4].replace('size=',   '').split(',').map(e => parseFloat(e).toString()).join(',');
+							if (vIsDef("zoneRule")) {
+								args[0] = v("zoneRule");
+								// console.log(args[1]) // promising filesave later?
+								args[2] = '';
+								args[3] = args[3].replace('center=', '');
+								args[4] = args[4].replace('size=', '');
+								args[5] = '';
+							}
 							break;
 						case "portal":
-							args[0] = "%portalRule%";
-							// console.log(args[1]) // promising filesave later?
-							args[2] = "";
-							args[3] = args[3].replace('center=', '');
-							args[3] = args[3].split(',').map(e => parseFloat(e).toString()).join(',')
-							args[4] = args[4].replace('size=', '');
-							args[4] = args[4].split(',').map(e => parseFloat(e).toString()).join(',')
-							args[5] = args[5].replace('angle=0.00', '');
+							args[3] = "center=" + args[3].replace('center=', '').split(',').map(e => parseFloat(e).toString()).join(',');
+							args[4] = "size="   + args[4].replace('size=',   '').split(',').map(e => parseFloat(e).toString()).join(',');
+							if (vIsDef("portalRule")) {
+								args[0] = v("portalRule");
+								// console.log(args[1]) // promising filesave later?
+								args[2] = '';
+								args[3] = args[3].replace('center=', '');
+								args[4] = args[4].replace('size=', '');
+								args[5] = '';
+							}
 							break;
 						case "fly":
 							switch (args[1]) {
 								case `"Crouch Fly"`:
-									args = ["%flyRule%"];
+									args = setIfDef(args, "flyRule");
 									break;
 								case `"Crouch Fly Blue"`:
-									args = ["%flyRuleCoopBlue%"];
+									args = setIfDef(args, "flyRuleCoopBlue");
 									break;
 								case `"Crouch Fly Orange"`:
-									args = ["%flyRuleCoopOrange%"];
+									args = setIfDef(args, "flyRuleCoopOrange");
 									break;
 							}
 							break;
 						case "flags":
 							switch (args[1]) {
 								case `"Flags"`:
-									args = ["%genericSPFlagsRule%"];
+									args = setIfDef(args, "genericSPFlagsRule");
 									break;
 								case `"Flags 1"`:
-									args = ["%genericMPFlag1Rule%"];
+									args = setIfDef(args, "genericMPFlag1Rule");
 									break;
 								case `"Flags 2"`:
-									args = ["%genericMPFlag2Rule%"];
+									args = setIfDef(args, "genericMPFlag2Rule");
 									break;
 							}
 							break;
 					}
 					break;
 				case "sar_speedrun_cc_finish":
-					args[0] = "%endCategory%"
+					args = setIfDef(args, "endCategory");
 					break;
 			}
-			body[i] = args.join(" ").trim().replaceEvery("  ", " ");
+			body[i] = (typeof args == "string" ? args : args.join(" ")).trim().replaceEvery("  ", " ");
 			body[i] = compileVariables(body[i]);
 			body[i] = squishCommand(body[i]);
 		}
 		body = body.join('\n');
-		body = body.replaceAll(cV("\n%genericStartRule%"), cV(";%genericStartRule%"));
-		body = body.replaceAll(cV("\n%flyRuleCoopBlue%\n%flyRuleCoopOrange%"), cV("\n%flyRuleCoopBoth%"));
-		body = body.replaceAll(cV("\n%genericSPFlagsRule%\n%endCategory%"), cV("\n%genericSPFlagRules%"));
-		body = body.replaceAll(cV("\n%genericMPFlag1Rule%\n%genericMPFlag2Rule%\n%endCategory%"), cV("\n%genericMPFlagRules%"));
-		body = body.replaceAll(cV("\n%endTriggerBlue%\n%endTriggerOrange%\n%genericMPFlagRules%"), cV("\n%endTriggerAndMPFlagRules%"));
 
+		let a = [
+			"genericStartRule",
+			"flyRuleCoopBlue",
+			"flyRuleCoopOrange",
+			"flyRuleCoopBoth",
+			"genericSPFlagsRule",
+			"endCategory",
+			"genericSPFlagRules",
+			"genericMPFlag1Rule",
+			"genericMPFlag2Rule",
+			"genericMPFlagRules",
+			"endTriggerBlue",
+			"endTriggerOrange",
+			"endTriggerAndMPFlagRules"
+		].map(e => cV(v(e)));
+
+		body = body.replaceAll(`\n${a[0]}`, `;${a[0]}`);
+		body = body.replaceAll(`\n${a[1]}\n${a[2]}`, `\n${a[3]}`);
+		body = body.replaceAll(`\n${a[4]}\n${a[5]}`, `\n${a[6]}`);
+		body = body.replaceAll(`\n${a[7]}\n${a[8]}\n${a[5]}`, `\n${a[9]}`);
+		body = body.replaceAll(`\n${a[10]}\n${a[11]}\n${a[9]}`, `\n${a[12]}`);
+
+		if (flattenContent) {
+			body = body.split('\n').join(';');
+		}
 		txt.push(body);
 	}
 
@@ -1138,16 +1210,61 @@ function compile() {
 		}
 		footer.push('()"');
 		footer.push('(("');
-		txt.push(footer.join(";"))
+		if (flattenFooter) {
+			footer = footer.join(';');
+		} else footer = footer.join('\n');
+		txt.push(footer)
 	} //undefine aliases and functions
 
-	document.querySelector("#out").value = txt.join("\n");
-	document.querySelector("#outpre").innerHTML = `Compiled: (${txt.join("\n").length} bytes)`;
+	if (flattenHeader && flattenContent && flattenFooter) {
+		txt = txt.join(';');
+	} else txt = txt.join('\n');
 
-	console.clear();
-	console.log("Trigger ending words:\n" + sortByOccurrences(trigEnds));
-	console.log("Targetnames:\n" + sortByOccurrences(targetnames));
-	console.log("Inputnames:\n" + sortByOccurrences(inputnames));
+	document.querySelector("#out").value = txt;
+	document.querySelector("#outpre").innerHTML = `Compiled: (${txt.length} bytes)`;
+
+
+	// Thanks to https://stackoverflow.com/a/22826906/13192876
+	let width = Math.ceil(Math.sqrt(txt.length));
+	let buffer = new Uint8ClampedArray(width * width * 4);
+	for (var y = 0; y < width; y++) {
+		for (var x = 0; x < width; x++) {
+			var loc = (x + y * width)
+			var pos = loc * 4; // position in buffer based on x and y1
+			var val = loc < txt.length ? txt.charCodeAt(loc) : 0
+			buffer[pos    ] = val % 256;
+			buffer[pos + 1] = Math.floor(val / 256);
+			buffer[pos + 2] = 255;
+			buffer[pos + 3] = 255;
+		}
+	}
+	let ctx = canvas.getContext('2d');
+	[canvas.width, canvas.height] = [width, width];
+	let idata = ctx.createImageData(width, width);
+	idata.data.set(buffer);
+	ctx.imageSmoothingEnabled = false;
+	ctx.putImageData(idata, 0, 0);
+	ctx.imageSmoothingEnabled = false;
+
+	// console.clear();
+	// console.log("Trigger ending words:\n" + sortByOccurrences(trigEnds));
+	// console.log("Targetnames:\n" + sortByOccurrences(targetnames));
+	// console.log("Inputnames:\n" + sortByOccurrences(inputnames));
+}
+
+function setIfDef(val, txt) {
+	return vIsDef(txt) ? v(txt) : val;
+}
+
+function v(txt) {
+	let rChars = document.querySelector("#regulChars").value;
+	let bChars = document.querySelector("#breakChars").value;
+	let breakset = aliases.concat(functions).some(e => e[0] == `${bChars[0]}${txt}${bChars[1]}`);
+	let [startChar, endChar] = breakset ? [bChars[0], bChars[1]] : [rChars[0], rChars[1]];
+	return `${startChar}${txt}${endChar}`;
+}
+function vIsDef(txt) {
+	return aliases.concat(functions).some(e => e[0] == v(txt));
 }
 
 function sortByOccurrences(arr) {
@@ -1170,27 +1287,28 @@ function cV(txt) {
 }
 
 function compileVariables(txt) {
-	for (let i = 0; i < aliases.length; i++) {
-		txt = txt.replaceAll(aliases[i][0], aliases[i][1]);
-	}
-	for (let i = 0; i < functions.length; i++) {
-		txt = txt.replaceAll(functions[i][0], functions[i][1]);
-	}
+	aliases.concat(functions).forEach(e => {
+		txt = txt.replaceAll(e[0], e[1]);
+	})
 	return txt;
 }
 
 function squishCommand(txt) {
+	// squish breakset characters
+	for (let i = 0; i < allowedChars[1].length; i++) {
+		txt = txt.replaceAll(` ${allowedChars[1][i]} `, allowedChars[1][i]).replace(`${allowedChars[1][i]} `, allowedChars[1][i]);
+	}
 	let split = txt.split('"');
 	let change = [split[0].trim()];
-	for (let j = 0; j < split.length; j++) {
-		if (j % 2 == 0) {
-			change.push(split.length - 1 > j ? split[j + 1] : '');
-		} else {
-			change.push(split.length - 1 > j ? split[j + 1].trim() : '');
-		}
+	// squish quotes
+	for (let i = 0; i < split.length; i++) {
+		let p = split[i + 1];
+		if (i % 2 != 0) p = p.trim();
+		change.push(i < split.length - 1 ? p : '');
 	}
-	change = change.join('"');
-	return change.substring(0, change.length - 1);
+	change = change.join('"')
+	change = change.substring(0, change.length - 1);
+	return change;
 }
 
 function txtUpdate() {

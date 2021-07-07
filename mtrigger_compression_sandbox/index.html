@@ -13,30 +13,58 @@
       label {
         margin-left: 100px;
       }
+      label[ten] {
+        margin-left: 10px;
+      }
+      button {
+        width:  auto;
+        margin-right: -30px;
+      }
+      input[type="text"] {
+        width: 25px;
+      }
+      canvas {
+        width: 140px;
+      }
 	</style>
   </head>
   <body>
-  	<b id="txtpre">Readable Header:</b><br>
+  	<b>Readable Header:</b><br>
 
-  	<textarea id="txt" style="width:100%;" rows="34" oninput="txtUpdate()"></textarea><br>
+  	<textarea id="txt" style="width:100%;" rows="39" oninput="txtUpdate()"></textarea><br>
 
   	<b id="outpre"></b>
 
-    <label for="liveUpdate">Compile live?</label>
+    <label for="liveUpdate">            Compile live? </label>
     <input type="checkbox" id="liveUpdate" name="liveUpdate" checked onclick="toggleLiveUpdate()">
     
     <button type="button" onclick="compile()" style="visibility:hidden;">Compile</button>
 
-    <label for="includeHeader">Include header?</label>
+    <label for="includeHeader">       Include header? </label>
     <input type="checkbox" id="includeHeader" name="includeHeader" checked onclick="compile()">
+    <label for="flattenHeader" ten>          Flatten? </label>
+    <input type="checkbox" id="flattenHeader" name="flattenHeader" checked onclick="compile()">
 
-    <label for="includeContent">Include content?</label>
+    <label for="includeContent">     Include content? </label>
     <input type="checkbox" id="includeContent" name="includeContent" checked onclick="compile()">
+    <label for="flattenContent" ten>         Flatten? </label>
+    <input type="checkbox" id="flattenContent" name="flattenContent" checked onclick="compile()">
 
-    <label for="includeFooter">Include footer?</label>
-    <input type="checkbox" id="includeFooter" name="includeFooter" checked onclick="compile()"><br>
+    <label for="includeFooter">       Include footer? </label>
+    <input type="checkbox" id="includeFooter" name="includeFooter" checked onclick="compile()">
+    <label for="flattenFooter" ten>          Flatten? </label>
+    <input type="checkbox" id="flattenFooter" name="flattenFooter" checked onclick="compile()">
 
-  	<textarea id="out" readonly style="width:100%;" rows="33"></textarea>
+    <label for="regulChars">       Regular Variables: </label>
+    <input type="text" id="regulChars" name="regulChars" value="[]" oninput="compile()">
+
+    <label for="breakChars">      Breakset Variables: </label>
+    <input type="text" id="breakChars" name="breakChars" value="{}" oninput="compile()"><br>
+
+  	<textarea id="out" readonly style="width:100%;" rows="20"></textarea><br>
+
+    <b>UTF-16 Image Representation</b><br>
+    <canvas></canvas>
 
     <script src="sketch.js"></script>
   </body>
