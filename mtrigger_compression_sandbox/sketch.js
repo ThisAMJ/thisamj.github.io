@@ -5,7 +5,26 @@ var targetnames = [], inputnames = [], trigEnds = [];
 var allowedChars = [
 		"!#$%&*+,-./0123456789<=>?@[\\]^_`abcdefghijklmnopqrstuvwxyz|~", // regular variable names
 		"{}:'"]; // break set (separate arguments, use on 4 most high traffic variables)
-var canvas = document.querySelector("canvas");;
+var canvas = document.querySelector("canvas");
+
+//You can try to shuffle these around to optimise the usage better, I think I've done pretty well
+let shortcuts = [
+	["TargetNamePlayerClip"   , ""             , "departure_elevator-elevator_doorclose_playerclip", ""             ],
+	["TargetNameAirlockOrange", ""             , "airlock_1-relay_orange_in"                       , ""             ],
+	["InputNameOnProxyRelay1" , ""             , ""                                                , "OnProxyRelay1"],
+	["InputNameOnProxyRelay2" , ""             , ""                                                , "OnProxyRelay2"],
+	["InputNamePlaySound"     , ""             , ""                                                , "PlaySound"    ],
+	["InputNameTrigger"       , ""             , ""                                                , "Trigger"      ],
+	["NameEndsWithActivation" , " Activation\"", ""                                                , ""             ],
+	["InputNameOnProxyRelay3" , ""             , ""                                                , "OnProxyRelay3"],
+	["InputNameEnable"        , ""             , ""                                                , "Enable"       ],
+	["InputNameStart"         , ""             , ""                                                , "Start"        ],
+	["InputNameTurnOn"        , ""             , ""                                                , "TurnOn"       ],
+	["InputNameDisable"       , ""             , ""                                                , "Disable"      ],
+	["NameEndsWithRoom"       , " Room\""      , ""                                                , ""             ],
+	["InputNameOpen"          , ""             , ""                                                , "Open"         ],
+]
+
 
 function compile() {
 	let flattenHeader = document.querySelector("#flattenHeader").checked;
@@ -1077,23 +1096,7 @@ function compile() {
 							} // Middle Trigger Blue/Orange
 
 
-							//You can try to shuffle these around to optimise the usage better, I think I've done pretty well
-							let shortcuts = [
-								["TargetNamePlayerClip"   , ""             , "departure_elevator-elevator_doorclose_playerclip", ""             ],
-								["TargetNameAirlockOrange", ""             , "airlock_1-relay_orange_in"                       , ""             ],
-								["InputNameOnProxyRelay1" , ""             , ""                                                , "OnProxyRelay1"],
-								["InputNameOnProxyRelay2" , ""             , ""                                                , "OnProxyRelay2"],
-								["InputNamePlaySound"     , ""             , ""                                                , "PlaySound"    ],
-								["InputNameTrigger"       , ""             , ""                                                , "Trigger"      ],
-								["NameEndsWithActivation" , " Activation\"", ""                                                , ""             ],
-								["InputNameOnProxyRelay3" , ""             , ""                                                , "OnProxyRelay3"],
-								["InputNameEnable"        , ""             , ""                                                , "Enable"       ],
-								["InputNameStart"         , ""             , ""                                                , "Start"        ],
-								["InputNameTurnOn"        , ""             , ""                                                , "TurnOn"       ],
-								["InputNameDisable"       , ""             , ""                                                , "Disable"      ],
-								["NameEndsWithRoom"       , " Room\""      , ""                                                , ""             ],
-								["InputNameOpen"          , ""             , ""                                                , "Open"         ],
-							]
+							
 							for (let j = 0; j < shortcuts.length; j++) {
 								let i1 = 1;
 								while (shortcuts[j][i1] == "") i1++;
