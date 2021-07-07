@@ -21,9 +21,7 @@ function compile() {
 
 	aliases = [], functions = []
 	targetnames = [], inputnames = [], trigEnds = [];
-	let varCount = [0, 0];
-	
-	let txt = ['sar_alias(sar_alias', '()sar_function'];
+	let txt = [], varCount = [0, 0];
 
 	localStorage.setItem('readableHeader', document.querySelector("#txt").value);
 	localStorage.setItem('compileLive',    document.querySelector("#liveUpdate").checked);
@@ -36,83 +34,84 @@ function compile() {
 	localStorage.setItem('regularChars',   document.querySelector("#regulChars").value);
 	localStorage.setItem('breakChars',     document.querySelector("#breakChars").value);
 
-	txt = txt.concat(document.querySelector("#txt").value.split("\n"));
+	
+	let header = [], content = "", footer = [];
 
 	{
-		for (let i = 0; i < txt.length; i++) {
-			if (txt[i].indexOf("//") > -1) txt[i] = txt[i].substring(0, txt[i].indexOf("//")); // remove comments
-			txt[i] = txt[i].trim().replaceEvery("  ", " ");
-			txt[i] = txt[i].replaceAll('; ', ';'); // squish command concats
-		}
-		txt = txt.filter(e => e != "");
-	} // initial squish
-
-	{
-		for (let i = 0; i < txt.length; i++) {
-			if (txt[i].startsWith("alias ")) {
-				txt[i] = txt[i].replace("alias ", "(");
-				let variableName = txt[i].substring(1, txt[i].indexOf(" "));
-				let bChars = document.querySelector("#breakChars").value;
-				if (variableName.encases(bChars[0], bChars[1])) {
-					// labeled as important variable, use break set
-					aliases.push([variableName, allowedChars[1][varCount[1]]]);
-					varCount[1]++;
-				} else {
-					// use any character
-					aliases.push([variableName, allowedChars[0][varCount[0]]]);
-					varCount[0]++;
-				}
-			} else if (txt[i].startsWith("funct ")) {
-				txt[i] = txt[i].replace("funct ", ")");
-				let variableName = txt[i].substring(1, txt[i].indexOf(" "));
-				let bChars = document.querySelector("#breakChars").value;
-				if (variableName.encases(bChars[0], bChars[1])) {
-					functions.push([variableName, allowedChars[1][varCount[1]]]);
-					varCount[1]++;
-				} else {
-					functions.push([variableName, allowedChars[0][varCount[0]]]);
-					varCount[0]++;
-				}
+		header = ['sar_alias(sar_alias', '()sar_function'].concat(document.querySelector("#txt").value.split("\n"));
+		{
+			for (let i = 0; i < header.length; i++) {
+				if (header[i].indexOf("//") > -1) header[i] = header[i].substring(0, header[i].indexOf("//")); // remove comments
+				header[i] = header[i].trim().replaceEvery("  ", " ");
+				header[i] = header[i].replaceAll('; ', ';'); // squish command concats
 			}
-			txt[i] = compileVariables(txt[i]).replaceAll(" funct ", ")");
+			header = header.filter(e => e != "");
+		} // initial squish
 
-
-			let inFunction = functions.filter(e => txt[i].startsWith(e[1] + ' '));
-			if (inFunction.length > 0) { // if this line starts with a function reference
-				let variableName = txt[i].split(" ")[1], char;
-				if (i < txt.length - 2 && !txt[i + 1].startsWith(inFunction[0][0] + ' ')) {
-					char = inFunction[0][1];
-				} else {
+		{
+			for (let i = 0; i < header.length; i++) {
+				if (header[i].startsWith("alias ")) {
+					header[i] = header[i].replace("alias ", "(");
+					let variableName = header[i].substring(1, header[i].indexOf(" "));
 					let bChars = document.querySelector("#breakChars").value;
 					if (variableName.encases(bChars[0], bChars[1])) {
-						char = allowedChars[1][varCount[1]];
+						// labeled as important variable, use break set
+						aliases.push([variableName, allowedChars[1][varCount[1]]]);
 						varCount[1]++;
 					} else {
-						char = allowedChars[0][varCount[0]];
+						// use any character
+						aliases.push([variableName, allowedChars[0][varCount[0]]]);
+						varCount[0]++;
+					}
+				} else if (header[i].startsWith("funct ")) {
+					header[i] = header[i].replace("funct ", ")");
+					let variableName = header[i].substring(1, header[i].indexOf(" "));
+					let bChars = document.querySelector("#breakChars").value;
+					if (variableName.encases(bChars[0], bChars[1])) {
+						functions.push([variableName, allowedChars[1][varCount[1]]]);
+						varCount[1]++;
+					} else {
+						functions.push([variableName, allowedChars[0][varCount[0]]]);
 						varCount[0]++;
 					}
 				}
-				
-				functions.push([variableName, char]);
-				txt[i] = txt[i].replace(variableName, char);
+				header[i] = compileVariables(header[i]).replaceAll(" funct ", ")");
+
+
+				let inFunction = functions.filter(e => header[i].startsWith(e[1] + ' '));
+				if (inFunction.length > 0) { // if this line starts with a function reference
+					let variableName = header[i].split(" ")[1], char;
+					if (i < header.length - 2 && !header[i + 1].startsWith(inFunction[0][0] + ' ')) {
+						char = inFunction[0][1];
+					} else {
+						let bChars = document.querySelector("#breakChars").value;
+						if (variableName.encases(bChars[0], bChars[1])) {
+							char = allowedChars[1][varCount[1]];
+							varCount[1]++;
+						} else {
+							char = allowedChars[0][varCount[0]];
+							varCount[0]++;
+						}
+					}
+					
+					functions.push([variableName, char]);
+					header[i] = header[i].replace(variableName, char);
+				}
 			}
+		} // alias and function compilation. smart redefinition too!
+		
+
+		header = header.map(e => squishCommand(e));
+		if (flattenHeader) {
+			header = header.join(';'); // join header into single line
+		} else {
+			header = header.join('\n');
 		}
-	} // alias and function compilation. smart redefinition too!
-	
+	} // header
 
-	txt = txt.map(e => squishCommand(e));
-	if (flattenHeader) {
-		txt = [txt.join(";")]; // join header into single line
-	}
-
-	if (!document.querySelector("#includeHeader").checked) {
-		txt = [];
-	} 
-
-	if (document.querySelector("#includeContent").checked) {
-		let body = "";
+	{
 		{
-			body = `
+			content = `
 			sar_speedrun_cc_start "Container Ride" map=sp_a1_intro1 action=split
 			sar_speedrun_cc_rule "Start" load action=force_start
 			sar_speedrun_cc_rule "Room Trigger" entity targetname=relay_start_map inputname=Trigger
@@ -1008,9 +1007,9 @@ function compile() {
 			`.trim().replaceAll('\t', '').split('\n');
 		} // import raw mtriggers
 
-		for (let i = 0; i < body.length; i++) {
-			let args = body[i].split(" "), argsTemp = [args[0]], temp = "", inQuotes = false;
-			let afterFirst = body[i].substring(args[0].length + 1);
+		for (let i = 0; i < content.length; i++) {
+			let args = content[i].split(" "), argsTemp = [args[0]], temp = "", inQuotes = false;
+			let afterFirst = content[i].substring(args[0].length + 1);
 			for (let j = 0; j < afterFirst.length; j++) {
 				if (afterFirst[j] == '"') {
 					if (inQuotes) {
@@ -1107,6 +1106,7 @@ function compile() {
 										if (shortcuts[j][i1].endsWith('"')) {
 											args[ind] += '"';
 										}
+										break;
 									}
 								}
 							}
@@ -1176,11 +1176,11 @@ function compile() {
 					args = setIfDef(args, "endCategory");
 					break;
 			}
-			body[i] = (typeof args == "string" ? args : args.join(" ")).trim().replaceEvery("  ", " ");
-			body[i] = compileVariables(body[i]);
-			body[i] = squishCommand(body[i]);
+			content[i] = (typeof args == "string" ? args : args.join(" ")).trim().replaceEvery("  ", " ");
+			content[i] = compileVariables(content[i]);
+			content[i] = squishCommand(content[i]);
 		}
-		body = body.join('\n');
+		content = content.join('\n');
 
 		let a = [
 			"genericStartRule",
@@ -1198,20 +1198,17 @@ function compile() {
 			"endTriggerAndMPFlagRules"
 		].map(e => cV(v(e)));
 
-		body = body.replaceAll(`\n${a[0]}`, `;${a[0]}`);
-		body = body.replaceAll(`\n${a[1]}\n${a[2]}`, `\n${a[3]}`);
-		body = body.replaceAll(`\n${a[4]}\n${a[5]}`, `\n${a[6]}`);
-		body = body.replaceAll(`\n${a[7]}\n${a[8]}\n${a[5]}`, `\n${a[9]}`);
-		body = body.replaceAll(`\n${a[10]}\n${a[11]}\n${a[9]}`, `\n${a[12]}`);
+		content = content.replaceAll(`\n${a[0]}`, `;${a[0]}`);
+		content = content.replaceAll(`\n${a[1]}\n${a[2]}`, `\n${a[3]}`);
+		content = content.replaceAll(`\n${a[4]}\n${a[5]}`, `\n${a[6]}`);
+		content = content.replaceAll(`\n${a[7]}\n${a[8]}\n${a[5]}`, `\n${a[9]}`);
+		content = content.replaceAll(`\n${a[10]}\n${a[11]}\n${a[9]}`, `\n${a[12]}`);
 
-		if (flattenContent) {
-			body = body.split('\n').join(';');
-		}
-		txt.push(body);
-	}
+		content = content.split('\n').join(flattenContent ? ';' : '\n');
+	} // content
 
-	if (document.querySelector("#includeFooter").checked) {
-		let footer = [];
+	{
+		footer = [];
 		for (let i = 0; i < aliases.length; i++) {
 			if (footer.indexOf(`(${aliases[i][1]}"`) == -1) footer.push(`(${aliases[i][1]}"`);
 		}
@@ -1220,15 +1217,27 @@ function compile() {
 		}
 		footer.push('()"');
 		footer.push('(("');
-		if (flattenFooter) {
-			footer = footer.join(';');
-		} else footer = footer.join('\n');
-		txt.push(footer)
-	} //undefine aliases and functions
+		footer = footer.join(flattenFooter ? ';' : '\n');
+	} // footer
 
-	if (flattenHeader && flattenContent && flattenFooter) {
-		txt = txt.join(';');
-	} else txt = txt.join('\n');
+
+	{
+		let flattenAll = true;
+		if (document.querySelector("#includeHeader").checked) {
+			if (!flattenHeader) flattenAll = false;
+			txt.push(header);
+		}
+		if (document.querySelector("#includeContent").checked) {
+			if (!flattenContent) flattenAll = false;
+			txt.push(content);
+		}
+		if (document.querySelector("#includeFooter").checked) {
+			if (!flattenFooter) flattenAll = false;
+			txt.push(footer);
+		}
+
+		txt = txt.join(flattenAll ? ';' : '\n');
+	}
 
 	document.querySelector("#out").value = txt;
 	document.querySelector("#outpre").innerHTML = `Compiled: (${txt.length} bytes)`;
@@ -1237,24 +1246,19 @@ function compile() {
 	// Thanks to https://stackoverflow.com/a/22826906/13192876
 	let width = Math.ceil(Math.sqrt(txt.length));
 	let buffer = new Uint8ClampedArray(width * width * 4);
-	for (var y = 0; y < width; y++) {
-		for (var x = 0; x < width; x++) {
-			var loc = (x + y * width)
-			var pos = loc * 4; // position in buffer based on x and y1
-			var val = loc < txt.length ? txt.charCodeAt(loc) : 0
-			buffer[pos    ] = val % 256;
-			buffer[pos + 1] = Math.floor(val / 256);
-			buffer[pos + 2] = 255;
-			buffer[pos + 3] = 255;
-		}
+	for (var loc = 0; loc < width * width; loc++) {
+		var pos = loc * 4; // pixel loc
+		var val = loc < txt.length ? txt.charCodeAt(loc) : 0
+		buffer[pos    ] = val % 256;
+		buffer[pos + 1] = Math.floor(val / 256);
+		buffer[pos + 2] = 255;
+		buffer[pos + 3] = 255;
 	}
 	let ctx = canvas.getContext('2d');
 	[canvas.width, canvas.height] = [width, width];
 	let idata = ctx.createImageData(width, width);
 	idata.data.set(buffer);
-	ctx.imageSmoothingEnabled = false;
 	ctx.putImageData(idata, 0, 0);
-	ctx.imageSmoothingEnabled = false;
 
 	// console.clear();
 	// console.log("Trigger ending words:\n" + sortByOccurrences(trigEnds));

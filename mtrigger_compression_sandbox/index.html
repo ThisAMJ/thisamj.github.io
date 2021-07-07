@@ -10,6 +10,9 @@
     		background: black;
     		color: white;
     	}
+      textarea {
+        width: 100%;
+      }
       label {
         margin-left: 35px;
       }
@@ -31,7 +34,7 @@
   <body>
   	<b>Readable Header:</b><br>
 
-  	<textarea id="txt" style="width:100%;" rows="39" oninput="txtUpdate()"></textarea><br>
+  	<textarea id="txt" rows="39" oninput="txtUpdate()"></textarea><br>
 
   	<b id="outpre"></b>
 
@@ -61,9 +64,9 @@
     <label for="breakChars">      Breakset Variables: </label>
     <input type="text" id="breakChars" name="breakChars" value="{}" oninput="compile()"><br>
 
-  	<textarea id="out" readonly style="width:100%;" rows="20"></textarea><br>
+  	<textarea id="out" readonly rows="20"></textarea><br>
 
-    <b>UTF-16 Image Representation</b><br>
+    <b>UTF-16 Image Representation (idk why i did this, but it was easy)</b><br>
     <canvas></canvas>
 
     <script src="sketch.js"></script>
