@@ -1074,7 +1074,7 @@ function compile() {
 
 
 		for (let i = 0; i < content.length; i++) {
-			let args = content[i].split(' ', argsTemp = [args[0]], temp = '', inQuotes = false;
+			let args = content[i].split(' '), argsTemp = [args[0]], temp = '', inQuotes = false;
 			let afterFirst = content[i].substring(args[0].length + 1);
 			for (let j = 0; j < afterFirst.length; j++) {
 				if (afterFirst[j] == '"') {
