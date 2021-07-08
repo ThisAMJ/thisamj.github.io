@@ -107,7 +107,7 @@ function compile() {
 			for (let i = 0; i < header.length; i++) {
 				if (header[i].indexOf('//') > -1) header[i] = header[i].substring(0, header[i].indexOf('//'));
 				header[i] = header[i].trim().replaceEvery('  ', ' ');
-				header[i] = header[i].replaceAll('; ', ';').replaceAll(' funct ', ')');
+				header[i] = header[i].replaceAll('; ', ';');
 			}
 			header = header.filter(e => e != '');
 		} // initial squish
@@ -143,7 +143,7 @@ function compile() {
 
 		{
 			for (let i = 0; i < header.length; i++) {
-				header[i] = compileVariables(header[i]);
+				header[i] = compileVariables(header[i]).replaceAll(' funct ', ')');
 
 
 				let inFunction = functions.filter(e => header[i].startsWith(e[1] + ' '));
