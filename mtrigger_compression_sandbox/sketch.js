@@ -1,91 +1,135 @@
 //Todo: Find most commonly used functions and use breakset automatically
 
+function q(s) {return document.querySelector(s)}
+function qA(s) {return document.querySelectorAll(s)}
+
 var aliases = [], functions = [];
-var targetnames = [], inputnames = [], trigEnds = [];
+var targetnames = [], inputnames = [], triggernames = [];
+
 var allowedChars = [
-		"!#$%&*+,-./0123456789<=>?@[\\]^_`abcdefghijklmnopqrstuvwxyz|~", // regular variable names
+		'!#$%&*+,-./0123456789<=>?@[\\]^_`abcdefghijklmnopqrstuvwxyz|~', // regular variable names
 		"{}:'"]; // break set (separate arguments, use on 4 most high traffic variables)
-var canvas = document.querySelector("canvas");
+var canvas = q('canvas');
+
 
 //You can try to shuffle these around to optimise the usage better, I think I've done pretty well
 let shortcuts = [
-	["TargetNamePlayerClip"   , ""             , "departure_elevator-elevator_doorclose_playerclip", ""             ],
-	["TargetNameAirlockOrange", ""             , "airlock_1-relay_orange_in"                       , ""             ],
-	["InputNameOnProxyRelay1" , ""             , ""                                                , "OnProxyRelay1"],
-	["InputNameOnProxyRelay2" , ""             , ""                                                , "OnProxyRelay2"],
-	["InputNamePlaySound"     , ""             , ""                                                , "PlaySound"    ],
-	["InputNameTrigger"       , ""             , ""                                                , "Trigger"      ],
-	["NameEndsWithActivation" , " Activation\"", ""                                                , ""             ],
-	["InputNameOnProxyRelay3" , ""             , ""                                                , "OnProxyRelay3"],
-	["InputNameEnable"        , ""             , ""                                                , "Enable"       ],
-	["InputNameStart"         , ""             , ""                                                , "Start"        ],
-	["InputNameTurnOn"        , ""             , ""                                                , "TurnOn"       ],
-	["InputNameDisable"       , ""             , ""                                                , "Disable"      ],
-	["NameEndsWithRoom"       , " Room\""      , ""                                                , ""             ],
-	["InputNameOpen"          , ""             , ""                                                , "Open"         ],
+	['InputNameOnProxyRelay1' ,                 '',                                                '','OnProxyRelay1'],
+	['InputNameTrigger'       ,                 '',                                                '',      'Trigger'],
+	['InputNameOnProxyRelay2' ,                 '',                                                '','OnProxyRelay2'],
+	['InputNamePlaySound'     ,                 '',                                                '',    'PlaySound'],
+	['TargetNamePlayerClip'   ,                 '','departure_elevator-elevator_doorclose_playerclip',             ''],
+	['NameDoorActivation'     ,'"Door Activation"',                                                '',             ''],
+	['InputNameOnProxyRelay3' ,                 '',                                                '','OnProxyRelay3'],
+	['NameTrigger'            ,         'Trigger"',                                                '',             ''],
+	['InputNameStart'         ,                 '',                                                '',        'Start'],
+	['InputNameEnable'        ,                 '',                                                '',       'Enable'],
+	['InputNameTurnOn'        ,                 '',                                                '',       'TurnOn'],
+	['NameRoom'               ,           ' Room"',                                                '',             ''],
+	['TargetNameButton'       ,                 '',                                         '_button',             ''],
+	['TargetNameAirlockOrange',                 '',                       'airlock_1-relay_orange_in',             ''],
+	['NameEndsWithActivation' ,     ' Activation"',                                                '',             ''],
+	['InputNameDisable'       ,                 '',                                                '',      'Disable'],
+	['InputNameOpen'          ,                 '',                                                '',         'Open'],
 ]
 
 
 function compile() {
-	let flattenHeader = document.querySelector("#flattenHeader").checked;
-	let flattenContent = document.querySelector("#flattenContent").checked;
-	let flattenFooter = document.querySelector("#flattenFooter").checked;
-	document.querySelector("label[for=\"flattenHeader\"]").style.display = document.querySelector("#includeHeader").checked ? "inline" : "none";
-	document.querySelector("label[for=\"flattenContent\"]").style.display = document.querySelector("#includeContent").checked ? "inline" : "none";
-	document.querySelector("label[for=\"flattenFooter\"]").style.display = document.querySelector("#includeFooter").checked ? "inline" : "none";
-	document.querySelector("#flattenHeader").style.display = document.querySelector("#includeHeader").checked ? "inline" : "none";
-	document.querySelector("#flattenContent").style.display = document.querySelector("#includeContent").checked ? "inline" : "none";
-	document.querySelector("#flattenFooter").style.display = document.querySelector("#includeFooter").checked ? "inline" : "none";
+	function v(txt) {
+		let rChars = q('#regulChars').value;
+		let bChars = q('#breakChars').value;
+		let breakset = aliases.concat(functions).some(e => e[0] == `${bChars[0]}${txt}${bChars[1]}`);
+		let [startChar, endChar] = breakset ? [bChars[0], bChars[1]] : [rChars[0], rChars[1]];
+		return `${startChar}${txt}${endChar}`;
+	}
+	function vIsDef(txt) {return aliases.concat(functions).some(e => e[0] == v(txt))}
+	function setIfDef(val, txt) {return vIsDef(txt) ? v(txt) : val}
+	function compileVariables(txt) {
+		aliases.concat(functions).forEach(e => txt = txt.replaceAll(e[0], e[1]));
+		return txt;
+	}
+	function cV(txt) {return compileVariables(txt)}
+	function squishCommand(txt) {
+		// squish breakset characters
+		for (let i = 0; i < allowedChars[1].length; i++) {
+			txt = txt.replaceAll(` ${allowedChars[1][i]} `, allowedChars[1][i]);
+			if (txt.startsWith(`${allowedChars[1][i]} `)) {
+				txt = txt.replace(`${allowedChars[1][i]} `, allowedChars[1][i]);
+			}
+		}
+		let split = txt.split('"');
+		let change = [split[0].trim()];
+		// squish quotes
+		for (let i = 0; i < split.length - 1; i++) {
+			let p = split[i + 1];
+			if (i % 2 != 0) p = p.trim();
+			change.push(i < split.length - 1 ? p : '');
+		}
+		change = change.join('"');
+		return change;
+	}
 
-
-	aliases = [], functions = []
-	targetnames = [], inputnames = [], trigEnds = [];
-	let txt = [], varCount = [0, 0];
-
-	localStorage.setItem('readableHeader', document.querySelector("#txt").value);
-	localStorage.setItem('compileLive',    document.querySelector("#liveUpdate").checked);
-	localStorage.setItem('includeHeader',  document.querySelector("#includeHeader").checked);
-	localStorage.setItem('includeContent', document.querySelector("#includeContent").checked);
-	localStorage.setItem('includeFooter',  document.querySelector("#includeFooter").checked);
-	localStorage.setItem('flattenHeader',  document.querySelector("#flattenHeader").checked);
-	localStorage.setItem('flattenContent', document.querySelector("#flattenContent").checked);
-	localStorage.setItem('flattenFooter',  document.querySelector("#flattenFooter").checked);
-	localStorage.setItem('regularChars',   document.querySelector("#regulChars").value);
-	localStorage.setItem('breakChars',     document.querySelector("#breakChars").value);
-
-	
-	let header = [], content = "", footer = [];
-
+	let flattenHeader, flattenContent, flattenFooter;
 	{
-		header = ['sar_alias(sar_alias', '()sar_function'].concat(document.querySelector("#txt").value.split("\n"));
+		flattenHeader = q('#flattenHeader').checked;
+		flattenContent = q('#flattenContent').checked;
+		flattenFooter = q('#flattenFooter').checked;
+		let disp = a => a ? 'inline' : 'none';
+		q('label[for=\"flattenHeader\"]').style.display = disp(q('#includeHeader').checked);
+		q('label[for=\"flattenContent\"]').style.display = disp(q('#includeContent').checked);
+		q('label[for=\"flattenFooter\"]').style.display = disp(q('#includeFooter').checked);
+		q('#flattenHeader').style.display = disp(q('#includeHeader').checked);
+		q('#flattenContent').style.display = disp(q('#includeContent').checked);
+		q('#flattenFooter').style.display = disp(q('#includeFooter').checked);
+		localStorage.setItem('readableHeader', q('#txt').value);
+		localStorage.setItem('compileLive',    q('#liveUpdate').checked);
+		localStorage.setItem('includeHeader',  q('#includeHeader').checked);
+		localStorage.setItem('includeContent', q('#includeContent').checked);
+		localStorage.setItem('includeFooter',  q('#includeFooter').checked);
+		localStorage.setItem('flattenHeader',  q('#flattenHeader').checked);
+		localStorage.setItem('flattenContent', q('#flattenContent').checked);
+		localStorage.setItem('flattenFooter',  q('#flattenFooter').checked);
+		localStorage.setItem('regularChars',   q('#regulChars').value);
+		localStorage.setItem('breakChars',     q('#breakChars').value);
+	}
+	
+	aliases = [], functions = [];
+	targetnames = [], inputnames = [], triggernames = [];
+
+	let txt = [], header = [], content = '', footer = [], varCount = [0, 0];
+	
+	{
+
+		let bChars = q('#breakChars').value;
+		header = ['sar_alias(sar_alias', '()sar_function'].concat(q('#txt').value.split('\n'));
+
 		{
 			for (let i = 0; i < header.length; i++) {
-				if (header[i].indexOf("//") > -1) header[i] = header[i].substring(0, header[i].indexOf("//")); // remove comments
-				header[i] = header[i].trim().replaceEvery("  ", " ");
-				header[i] = header[i].replaceAll('; ', ';'); // squish command concats
+				if (header[i].indexOf('//') > -1) header[i] = header[i].substring(0, header[i].indexOf('//'));
+				header[i] = header[i].trim().replaceEvery('  ', ' ');
+				header[i] = header[i].replaceAll('; ', ';').replaceAll(' funct ', ')');
 			}
-			header = header.filter(e => e != "");
+			header = header.filter(e => e != '');
 		} // initial squish
 
 		{
+			let aliasNames = [], functionNames = [];
 			for (let i = 0; i < header.length; i++) {
-				if (header[i].startsWith("alias ")) {
-					header[i] = header[i].replace("alias ", "(");
-					let variableName = header[i].substring(1, header[i].indexOf(" "));
-					let bChars = document.querySelector("#breakChars").value;
+				if (header[i].startsWith('alias ')) {
+					header[i] = header[i].replace('alias ', '(');
+					let variableName = header[i].substring(1, header[i].indexOf(' '));
+					aliasNames.push(variableName);
 					if (variableName.encases(bChars[0], bChars[1])) {
-						// labeled as important variable, use break set
 						aliases.push([variableName, allowedChars[1][varCount[1]]]);
 						varCount[1]++;
 					} else {
-						// use any character
 						aliases.push([variableName, allowedChars[0][varCount[0]]]);
 						varCount[0]++;
 					}
-				} else if (header[i].startsWith("funct ")) {
-					header[i] = header[i].replace("funct ", ")");
-					let variableName = header[i].substring(1, header[i].indexOf(" "));
-					let bChars = document.querySelector("#breakChars").value;
+				} else if (header[i].startsWith('funct ')) {
+					header[i] = header[i].replace('funct ', ')');
+					let variableName = header[i].substring(1, header[i].indexOf(' '));
+					functionNames.push(variableName);
 					if (variableName.encases(bChars[0], bChars[1])) {
 						functions.push([variableName, allowedChars[1][varCount[1]]]);
 						varCount[1]++;
@@ -94,16 +138,20 @@ function compile() {
 						varCount[0]++;
 					}
 				}
-				header[i] = compileVariables(header[i]).replaceAll(" funct ", ")");
+			}
+		} // find variables
+
+		{
+			for (let i = 0; i < header.length; i++) {
+				header[i] = compileVariables(header[i]);
 
 
 				let inFunction = functions.filter(e => header[i].startsWith(e[1] + ' '));
 				if (inFunction.length > 0) { // if this line starts with a function reference
-					let variableName = header[i].split(" ")[1], char;
+					let variableName = header[i].split(' ')[1], char;
 					if (i < header.length - 2 && !header[i + 1].startsWith(inFunction[0][0] + ' ')) {
 						char = inFunction[0][1];
 					} else {
-						let bChars = document.querySelector("#breakChars").value;
 						if (variableName.encases(bChars[0], bChars[1])) {
 							char = allowedChars[1][varCount[1]];
 							varCount[1]++;
@@ -121,11 +169,8 @@ function compile() {
 		
 
 		header = header.map(e => squishCommand(e));
-		if (flattenHeader) {
-			header = header.join(';'); // join header into single line
-		} else {
-			header = header.join('\n');
-		}
+		header = header.join(flattenHeader ? ';' : '\n');
+
 	} // header
 
 	{
@@ -1026,30 +1071,32 @@ function compile() {
 			`.trim().replaceAll('\t', '').split('\n');
 		} // import raw mtriggers
 
+
+
 		for (let i = 0; i < content.length; i++) {
-			let args = content[i].split(" "), argsTemp = [args[0]], temp = "", inQuotes = false;
+			let args = content[i].split(' ', argsTemp = [args[0]], temp = '', inQuotes = false;
 			let afterFirst = content[i].substring(args[0].length + 1);
 			for (let j = 0; j < afterFirst.length; j++) {
 				if (afterFirst[j] == '"') {
 					if (inQuotes) {
 						argsTemp.push('"' + temp + '"');
-						temp = "";
+						temp = '';
 					}
 					inQuotes = !inQuotes;
 				} else if (afterFirst[j] == ' ' && !inQuotes) {
 					if (afterFirst[j - 1] != '"') {
 						argsTemp.push(temp);
-						temp = "";
+						temp = '';
 					}
 				} else {
 					temp += afterFirst[j];
 				}
 			}
 			argsTemp.push(temp);
-			args = argsTemp.filter(e => e != "");
+			args = argsTemp.filter(e => e != '');
 
 			switch (args[0]) {
-				case "sar_speedrun_cc_start":
+				case 'sar_speedrun_cc_start':
 					let coop = args[2].indexOf('mp_coop_') > -1;
 					if (vIsDef('start' + (coop ? 'MP' : 'SP'))) {
 						args[0] = v('start' + (coop ? 'MP' : 'SP'));
@@ -1058,76 +1105,108 @@ function compile() {
 						args[3] = args[3].replace('action=split', '');
 					}
 					break;
-				case "sar_speedrun_cc_rule":
+				case 'sar_speedrun_cc_rule':
 					switch (args[2]) {
-						case "load":
-							args = setIfDef(args, "genericStartRule");
+						case 'load':
+							args = setIfDef(args, 'genericStartRule');
 							break;
-						case "entity":
-							if (vIsDef("entityRule")) {
-								args[0] = v("entityRule");
-								args[2] = "";
+						case 'entity':
+							if (vIsDef('entityRule')) {
+								args[0] = v('entityRule');
+								args[2] = '';
 								args[3] = args[3].replace('targetname=', '');
 								args[4] = args[4].replace('inputname=', '');
 							}
 
 							{
-								if (args[1] == '"End Trigger Blue"' && args[3] == "team_door-team_proxy" && args[4] == "OnProxyRelay1") {
-									args = setIfDef(args, "endTriggerBlue");
-								} else if (args[1] == '"End Trigger Orange"' && args[3] == "team_door-team_proxy" && args[4] == "OnProxyRelay3") {
-									args = setIfDef(args, "endTriggerOrange");
+								if (args[1] == '"End Trigger Blue"' &&
+									args[3] == 'team_door-team_proxy' &&
+									args[4] == 'OnProxyRelay1') {
+									args = setIfDef(args, 'endTriggerBlue');
+								}
+								if (args[1] == '"End Trigger Orange"' &&
+									args[3] == 'team_door-team_proxy' &&
+									args[4] == 'OnProxyRelay3') {
+									args = setIfDef(args, 'endTriggerOrange');
 								}
 							} // End Trigger Blue/Orange
 							
 							{
-								if (args[1] == `"Middle Trigger Blue"` && args[4] == "Trigger") {
-									if (vIsDef("midTriggerBlue")) {
-										args[0] = v("midTriggerBlue");
-										args[1] = "";
-										args[4] = "";
+								if (args[1] == '"Middle Trigger Blue"' &&
+									args[4] == 'Trigger') {
+									if (vIsDef('midTriggerBlue')) {
+										args[0] = v('midTriggerBlue');
+										args[1] = '';
+										args[4] = '';
 									}
-								} else if (args[1] == `"Middle Trigger Orange"` && args[4] == "Trigger") {
-									if (vIsDef("midTriggerOrange")) {
-										args[0] = v("midTriggerOrange");
-										args[1] = "";
-										args[4] = "";
+								}
+								if (args[1] == '"Middle Trigger Orange"' &&
+									args[4] == 'Trigger') {
+									if (vIsDef('midTriggerOrange')) {
+										args[0] = v('midTriggerOrange');
+										args[1] = '';
+										args[4] = '';
 									}
 								}
 							} // Middle Trigger Blue/Orange
 
-
-							
+							// Use the first shortcut you find that matches the rule
 							for (let j = 0; j < shortcuts.length; j++) {
 								let i1 = 1;
-								while (shortcuts[j][i1] == "") i1++;
-
+								while (shortcuts[j][i1] == '') i1++;
 								ind = i1 == 1 ? 1 : i1 + 1;
 								if (ind < args.length) {
 									if (args[ind].endsWith(shortcuts[j][i1]) && vIsDef(shortcuts[j][0])) {
 										args[0] = v(shortcuts[j][0]);
 										args[ind] = args[ind].replace(shortcuts[j][i1], '');
-										if (shortcuts[j][i1].endsWith('"')) {
+										if (shortcuts[j][i1].endsWith('"') && !shortcuts[j][i1].startsWith('"')) {
 											args[ind] += '"';
+										}
+										if (args[ind] == '""') {
+											args[ind] = '';
 										}
 										break;
 									}
 								}
 							}
-							// if (args[0] == v("entityRule")) {
-							// 	targetnames.push(args[3]);
-							// 	inputnames.push(args[4]);
-							// 	let s = args[1].split(" ");
-							// 	if (s.length > 1) {
-							// 		trigEnds.push(s[s.length - 1])
-							// 	}
-							// }
+
+							if (args[0] == setIfDef('sar_speedrun_cc_rule', 'entityRule')) {
+								// let str = "", subs = [];
+
+								// str = args[1], subs = [];
+								// for (let i = 0; i < str.length; i++) {
+								// 	subs.push(str.substr(i))
+								// }
+								// for (let i = 0; i < subs.length; i++) {
+								// 	subs[i] = [subs[i], 'n']
+								// }
+								// triggernames = triggernames.concat(subs);
+
+								// str = args[3].replace('targetname=', ''), subs = [];
+								// for (let i = 0; i < str.length; i++) {
+								// 	subs.push(str.substr(i))
+								// }
+								// for (let i = 0; i < subs.length; i++) {
+								// 	subs[i] = [subs[i], 't']
+								// }
+								// targetnames = targetnames.concat(subs);
+
+								// str = args[4].replace('inputname=', ''), subs = [];
+								// for (let i = 0; i < str.length; i++) {
+								// 	subs.push(str.substr(i))
+								// }
+								// for (let i = 0; i < subs.length; i++) {
+								// 	subs[i] = [subs[i], 'i']
+								// }
+								// inputnames = inputnames.concat(subs);
+							}
 
 							break;
-						case "zone":
-							args[3] = "center=" + args[3].replace('center=', '').split(',').map(e => parseFloat(e).toString()).join(',');
-							args[4] = "size="   + args[4].replace('size=',   '').split(',').map(e => parseFloat(e).toString()).join(',');
-							if (vIsDef("zoneRule")) {
-								args[0] = v("zoneRule");
+						case 'zone':
+							args[3] = 'center=' + args[3].replace('center=', '').split(',').map(e => parseFloat(e).toString()).join(',');
+							args[4] = 'size='   + args[4].replace('size=',   '').split(',').map(e => parseFloat(e).toString()).join(',');
+							if (vIsDef('zoneRule')) {
+								args[0] = v('zoneRule');
 								// console.log(args[1]) // promising filesave later?
 								args[2] = '';
 								args[3] = args[3].replace('center=', '');
@@ -1135,11 +1214,11 @@ function compile() {
 								args[5] = '';
 							}
 							break;
-						case "portal":
-							args[3] = "center=" + args[3].replace('center=', '').split(',').map(e => parseFloat(e).toString()).join(',');
-							args[4] = "size="   + args[4].replace('size=',   '').split(',').map(e => parseFloat(e).toString()).join(',');
-							if (vIsDef("portalRule")) {
-								args[0] = v("portalRule");
+						case 'portal':
+							args[3] = 'center=' + args[3].replace('center=', '').split(',').map(e => parseFloat(e).toString()).join(',');
+							args[4] = 'size='   + args[4].replace('size=',   '').split(',').map(e => parseFloat(e).toString()).join(',');
+							if (vIsDef('portalRule')) {
+								args[0] = v('portalRule');
 								// console.log(args[1]) // promising filesave later?
 								args[2] = '';
 								args[3] = args[3].replace('center=', '');
@@ -1147,59 +1226,58 @@ function compile() {
 								args[5] = '';
 							}
 							break;
-						case "fly":
+						case 'fly':
 							switch (args[1]) {
-								case `"Crouch Fly"`:
-									args = setIfDef(args, "flyRule");
+								case '"Crouch Fly"':
+									args = setIfDef(args, 'flyRule');
 									break;
-								case `"Crouch Fly Blue"`:
-									args = setIfDef(args, "flyRuleCoopBlue");
+								case '"Crouch Fly Blue"':
+									args = setIfDef(args, 'flyRuleCoopBlue');
 									break;
-								case `"Crouch Fly Orange"`:
-									args = setIfDef(args, "flyRuleCoopOrange");
+								case '"Crouch Fly Orange"':
+									args = setIfDef(args, 'flyRuleCoopOrange');
 									break;
 							}
 							break;
-						case "flags":
+						case 'flags':
 							switch (args[1]) {
-								case `"Flags"`:
-									args = setIfDef(args, "genericSPFlagsRule");
+								case '"Flags"':
+									args = setIfDef(args, 'genericSPFlagsRule');
 									break;
-								case `"Flags 1"`:
-									args = setIfDef(args, "genericMPFlag1Rule");
+								case '"Flags 1"':
+									args = setIfDef(args, 'genericMPFlag1Rule');
 									break;
-								case `"Flags 2"`:
-									args = setIfDef(args, "genericMPFlag2Rule");
+								case '"Flags 2"':
+									args = setIfDef(args, 'genericMPFlag2Rule');
 									break;
 							}
 							break;
 					}
 					break;
-				case "sar_speedrun_cc_finish":
-					args = setIfDef(args, "endCategory");
+				case 'sar_speedrun_cc_finish':
+					args = setIfDef(args, 'endCategory');
 					break;
 			}
-			content[i] = (typeof args == "string" ? args : args.join(" ")).trim().replaceEvery("  ", " ");
-			content[i] = compileVariables(content[i]);
-			content[i] = squishCommand(content[i]);
+			content[i] = (typeof args == 'string' ? args : args.join(' ')).trim().replaceEvery('  ', ' ');
+			content[i] = squishCommand(compileVariables(content[i]));
 		}
 		content = content.join('\n');
 
-		let a = [
-			"genericStartRule",
-			"flyRuleCoopBlue",
-			"flyRuleCoopOrange",
-			"flyRuleCoopBoth",
-			"genericSPFlagsRule",
-			"endCategory",
-			"genericSPFlagRules",
-			"genericMPFlag1Rule",
-			"genericMPFlag2Rule",
-			"genericMPFlagRules",
-			"endTriggerBlue",
-			"endTriggerOrange",
-			"endTriggerAndMPFlagRules"
-		].map(e => cV(v(e)));
+		let a = `
+			genericStartRule
+			flyRuleCoopBlue
+			flyRuleCoopOrange
+			flyRuleCoopBoth
+			genericSPFlagsRule
+			endCategory
+			genericSPFlagRules
+			genericMPFlag1Rule
+			genericMPFlag2Rule
+			genericMPFlagRules
+			endTriggerBlue
+			endTriggerOrange
+			endTriggerAndMPFlagRules
+		`.trim().replaceAll('\t', '').split('\n').map(e => cV(v(e)));
 
 		content = content.replaceAll(`\n${a[0]}`, `;${a[0]}`);
 		content = content.replaceAll(`\n${a[1]}\n${a[2]}`, `\n${a[3]}`);
@@ -1218,23 +1296,21 @@ function compile() {
 		for (let i = 0; i < functions.length; i++) {
 			if (footer.indexOf(`)${functions[i][1]}"`) == -1) footer.push(`)${functions[i][1]}"`);
 		}
-		footer.push('()"');
-		footer.push('(("');
-		footer = footer.join(flattenFooter ? ';' : '\n');
+		footer = footer.concat(['()"', '(("']).join(flattenFooter ? ';' : '\n');
 	} // footer
 
 
 	{
 		let flattenAll = true;
-		if (document.querySelector("#includeHeader").checked) {
+		if (q('#includeHeader').checked) {
 			if (!flattenHeader) flattenAll = false;
 			txt.push(header);
 		}
-		if (document.querySelector("#includeContent").checked) {
+		if (q('#includeContent').checked) {
 			if (!flattenContent) flattenAll = false;
 			txt.push(content);
 		}
-		if (document.querySelector("#includeFooter").checked) {
+		if (q('#includeFooter').checked) {
 			if (!flattenFooter) flattenAll = false;
 			txt.push(footer);
 		}
@@ -1242,8 +1318,8 @@ function compile() {
 		txt = txt.join(flattenAll ? ';' : '\n');
 	}
 
-	document.querySelector("#out").value = txt;
-	document.querySelector("#outpre").innerHTML = `Compiled: (${txt.length} bytes)`;
+	q('#out').value = txt;
+	q('#outpre').innerHTML = `Compiled: (${txt.length} bytes)`;
 
 
 	// Thanks to https://stackoverflow.com/a/22826906/13192876
@@ -1263,77 +1339,35 @@ function compile() {
 	idata.data.set(buffer);
 	ctx.putImageData(idata, 0, 0);
 
-	// console.clear();
-	// console.log("Trigger ending words:\n" + sortByOccurrences(trigEnds));
-	// console.log("Targetnames:\n" + sortByOccurrences(targetnames));
-	// console.log("Inputnames:\n" + sortByOccurrences(inputnames));
-}
-
-function setIfDef(val, txt) {
-	return vIsDef(txt) ? v(txt) : val;
-}
-
-function v(txt) {
-	let rChars = document.querySelector("#regulChars").value;
-	let bChars = document.querySelector("#breakChars").value;
-	let breakset = aliases.concat(functions).some(e => e[0] == `${bChars[0]}${txt}${bChars[1]}`);
-	let [startChar, endChar] = breakset ? [bChars[0], bChars[1]] : [rChars[0], rChars[1]];
-	return `${startChar}${txt}${endChar}`;
-}
-function vIsDef(txt) {
-	return aliases.concat(functions).some(e => e[0] == v(txt));
-}
-
-function sortByOccurrences(arr) {
-	let a = arr.sort(), b = [], t = a[0], count = 0;
-	for (let i = 0; i < a.length; i++) {
-		if (a[i] == t) {
-			count++;
-		} else {
-			b.push([t, (count - 1) * t.length]);
-			count = 1;
-		}
-		t = a[i];
-	}
-	b.sort((a, b) => {return b[1] - a[1]});
-	return b.map(e => `${e[1]} weight : ${e[0]}`).filter(e => parseInt(e.split(" ")[0]) > 1).join("\n");
-}
-
-function cV(txt) {
-	return compileVariables(txt);
-}
-
-function compileVariables(txt) {
-	aliases.concat(functions).forEach(e => {
-		txt = txt.replaceAll(e[0], e[1]);
-	})
 	return txt;
 }
 
-function squishCommand(txt) {
-	// squish breakset characters
-	for (let i = 0; i < allowedChars[1].length; i++) {
-		txt = txt.replaceAll(` ${allowedChars[1][i]} `, allowedChars[1][i]).replace(`${allowedChars[1][i]} `, allowedChars[1][i]);
+function sortByOccurrences(arr) {
+	let a = arr.sort((a, b) => {
+		if (a[0] < b[0]) return -1;
+		if (a[0] > b[0]) return 1;
+		return 0;
+	}), b = [], t = a[0], count = 0;
+
+	for (let i = 0; i < a.length; i++) {
+		if (a[i][0] == t) {
+			count++;
+		} else {
+			b.push([a[i - 1], count]);
+			count = 1;
+		}
+		t = a[i][0];
 	}
-	let split = txt.split('"');
-	let change = [split[0].trim()];
-	// squish quotes
-	for (let i = 0; i < split.length; i++) {
-		let p = split[i + 1];
-		if (i % 2 != 0) p = p.trim();
-		change.push(i < split.length - 1 ? p : '');
-	}
-	change = change.join('"')
-	change = change.substring(0, change.length - 1);
-	return change;
+	b.sort((a, b) => {return b[1] - a[1]});
+	return b.filter(e => e[1] > 1 && (e[1] - 1) * e[0].length > 5);
 }
 
 function txtUpdate() {
-	if (document.querySelector("#liveUpdate").checked) compile();
+	if (q('#liveUpdate').checked) compile();
 }
 
 function toggleLiveUpdate() {
-	document.querySelector("button").style.visibility = document.querySelector("#liveUpdate").checked ? "hidden" : "visible";
+	q('button').style.visibility = q('#liveUpdate').checked ? 'hidden' : 'visible';
 }
 
 function readStorage(key, fallback) {
@@ -1341,16 +1375,16 @@ function readStorage(key, fallback) {
 	return storage == null ? fallback : storage;
 }
 
-document.querySelector("#txt").value              = readStorage('readableHeader', '// Readable header goes here!');
-document.querySelector("#liveUpdate").checked     = readStorage('compileLive',    'true') == 'true';
-document.querySelector("#includeHeader").checked  = readStorage('includeHeader',  'true') == 'true';
-document.querySelector("#includeContent").checked = readStorage('includeContent', 'true') == 'true';
-document.querySelector("#includeFooter").checked  = readStorage('includeFooter',  'true') == 'true';
-document.querySelector("#flattenHeader").checked  = readStorage('flattenHeader',  'true') == 'true';
-document.querySelector("#flattenContent").checked = readStorage('flattenContent', 'true') == 'true';
-document.querySelector("#flattenFooter").checked  = readStorage('flattenFooter',  'true') == 'true';
-document.querySelector("#regulChars").value       = readStorage('regularChars',   '[]');
-document.querySelector("#breakChars").value       = readStorage('breakChars',     '{}');
-	
+q('#txt').value              = readStorage('readableHeader', '// Readable header goes here!');
+q('#liveUpdate').checked     = readStorage('compileLive',    'true') == 'true';
+q('#includeHeader').checked  = readStorage('includeHeader',  'true') == 'true';
+q('#includeContent').checked = readStorage('includeContent', 'true') == 'true';
+q('#includeFooter').checked  = readStorage('includeFooter',  'true') == 'true';
+q('#flattenHeader').checked  = readStorage('flattenHeader',  'true') == 'true';
+q('#flattenContent').checked = readStorage('flattenContent', 'true') == 'true';
+q('#flattenFooter').checked  = readStorage('flattenFooter',  'true') == 'true';
+q('#regulChars').value       = readStorage('regularChars',   '[]');
+q('#breakChars').value       = readStorage('breakChars',     '{}');
 
+toggleLiveUpdate();
 compile();
