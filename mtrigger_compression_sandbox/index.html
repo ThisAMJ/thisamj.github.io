@@ -2,9 +2,9 @@
 <html lang="en">
   <head>
     <title>Sandbox</title>
+    <link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/69196954">
     <meta charset="utf-8" />
     <script src="../prototypes.js"></script>
-    <link rel="shortcut icon" type="image/png" href="https://avatars.githubusercontent.com/u/69196954">
     <style>
     	body, textarea {
     		background: black;
@@ -38,31 +38,22 @@
 
   	<b id="outpre"></b>
 
-    <label for="liveUpdate">            Compile live? </label>
-    <input type="checkbox" id="liveUpdate" name="liveUpdate" checked onclick="toggleLiveUpdate()">
+    <label for="liveUpdate" ten>            Compile live? </label>
+    <input type="checkbox" id="liveUpdate" name="liveUpdate" checked onclick="toggleLiveUpdate(true)">
     
-    <button type="button" onclick="compile()" style="visibility:hidden;">Compile</button>
+    <button type="button" onclick="compile()" style="visibility:hidden">Compile</button>
 
     <label for="includeHeader">       Include header? </label>
     <input type="checkbox" id="includeHeader" name="includeHeader" checked onclick="compile()">
-    <label for="flattenHeader" ten>          Flatten? </label>
-    <input type="checkbox" id="flattenHeader" name="flattenHeader" checked onclick="compile()">
 
     <label for="includeContent">     Include content? </label>
     <input type="checkbox" id="includeContent" name="includeContent" checked onclick="compile()">
-    <label for="flattenContent" ten>         Flatten? </label>
-    <input type="checkbox" id="flattenContent" name="flattenContent" checked onclick="compile()">
 
     <label for="includeFooter">       Include footer? </label>
     <input type="checkbox" id="includeFooter" name="includeFooter" checked onclick="compile()">
-    <label for="flattenFooter" ten>          Flatten? </label>
-    <input type="checkbox" id="flattenFooter" name="flattenFooter" checked onclick="compile()">
 
-    <label for="regulChars">       Regular Variables: </label>
-    <input type="text" id="regulChars" name="regulChars" value="[]" oninput="compile()">
-
-    <label for="breakChars">      Breakset Variables: </label>
-    <input type="text" id="breakChars" name="breakChars" value="{}" oninput="compile()"><br>
+    <label for="flatten">                    Flatten? </label>
+    <input type="checkbox" id="flatten" name="flatten" checked onclick="compile()"><br>
 
   	<textarea id="out" readonly rows="20"></textarea><br>
 
