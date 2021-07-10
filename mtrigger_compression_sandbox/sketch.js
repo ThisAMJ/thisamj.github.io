@@ -392,7 +392,7 @@ function compile() {
 			i++;
 		}
 	}
-	
+
 	// use regular set for every other command
 	// for now smart redefinition is ignored, could save a few definitions
 	// but only if i can be fked figuring that out
