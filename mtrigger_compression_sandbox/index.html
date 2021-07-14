@@ -1,65 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Sandbox</title>
-    <link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/69196954">
-    <meta charset="utf-8" />
-    <script src="../prototypes.js"></script>
-    <style>
-    	body, textarea {
-    		background: black;
-    		color: white;
-    	}
-      textarea {
-        width: 100%;
-      }
-      label {
-        margin-left: 35px;
-      }
-      label[ten] {
-        margin-left: 10px;
-      }
-      button {
-        width:  auto;
-        margin-right: -30px;
-      }
-      input[type="text"] {
-        width: 25px;
-      }
-      canvas {
-        width: 140px;
-      }
-	</style>
-  </head>
-  <body>
-  	<b>Readable Header:</b><br>
+	<head>
+		<title>Sandbox</title>
+		<link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/69196954">
+		<meta charset="utf-8" />
+		<script src="../prototypes.js"></script>
+		<style>
+			body, textarea {
+				background: black;
+				color: white;
+			}
+			textarea {
+				width: 100%;
+			}
+			label {
+				margin-left: 35px;
+			}
+			label[ten] {
+				margin-left: 10px;
+			}
+			button {
+				width:  auto;
+				margin-right: -30px;
+			}
+			input[type="text"] {
+				width: 25px;
+			}
+			canvas {
+				width: 140px;
+			}
+		</style>
+	</head>
+	<body>
+		<b>Readable Header:</b><br>
+		<textarea id="txt" rows="39" oninput="txtUpdate()" spellcheck="false"></textarea><br>
+		
+		<b id="outpre"></b>
 
-  	<textarea id="txt" rows="39" oninput="txtUpdate()"></textarea><br>
-
-  	<b id="outpre"></b>
-
-    <label for="liveUpdate" ten>            Compile live? </label>
-    <input type="checkbox" id="liveUpdate" name="liveUpdate" checked onclick="toggleLiveUpdate(true)">
+		<label for="liveUpdate" ten>            Compile live? </label>
+		<input type="checkbox" id="liveUpdate" name="liveUpdate" checked onclick="toggleLiveUpdate(true)">
     
-    <button type="button" onclick="compile()" style="visibility:hidden">Compile</button>
-
-    <label for="includeHeader">       Include header? </label>
-    <input type="checkbox" id="includeHeader" name="includeHeader" checked onclick="compile()">
-
-    <label for="includeContent">     Include content? </label>
-    <input type="checkbox" id="includeContent" name="includeContent" checked onclick="compile()">
-
-    <label for="includeFooter">       Include footer? </label>
-    <input type="checkbox" id="includeFooter" name="includeFooter" checked onclick="compile()">
-
-    <label for="flatten">                    Flatten? </label>
-    <input type="checkbox" id="flatten" name="flatten" checked onclick="compile()"><br>
-
-  	<textarea id="out" readonly rows="20"></textarea><br>
-
-    <b>UTF-16 Image Representation (idk why i did this, but it was easy)</b><br>
-    <canvas></canvas>
-
-    <script src="sketch.js"></script>
-  </body>
+		<button type="button" onclick="compile()" style="visibility:hidden">Compile</button>
+		
+		<label for="includeHeader">       Include header? </label>
+		<input type="checkbox" id="includeHeader" name="includeHeader" checked onclick="compile()">
+		
+		<label for="includeContent">     Include content? </label>
+		<input type="checkbox" id="includeContent" name="includeContent" checked onclick="compile()">
+		
+		<label for="includeFooter">       Include footer? </label>
+		<input type="checkbox" id="includeFooter" name="includeFooter" checked onclick="compile()">
+		
+		<label for="flatten">                    Flatten? </label>
+		<input type="checkbox" id="flatten" name="flatten" checked onclick="compile()"><br>
+		
+		<textarea id="out" readonly rows="20" spellcheck="false"></textarea><br>
+		
+		<b>UTF-16 Image Representation (idk why i did this, but it was easy)</b><br>
+		<canvas></canvas>
+		
+		<script src="sketch.js"></script>
+	</body>
 </html>

@@ -1,20 +1,15 @@
 String.prototype.padByDelim = function(d) {
-	var out = [], maxes = [], split = this.split('\n').map(e => e.split(d)), i, k;
-	split.forEach(e => {
-		if (e.length < 2) return;
-		for (i = 0; i < e.length; i++) {
-			k = i > e.length - 1 ? 0 : e[i].length;
-			maxes[i] = maxes[i] ? Math.max(maxes[i], k) : k;
-		}
-	});
-	split.forEach(e => {
-		if (e.length < 2) return out = out.concat(e);
-		for (i = 0; i < e.length; i += 2) {
-			e[i] = ' '.repeat(i > 0 ? maxes[i - 1] - e[i - 1].length : 0) + e[i] + ' '.repeat(maxes[i] - e[i].length);
-		}
-		out.push(e.join(d));
-	});
-	return out.join('\n');
+	var maxes = [];
+	return this.split('\n').map(e => e.split(d)).map(e => {
+		e.map((e, f, g) => 
+			maxes[f] = maxes[f] ? Math.max(maxes[f], e.length) : e.length
+		);
+		return e;
+	}).map(e => 
+		e.length < 2 ? e : e.map((e, f, g) => 
+			f % 2 == 0 ? ' '.repeat(f > 0 ? maxes[f - 1] - g[f - 1].length : 0) + e + ' '.repeat(maxes[f] - e.length) : e
+		).join(d)
+	).join('\n');
 }
 
 String.prototype.encases = function(s, e) {
@@ -24,7 +19,7 @@ String.prototype.encases = function(s, e) {
 String.prototype.replaceEvery = function(s, r = '') {
 	let string = this.valueOf();
 	if (r.indexOf(s) > -1) return string;
-	while (string.indexOf(s) > -1) string = string.replaceAll(s,r);
+	while (string.indexOf(s) > -1) string = string.replaceAll(s, r);
 	return string;
 }
 
@@ -33,12 +28,12 @@ String.prototype.clip = function() {
 	navigator.clipboard.writeText(this.valueOf()).catch(e => {
 		// If it fails, fallback to old method
 		with (document) {
-			let dummy = createElement('textarea');
-			body.appendChild(dummy);
-			dummy.value = this.valueOf();
-			dummy.select();
+			let f = createElement('textarea');
+			body.appendChild(f);
+			f.value = this.valueOf();
+			f.select();
 			execCommand('copy');
-			body.removeChild(dummy);
+			body.removeChild(f);
 		}
 	});
 }
@@ -47,16 +42,16 @@ Array.prototype.sortByOccurrences = function() {
 	// sort a alphabetically so occurrences are adjacent
 	// ES6 copy to avoid mutation of input
 	let a = [...this].sort(), b = [], t = a[0], count = 0;
-
-	for (let i = 0; i < a.length + 1; i++) {
-		if (a[i] == t) {
+	a.map(e => {
+		if (e == t) {
 			count++;
 		} else {
 			b.push([t, count]);
 			count = 1;
 		}
-		t = a[i];
-	}
+		t = e;
+	});
+	b.push([t, count]);
 	return b.sort((a, b) => b[1] - a[1]); // most common first
 }
 
@@ -65,8 +60,8 @@ function formatBytes(a, b = 2, k = true) {
 	with (Math) {
 		let d = floor(log(a) / log(1000 + k * 24));
 		if (d < 1) return a + ' Byte' + (a == 1 ? '' : 's');
-		let s = k ? ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'] : ['kB','mB','gB','tB','pB','eB','zB','yB'];
-		return parseFloat((a / pow(1000 + k * 24, d)).toFixed(max(0, b))) + ' ' + s[d - 1];
+		let s = k ? ['Ki','Mi','Gi','Ti','Pi','Ei','Zi','Yi'] : ['k','m','g','t','p','e','z','y'];
+		return parseFloat((a / pow(1000 + k * 24, d)).toFixed(max(0, b))) + ' ' + s[d - 1] + 'B';
 	}
 }
 

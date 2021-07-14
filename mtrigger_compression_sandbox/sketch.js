@@ -1,12 +1,8 @@
-// Known bugs: 
-// 		Breakset squishing will squish within names e.g. Funnel Catch (MP) -> Funnel Catch(MP)
 
 let q =  s => document.querySelector(s);
 let qA = s => document.querySelectorAll(s);
 
-var allowedChars = [
-		'!#$%&*+,-./0123456789<=>?@[\\]^_`abcdefghijklmnopqrstuvwxyz|~', // regular variable names
-		"(){}:'"]; // breakset (separate arguments, use on 6 most high traffic variables)
+var allowedChars = ['!#$%&*+,-./0123456789<=>?@[\\]^_`abcdefghijklmnopqrstuvwxyz|~', "(){}:'"];
 var canvas = q('canvas');
 
 
@@ -44,6 +40,8 @@ shortcuts.zoneRules = [
 	['zoneNamePassthrough','Portal Passthrough"'],
 	['zoneNamePExit'      ,      ' Portal Exit"'],
 	['zoneNamePEntry'     ,      'Portal Entry"'],
+	['zoneNamePortal'     ,           ' Portal"'],
+	['zoneNameWall'       ,             ' Wall"'],
 ];
 
 
@@ -94,7 +92,9 @@ function compileFrom(text) {
 	let squishCommand = (t) => 
 		t.split('\n').map(e => 
 			Array.from("(){}:'").reduce((e, f) => 
-				e.replaceAll(f + ' ', f).replaceAll(' ' + f, f)
+				e.split('"').map((g, h) => 
+					h % 2 == 0 ? g.replaceAll(f + ' ', f).replaceAll(' ' + f, f) : g
+				).join('"')
 			, e.split('"').length == 2 ? e : e.split('"').map((e, f, g) => 
 				f % 2 == 0 || e.indexOf('$') == -1 && (e.indexOf(' ') == -1 && e.indexOf(';') == -1 && f < g.length - 1) ? e : `"${e}"`
 			).join(' ').replaceEvery('  ', ' ').replaceAll('; ', ';')).split('"').map((e, f, g) => 
@@ -106,40 +106,38 @@ function compileFrom(text) {
 
 	console.clear();
 
-	let aliases = [], functions = [], varCount = [0, 2];
+	let aliases = [], functions = [], varCount = [0, 0];
 	let analysis = {entityRules : [], zoneRules : [], portalRules : []};
 
 	let txt = [], header, content, footer;
 	let rChars = ['',''];
 	
+	let pFloat = e => parseFloat(e);
+	
 	{ // header
-		header = ['sar_alias ( sar_alias', '( ) sar_function'].concat(text.split('\n'));
+		header = ['sar_alias [alias] sar_alias', 'alias [funct] sar_function'].concat(text.split('\n'));
+		aliases.push(['[alias]']);
 
-		{ // initial squish
-			for (let i = 0; i < header.length; i++) {
-				if (header[i].indexOf('//') > -1) header[i] = header[i].substring(0, header[i].indexOf('//'));
-				header[i] = header[i].trim().replaceEvery('  ', ' ');
-			}
-			header = header.filter(e => e != '');
-		}
-
-		{ // find variables
-			for (let i = 0; i < header.length; i++) {
-				if (header[i].split(' ').length > 1) {
-					let variableName = header[i].split(' ')[1];
+		{ // initial squish, find variables, get rChars
+			header = header.map(e => e.trim().replaceEvery('  ', ' ')).map(e => 
+				e.indexOf('//') > -1 ? e.substring(0, e.indexOf('//')) : e
+			).filter(e => e != '').map(e => {
+				if (e.split(' ').length > 1) {
+					let variableName = e.split(' ')[1];
 					Array.from(allowedChars[1]).forEach(e => variableName = variableName.replaceAll(e, ''));
-					if (header[i].startsWith('alias ')) {
-						header[i] = header[i].replace('alias ', '( ');
+					if (e.startsWith('alias ')) {
+						e = e.replace('alias ', '[alias] ');
 						aliases.push([variableName]);
-					} else if (header[i].startsWith('funct ')) {
-						header[i] = header[i].replace('funct ', ') ');
+					} else if (e.startsWith('funct ')) {
+						e = e.replace('funct ', '[funct] ');
 						functions.push([variableName]);
-					} else if (functions.some(e => header[i].startsWith(e[0]))) {
+					} else if (functions.some(f => e.startsWith(f[0]))) {
 						functions.push([variableName]);
 					}
-					header[i] = header[i].replaceAll(' funct ', ' ) ');
+					return e.replaceAll(' funct ', ' [funct] ')
 				}
-			}
+				return e
+			});
 
 			// First alias or function
 			// Does it start with alphabetic char?
@@ -167,7 +165,7 @@ function compileFrom(text) {
 		content = [...defaultMtriggers];
 
 		for (let i = 0; i < content.length; i++) {
-			let args = content[i].split('"').map(e => e.trim()).reduce((e, f, g) => e.concat(g % 2 == 0 ? f.trim().split(' ') : ['"' + f + '"']), []).flat(1);
+			let args = content[i].split('"').map(e => e.trim()).map((e, f) => f % 2 == 0 ? e.trim().split(' ') : [`"${e}"`]).flat(1);
 
 			switch (args[0]) {
 				case 'sar_speedrun_cc_start':
@@ -182,6 +180,7 @@ function compileFrom(text) {
 					}
 					break;
 				case 'sar_speedrun_cc_rule':
+					args[0] = setIfDef(args[0], 'createRule');
 					switch (args[2]) {
 						case 'load':
 							args = setIfDef(args, 'genericStartRule');
@@ -233,45 +232,45 @@ function compileFrom(text) {
 							} // Middle Trigger Blue/Orange
 
 							if (args.length < 6) {
-								// Use the first shortcut you find that matches the rule
-								for (let j = 0; j < shortcuts.entityRules.length; j++) {
+								// Use the best shortcut for the job
+								let usable = shortcuts.entityRules.map(e => {
 									let i1 = 1;
-									while (shortcuts.entityRules[j][i1] == '') i1++;
+									while (e[i1] == '') i1++;
 									let ind = i1 == 1 ? 1 : i1 + 1;
 									if (ind < args.length) {
-										if (args[ind].endsWith(shortcuts.entityRules[j][i1]) && vIsDef(shortcuts.entityRules[j][0])) {
-											args[0] = v(shortcuts.entityRules[j][0]);
-											args[ind] = args[ind].replace(shortcuts.entityRules[j][i1], '');
-											if (shortcuts.entityRules[j][i1].endsWith('"') && !shortcuts.entityRules[j][i1].startsWith('"')) {
-												args[ind] += '"';
-											}
-											if (args[ind] == '""') {
-												args[ind] = '';
-											}
-											break;
+										if (args[ind].endsWith(e[i1]) && vIsDef(e[0])) {
+											return [e[i1].replaceAll('"', '').length, e];
 										}
+									}
+								}).filter(e => e).sort((a, b) => b[0] - a[0]);
+								if (usable[0]) {
+									let i1 = 1;
+									while (usable[0][1][i1] == '') i1++;
+									let ind = i1 == 1 ? 1 : i1 + 1;
+									args[0] = v(usable[0][1][0]);
+									args[ind] = args[ind].replace(usable[0][1][i1], '');
+									if (usable[0][1][i1].endsWith('"') && !usable[0][1][i1].startsWith('"')) {
+										args[ind] += '"';
 									}
 								}
 							}
 
-							if (args[0] == setIfDef('sar_speedrun_cc_rule', 'entityRule')) {
+							if (args[0] == setIfDef(setIfDef('sar_speedrun_cc_rule', 'createRule'), 'entityRule')) {
 								analysis.entityRules.push([name, target, input]);
 							}
 
 
 							break;
 						case 'zone':
-							args[3] = 'center=' + args[3].replace('center=', '').split(',').map(e => parseFloat(e)).join(',');
-							args[4] = 'size='   + args[4].replace('size=',   '').split(',').map(e => parseFloat(e)).join(',');
-							args[5] = 'angle='  + args[5].replace('angle=',  '').split(',').map(e => parseFloat(e)).join(',');
+							args[3] = 'center=' + args[3].replace('center=', '').split(',').map(pFloat).join(',');
+							args[4] = 'size='   + args[4].replace('size=',   '').split(',').map(pFloat).join(',');
+							args[5] = 'angle='  + args[5].replace('angle=',  '').split(',').map(pFloat).join(',');
 							if (vIsDef('zoneRule') && args[5] == 'angle=0') {
-								args = [
-									v('zoneRule'),
-									args[1], // promising filesave later?
-									'',
-									args[3].replace('center=', ''),
-									args[4].replace('size=', '')
-								];
+								args[0] = v('zoneRule');
+								args[2] = '';
+								args[3] = args[3].replace('center=', '');
+								args[4] = args[4].replace('size=', '');
+								args[5] = '';
 
 								// Use the first shortcut you find that matches the rule
 								for (let j = 0; j < shortcuts.zoneRules.length; j++) {
@@ -288,23 +287,21 @@ function compileFrom(text) {
 									}
 								}
 
-								if (args[0] == setIfDef('sar_speedrun_cc_rule', 'zoneRule')) {
+								if (args[0] == setIfDef(setIfDef('sar_speedrun_cc_rule', 'createRule'), 'zoneRule')) {
 									analysis.zoneRules.push([args[1], args[3].replace('center=', ''), args[4].replace('size=', '')]);
 								}
 							}
 							break;
 						case 'portal':
-							args[3] = 'center=' + args[3].replace('center=', '').split(',').map(e => parseFloat(e)).join(',');
-							args[4] = 'size='   + args[4].replace('size=',   '').split(',').map(e => parseFloat(e)).join(',');
-							args[5] = 'angle='  + args[5].replace('angle=',  '').split(',').map(e => parseFloat(e)).join(',');
+							args[3] = 'center=' + args[3].replace('center=', '').split(',').map(pFloat).join(',');
+							args[4] = 'size='   + args[4].replace('size=',   '').split(',').map(pFloat).join(',');
+							args[5] = 'angle='  + args[5].replace('angle=',  '').split(',').map(pFloat).join(',');
 							if (vIsDef('portalRule') && args[5] == 'angle=0') {
-								args = [
-									v('portalRule'),
-									args[1], // promising filesave later?
-									'',
-									args[3].replace('center=', ''),
-									args[4].replace('size=', '')
-								];
+								args[0] = v('portalRule');
+								args[2] = '';
+								args[3] = args[3].replace('center=', '');
+								args[4] = args[4].replace('size=', '');
+								args[5] = '';
 
 								// Use the first shortcut you find that matches the rule
 								for (let j = 0; j < shortcuts.portalRules.length; j++) {
@@ -321,8 +318,8 @@ function compileFrom(text) {
 									}
 								}
 
-								if (args[0] == setIfDef('sar_speedrun_cc_rule', 'portalRule')) {
-									analysis.zoneRules.push([args[1], args[3].replace('center=', ''), args[4].replace('size=', '')]);
+								if (args[0] == setIfDef(setIfDef('sar_speedrun_cc_rule', 'createRule'), 'portalRule')) {
+									analysis.portalRules.push([args[1], args[3].replace('center=', ''), args[4].replace('size=', '')]);
 								}
 
 							}
@@ -391,21 +388,11 @@ function compileFrom(text) {
 
 	{ // footer
 		footer = [];
-		for (let i = 0; i < aliases.length; i++) {
-			if (aliases[i][1]) {
-				if (footer.indexOf(`( ${aliases[i][1]} "`) == -1) footer.push(`( ${aliases[i][1]} "`);
-			} else {
-				if (footer.indexOf(`( ${aliases[i][0]} "`) == -1) footer.push(`( ${aliases[i][0]} "`);
-			}
-		}
-		for (let i = 0; i < functions.length; i++) {
-			if (functions[i][1]) {
-				if (footer.indexOf(`) ${functions[i][1]} "`) == -1) footer.push(`) ${functions[i][1]} "`);
-			} else {
-				if (footer.indexOf(`) ${functions[i][0]} "`) == -1) footer.push(`) ${functions[i][0]} "`);
-			}
-		}
-		footer = footer.concat(['( ) "', '( ( "']);
+		footer = aliases.map(e => 
+			e[0] != '[alias]' && e[0] != '[funct]' ? `[alias] ${e[0]} "` : undefined
+		).concat(functions.map(e => 
+			`[funct] ${e[0]} "`
+		)).concat(['[alias] [funct] "', '[alias] [alias] "']).filter(e => e);
 	}
 
 	if (q('#includeHeader').checked) txt.push(header.join('\n'));
@@ -429,40 +416,26 @@ function compileFrom(text) {
 			let co = occurrences(' ' + functions[i][0]) + occurrences(functions[i][0] + ' ');
 			breakableOccurrences.push([false, i, co - c])
 		}
-		breakableOccurrences.sort((a, b) => b[2] - a[2]);
-		let i = 0;
-		while (varCount[1] < allowedChars[1].length && i < breakableOccurrences.length) {
-			let it = breakableOccurrences[i];
-			(it[0] ? aliases : functions)[it[1]][1] = allowedChars[1][varCount[1]];
-			varCount[1]++;
-			i++;
-		}
+		breakableOccurrences.sort((a, b) => b[2] - a[2]).slice(0, allowedChars[1].length).map(e => {
+			(e[0] ? aliases : functions)[e[1]][1] = allowedChars[1][varCount[1]++];
+		});
 	}
 
 	// use regular set for every other command
 	// for now smart redefinition is ignored, could save a few definitions
 	// but only if i can be fked figuring that out
 	{
-		for (let i = 0; i < aliases.length; i++) {
-			if (!aliases[i][1]) {
-				aliases[i][1] = allowedChars[0][varCount[0]];
-				varCount[0]++;
-			}
-		}
-		for (let i = 0; i < functions.length; i++) {
-			if (!functions[i][1]) {
-				functions[i][1] = allowedChars[0][varCount[0]];
-				varCount[0]++;
-			}
-		}
+		let f = e => e[1] ? e : [e[0], allowedChars[0][varCount[0]++]];
+		aliases = aliases.map(f);
+		functions = functions.map(f);
 	}
+	console.log(varCount[0] + "/" + allowedChars[0].length + " variables used (" + (varCount[0] / allowedChars[0].length * 100).toFixed(2) +"%)");
 
-	let f = e => (e[0] ? aliases : functions)[e[1]][0] + ' : ' + e[2] + ' breakable space(s) : ' + (e[0] ? aliases : functions)[e[1]][1];
-	console.log('Breakset variables :\n' + breakableOccurrences.slice(0, allowedChars[1].length - 2).map(f).join('\n').padByDelim(':'));
-	console.log('Other variables :\n' + breakableOccurrences.slice(allowedChars[1].length - 2).map(f).join('\n').padByDelim(':'));
+	let f = e => (e[0] ? aliases : functions)[e[1]][0] + ' :: ' + e[2] + ' breakable space(s) : ' + (e[0] ? aliases : functions)[e[1]][1];
+	console.log('Breakset variables :\n' + breakableOccurrences.slice(0, allowedChars[1].length).map(f).join('\n').padByDelim(':'));
+	console.log('Other variables :\n' + breakableOccurrences.slice(allowedChars[1].length).map(f).join('\n').padByDelim(':'));
 
 	console.log(analysis);
-
 
 	txt = compileVariables(txt);
 	txt = squishCommand(txt);
