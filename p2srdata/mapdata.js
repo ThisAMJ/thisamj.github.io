@@ -91,45 +91,41 @@ class MapFile {
 
 	remTrailingZeroes() {
 		// all this does is remove trailing zeros
-		for (let index in this.triggers) {
-			let trigger = this.triggers[index];
-			let name = trigger.substring(0, trigger.indexOf('"', 1) + 1);
-			let args = trigger.substring(trigger.indexOf('"', 1) + 2).split(" ");
-			for (let i = 1; i < args.length; i++) {
-				let property = args[i].split("=");
+		this.triggers = this.triggers.map(e => {
+			let name = e.substring(0, e.indexOf('"', 1) + 1);
+			let args = e.substring(e.indexOf('"', 1) + 2).split(" ");
+			args = args.map(e => {
+				let property = e.split("=");
 				if (property.length > 0 && ["center", "size", "angle"].indexOf(property[0]) > -1) {
 					let values = property[1].split(",");
 					for (let j = 0; j < values.length; j++) {
-						//toString() removes trailing zeros from a number
 						values[j] = parseFloat(values[j]).toString();
 					}
 					property[1] = values.join(",");
 				}
-				args[i] = property.join("=");
-			}
-			this.triggers[index] = name + " " + args.join(" ");
-		}
+				return property.join("=");
+			});
+			return name + " " + args.join(" ");
+		});
 	}
 
 	addTrailingZeroes() {
-		for (let index in this.triggers) {
-			let trigger = this.triggers[index];
-			let name = trigger.substring(0, trigger.indexOf('"', 1) + 1);
-			let args = trigger.substring(trigger.indexOf('"', 1) + 2).split(" ");
-			for (let i = 1; i < args.length; i++) {
-				let property = args[i].split("=");
+		this.triggers = this.triggers.map(e => {
+			let name = e.substring(0, e.indexOf('"', 1) + 1);
+			let args = e.substring(e.indexOf('"', 1) + 2).split(" ");
+			args = args.map(e => {
+				let property = e.split("=");
 				if (property.length > 0 && ["center", "size", "angle"].indexOf(property[0]) > -1) {
 					let values = property[1].split(",");
 					for (let j = 0; j < values.length; j++) {
-						//toString() removes trailing zeros from a number
 						values[j] = parseFloat(values[j]).toFixed(2).toString();
 					}
 					property[1] = values.join(",");
 				}
-				args[i] = property.join("=");
-			}
-			this.triggers[index] = name + " " + args.join(" ");
-		}
+				return property.join("=");
+			});
+			return name + " " + args.join(" ");
+		});
 	}
 }
 
@@ -139,6 +135,7 @@ async function updateWikiData() {
 		await updateWikiContent();
 	}
 	for (let map of maps) {
+		if (!map.wikicontent) continue;
 		var lines = map.wikicontent.split('\n');
 		map.formattedWiki = [];
 		map.categories = [];
@@ -258,21 +255,20 @@ async function updateWikiData() {
 }
 
 async function updateWikiContent() {
-	var titles = maps.map(e => {return e.wikiname});
 	// maximum titles count is 50, split them into chunks
-	for (let i = 0; i < titles.length; i += 50) {
-		let titleChunk = titles.slice(i, i + 50).join("|");
-		// api query from fucking hell. took me 2 hours to find the origin option
-		let url = `https://wiki.portal2.sr/api.php?action=query&format=json&origin=*&prop=revisions&rvprop=content&rvslots=main&titles=${titleChunk}`;
-		let time = new Date(), response = await queryAPI(url);
-		console.log(`got wikitext for maps ${i}-${Math.min(maps.length - 1, i + 50)} (${formatBytes(response.length)}), took ${new Date() - time}ms`);
-		let json = JSON.parse(response).query.pages;
-		for (let key in json) {
-			if (json.hasOwnProperty(key)) {
-				let map = mapWithWikiName(json[key].title);
+	var urls = maps.chunkify(50).map(e => 
+		'https://wiki.portal2.sr/api.php?action=query&format=json&origin=*&prop=revisions&rvprop=content&rvslots=main&titles=' +
+		e.map(e => e.wikiname).join('|')
+	);
+	let response = await queryAPI(urls, r => r.json());
+	for (let i = 0; i < response.length; i++) {
+		let pages = response[i].query.pages;
+		for (let page in pages) {
+			if (pages.hasOwnProperty(page)) {
+				let map = mapWithWikiName(pages[page].title);
 				map.wikicontent = "";
-				if (json[key].hasOwnProperty("revisions")) {
-					let txt = json[key].revisions[0].slots.main["*"];
+				if (pages[page].hasOwnProperty("revisions")) {
+					let txt = pages[page].revisions[0].slots.main["*"];
 					if (txt.startsWith("#REDIRECT")) {
 						// can't be fucked doing this so YEET
 						console.error(`couldn't get wikitext for ${map.wikiname}, got redirected`);
@@ -285,35 +281,37 @@ async function updateWikiContent() {
 			}
 		}
 	}
+	console.log('got wikicontent!');
 }
 
 async function updateMtriggers() {
-	var titles = maps.map(e => {return `${e.coop ? "Coop/Course" : "SP/Chapter"}${e.chapter}/${e.filename}.cfg`}), count = 0;
-	for (let i = 0; i < titles.length; i++) {
-		// github good website, didn't take me 2 hours to figure out :D
-		let url = `https://raw.githubusercontent.com/p2sr/portal2-mtriggers/master/${titles[i]}`;
-		let time = new Date(), response = await queryAPI(url);
-		if (response != "404 NOT FOUND") {
-			for (let j = 0; j < response.split('\n').length; j++) {
-				if (response.split('\n')[j].trim().startsWith("//")) {
-					console.log(maps[i].splitname)
-					console.log(response.split('\n')[j])
-				}
-			}
-			let t = maps[i].triggersFromTxt(response);
-			count++;
-			// console.log(`got mtriggers for ${maps[i].wikiname} (${formatBytes(response.length)}), took ${new Date() - time}ms`);
-			// console.log(t.join("\n"));
-		} else {
+	let urls = maps.map(e => 
+		`${e.coop ? "Coop/Course" : "SP/Chapter"}${e.chapter}/${e.filename}.cfg`
+	).map(e =>
+		"https://raw.githubusercontent.com/p2sr/portal2-mtriggers/master/" + e
+	);
+	let mtriggers = await queryAPI(urls), count = 0;
+	for (let i = 0; i < mtriggers.length; i++) {
+		let response = mtriggers[i];
+		if (response == "404: Not Found") {
 			// probably a cutscene map
 			maps[i].triggers = [];
 			if (maps[i].cmNative) {
 				// hey wait this aint a cutscene map it just has no triggers
 				maps[i].addGenericTriggers();
 			}
+		} else {
+			count++;
+			let lines = response.split('\n');
+			for (let j = 0; j < lines.length; j++) {
+				if (lines[j].trim().startsWith("//")) {
+					console.log(maps[i].splitname + ' : ' + lines[j].replace("//", ""));
+				}
+			}
+			let triggers = maps[i].triggersFromTxt(response);
 		}
 	}
-	console.log(`got mtriggers for ${count} maps, ${titles.length - count} not found`);
+	console.log(`got mtriggers for ${count} maps, ${urls.length - count} not found`);
 }
 
 function mapWithFileName(str) {
@@ -354,13 +352,13 @@ function addMaps() {
 		'"Ending Room" zone center=-699.63,96.04,-3.06 size=8.68,64.14,107.93 angle=0.00',
 		'"Exit Door" zone center=-319.62,624.13,-0.38 size=127.17,30.40,127.17 angle=0.00',
 		'"End" entity targetname=departure_elevator-close inputname=Trigger'],
-		`Aperture Science Reintegration [As]sociate`));
+		`Aperture Science Reintegration [Associate]`));
 	maps.push(new MapFile('sp_a1_intro3', 'Portal Gun', 1, false, [
 		'"Drop Trigger" entity targetname=podium_collapse inputname=EnableRefire',
 		'"Portal Entry" zone center=94.68,2260.19,-192.30 size=103.55,70.96,127.34 angle=0.00',
 		'"Orange Portal Trigger" entity targetname=room_1_portal_deactivate_rl inputname=Trigger',
 		'"Door Trigger" entity targetname=door_3-proxy inputname=OnProxyRelay2'],
-		`I'm just gonna [wait] for you up ahead`));
+		`Should've asked that [first]. I'm just gonna [wait] for you up ahead`));
 	maps.push(new MapFile('sp_a1_intro4', 'Smooth Jazz', 1, false, [
 		'"Dropper Trigger" entity targetname=logic_drop_box inputname=Trigger',
 		'"Second Room" entity targetname=info_sign-proxy inputname=OnProxyRelay1',

@@ -55,6 +55,14 @@ Array.prototype.sortByOccurrences = function() {
 	return b.sort((a, b) => b[1] - a[1]); // most common first
 }
 
+Array.prototype.chunkify = function(size) {
+	let chunks = [];
+	for (let i = 0; i < this.length; i += size) {
+		chunks.push(this.slice(i, i + size));
+	}
+	return chunks;
+}
+
 function formatBytes(a, b = 2, k = true) {
 	// Modified version of https://stackoverflow.com/a/18650828/13192876
 	with (Math) {
@@ -65,30 +73,11 @@ function formatBytes(a, b = 2, k = true) {
 	}
 }
 
-const queryAPI = url => new Promise((res, rej) => {
-	// thank you https://stackoverflow.com/a/48969580/13192876
-	let xhr = new XMLHttpRequest();
-	xhr.open("GET", url, true);
-	xhr.onload = function() {
-		with (this) {
-			if (readyState == 4 && status == 200) {
-				res(response);
-			} else {
-				if (status == 404) res('404 NOT FOUND');
-				rej({
-					status: status,
-					statusText: xhr.statusText
-				});
-			}
-		}
-	}
-	xhr.onerror = function() {
-		rej({
-			status: this.status,
-			statusText: xhr.statusText
-		});
-	}
-	xhr.send();
+const queryAPI = (url, typeFunc = r => r.text()) => new Promise((res) => {
+	let f = e => fetch(e).then(typeFunc);
+	typeof url == "string" ?
+		f(url).then(r => res(r)) : 
+		Promise.all(url.map(f)).then(r => res(r));
 });
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
