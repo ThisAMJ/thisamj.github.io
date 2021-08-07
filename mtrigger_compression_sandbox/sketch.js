@@ -68,10 +68,10 @@ var squishCommand = t =>
 			, e.split('"').length == 2 ? e : e.split('//').map((e, f, g) => 
 				e.length == 0 ? null : f > 0 && (g.slice(0, f).join('').split('"').length - 1) % 2 == 0 ? null : e
 			).filter(e => e).join('//').split('"').map((e, f, g) => 
-				f % 2 == 0 || e.indexOf('$') == -1 && (e.indexOf(' ') == -1 && e.indexOf(';') == -1 && e.indexOf('//') == -1 && e != '' && f < g.length - 1) ? e : `"${e}"`
-			).join(' ').replaceAll('; ', ';').replaceAll(' ;', ';')).split('"').map((e, f) => 
-				f % 2 == 0 ? e.trim().replaceAll('\t', ' ').replaceEvery('  ', ' ') : e
-			).join('"');
+				f % 2 == 0 || e.indexOf('$') == -1 && (e.indexOf(' ') == -1 && e.indexOf(';') == -1 && e.indexOf('//') == -1 && !"(){}:'".split('').some(f => e.indexOf(f) > -1) && e != '' && f < g.length - 1) ? e : `"${e}"`
+			).join(' ')).split('"').map((e, f) => 
+				f % 2 == 0 ? e.trim().replaceAll('\t', ' ').replaceEvery('  ', ' ') : e.indexOf(';') > -1 ? e.replaceAll('\t', ' ').replaceEvery('  ', ' ') : e
+			).join('"').replaceAll('; ', ';').replaceAll(' ;', ';');
 		while (e.endsWith('""')) e = e.substr(0, e.length - 2);
 		return e;
 	}).filter(e => e != '').join('\n');
