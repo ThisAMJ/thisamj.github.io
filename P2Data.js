@@ -1,3 +1,5 @@
+// Requires prototypes.js, FileSaver.js and jszip.js referenced before usage
+
 class P2Data {
 	constructor() {
 		let genericTriggers = coop => ['"Start" load action=force_start'].concat(coop ? ['"Flags 1" flags', '"Flags 2" flags "ccafter=Flags 1" action=stop'] : ['"Flags" flags action=stop']);
@@ -5,10 +7,13 @@ class P2Data {
 			filename: e[0],
 			splitname: e[1],
 			wikiname:
-				e[1] == 'Funnel Catch (SP)' ? 'Funnel Catch (singleplayer)' :
-				e[1] == 'Funnel Catch (MP)' ? 'Funnel Catch' :
-				e[1] == 'Jailbreak'         ? 'Jail Break' :
-				e[1],
+				e[1] == 'Funnel Catch (SP)'
+					? 'Funnel Catch (singleplayer)'
+					: e[1] == 'Funnel Catch (MP)'
+						? 'Funnel Catch'
+						: e[1] == 'Jailbreak'
+							? 'Jail Break'
+							: e[1],
 			chapter: isNaN(parseInt(e[2])) ? -1 : parseInt(e[2]),
 			coop: e[3],
 			triggers: genericTriggers(e[3]),
@@ -17,7 +22,7 @@ class P2Data {
 			cmNative: false
 		});
 		this.maps = [
-			P2Map(['sp_a1_intro1'                , 'Container Ride',       1, false, ``]),
+			P2Map(['sp_a1_intro1'                , 'Container Ride',       1, false, `In a dire e[mer]gency`]),
 			P2Map(['sp_a1_intro2'                , 'Portal Carousel',      1, false, `Aperture Science Reintegration [Associate]`]),
 			P2Map(['sp_a1_intro3'                , 'Portal Gun',           1, false, `Should've asked that [first]. I'm just gonna [wait] for you up ahead`]),
 			P2Map(['sp_a1_intro4'                , 'Smooth Jazz',          1, false, ``]),
@@ -30,7 +35,7 @@ class P2Data {
 			P2Map(['sp_a2_laser_stairs'          , 'Laser Stairs',         2, false, `That's what it says: a [horrible] person`]),
 			P2Map(['sp_a2_dual_lasers'           , 'Dual Lasers',          2, false, `Emerge from suspension terribly [undernourished]`]),
 			P2Map(['sp_a2_laser_over_goo'        , 'Laser Over Goo',       2, false, ``]),
-			P2Map(['sp_a2_catapult_intro'        , 'Catapult Intro',       2, false, `Room full of air [for] the rest of your life`]),
+			P2Map(['sp_a2_catapult_intro'        , 'Catapult Intro',       2, false, `Room full of air [for] the rest`]),
 			P2Map(['sp_a2_trust_fling'           , 'Trust Fling',          2, false, ``]),
 			P2Map(['sp_a2_pit_flings'            , 'Pit Flings',           2, false, ``]),
 			P2Map(['sp_a2_fizzler_intro'         , 'Fizzler Intro',        2, false, ``]),
@@ -39,55 +44,56 @@ class P2Data {
 			P2Map(['sp_a2_bridge_intro'          , 'Bridge Intro',         3, false, `Did you guess 'sharks'? Because [that's] wrong`]),
 			P2Map(['sp_a2_bridge_the_gap'        , 'Bridge The Gap',       3, false, `There's lots of room [here]`]),
 			P2Map(['sp_a2_turret_intro'          , 'Turret Intro',         3, false, ``]),
-			P2Map(['sp_a2_laser_relays'          , 'Laser Relays',         3, false, `Technically, it's a [medical] experiment`]),             
+			P2Map(['sp_a2_laser_relays'          , 'Laser Relays',         3, false, `Technically, it's a [medical] experiment`]),
 			P2Map(['sp_a2_turret_blocker'        , 'Turret Blocker',       3, false, `A man [and] a woman`]),
-			P2Map(['sp_a2_laser_vs_turret'       , 'Laser Vs Turret',      3, false, `[second high note]`]),
+			P2Map(['sp_a2_laser_vs_turret'       , 'Laser Vs Turret',      3, false, `[2nd high note]`]),
 			P2Map(['sp_a2_pull_the_rug'          , 'Pull The Rug',         3, false, `After all [these] years`]),
 			P2Map(['sp_a2_column_blocker'        , 'Column Blocker',       4, false, ``]),
 			P2Map(['sp_a2_laser_chaining'        , 'Laser Chaining',       4, false, ``]),
-			P2Map(['sp_a2_triple_laser'          , 'Triple Laser',         4, false, `Look at things objectively, [see] what you don't need`]),               
+			P2Map(['sp_a2_triple_laser'          , 'Triple Laser',         4, false, `Look at things objectively, [see] what you`]),
 			P2Map(['sp_a2_bts1'                  , 'Jailbreak',            4, false, ``]),
 			P2Map(['sp_a2_bts2'                  , 'Escape',               4, false, ``]),
 			P2Map(['sp_a2_bts3'                  , 'Turret Factory',       5, false, ``]),
 			P2Map(['sp_a2_bts4'                  , 'Turret Sabotage',      5, false, ``]),
 			P2Map(['sp_a2_bts5'                  , 'Neurotoxin Sabotage',  5, false, ``]),
-			P2Map(['sp_a2_bts6'                  , 'Tube Ride',            5, false, ``]),                                        
+			P2Map(['sp_a2_bts6'                  , 'Tube Ride',            5, false, ``]),
 			P2Map(['sp_a2_core'                  , 'Core',                 5, false, ``]),
-			P2Map(['sp_a3_00'                    , 'Long Fall',            6, false, ``]),                                        
+			P2Map(['sp_a3_00'                    , 'Long Fall',            6, false, ``]),
 			P2Map(['sp_a3_01'                    , 'Underground',          6, false, ``]),
 			P2Map(['sp_a3_03'                    , 'Cave Johnson',         6, false, ``]),
-			P2Map(['sp_a3_jump_intro'            , 'Repulsion Intro',      6, false, `Here's some advice the lab boys gave me [*] do not`]),
-			P2Map(['sp_a3_bomb_flings'           , 'Bomb Flings',          6, false, `Slight chance the [calcium] could harden`]),
-			P2Map(['sp_a3_crazy_box'             , 'Crazy Box',            6, false, `Invent a special safety [door] that won't hit you`]),
+			P2Map(['sp_a3_jump_intro'            , 'Repulsion Intro',      6, false, `Advice the lab boys gave me: [*] do not`]),
+			P2Map(['sp_a3_bomb_flings'           , 'Bomb Flings',          6, false, `Chance the [calcium] could harden`]),
+			P2Map(['sp_a3_crazy_box'             , 'Crazy Box',            6, false, `Special safety [door] that won't`]),
 			P2Map(['sp_a3_transition01'          , 'PotatOS',              6, false, ``]),
-			P2Map(['sp_a3_speed_ramp'            , 'Propulsion Intro',     7, false, `With your help, we're gonna change [the] world`]),          
+			P2Map(['sp_a3_speed_ramp'            , 'Propulsion Intro',     7, false, `With your help, we're gonna change [the] world`]),
 			P2Map(['sp_a3_speed_flings'          , 'Propulsion Flings',    7, false, `I mentioned earlier. [Again]: all you gotta do`]),
 			P2Map(['sp_a3_portal_intro'          , 'Conversion Intro',     7, false, ``]),
 			P2Map(['sp_a3_end'                   , 'Three Gels',           7, false, ``]),
-			P2Map(['sp_a4_intro'                 , 'Test',                 8, false, `Paradox idea didn't work. [And] it almost killed me`]),
-			P2Map(['sp_a4_tb_intro'              , 'Funnel Intro',         8, false, `The good [news] is... well, none so far`]),                             
+			P2Map(['sp_a4_intro'                 , 'Test',                 8, false, `Paradox idea didn't work. [And] it almost`]),
+			P2Map(['sp_a4_tb_intro'              , 'Funnel Intro',         8, false, `The good [news] is... well, none so far`]),
 			P2Map(['sp_a4_tb_trust_drop'         , 'Ceiling Button',       8, false, `I knew we're in a lot [of] trouble`]),
 			P2Map(['sp_a4_tb_wall_button'        , 'Wall Button',          8, false, `Oh no... [*] it's happening sonner than I expected`]),
 			P2Map(['sp_a4_tb_polarity'           , 'Polarity',             8, false, ``]),
 			P2Map(['sp_a4_tb_catch'              , 'Funnel Catch (SP)',    8, false, `Can get a little... [unbearable]`]),
 			P2Map(['sp_a4_stop_the_box'          , 'Stop The Box',         8, false, `No. [No]. That was the solution`]),
-			P2Map(['sp_a4_laser_catapult'        , 'Laser Catapult',       8, false, `Maintain any of the [crucial] functions required`]),
+			P2Map(['sp_a4_laser_catapult'        , 'Laser Catapult',       8, false, `Any of the [crucial] functions required`]),
 			P2Map(['sp_a4_laser_platform'        , 'Laser Platform',       8, false, ``]),
-			P2Map(['sp_a4_speed_tb_catch'        , 'Propulsion Catch',     8, false, `Gonna love it, to [*] death`]),                            
-			P2Map(['sp_a4_jump_polarity'         , 'Repulsion Polarity',   8, false, `He's got a surprise [for] us`]),
+			P2Map(['sp_a4_speed_tb_catch'        , 'Propulsion Catch',     8, false, `Gonna love it, to [*] death`]),
+			P2Map(['sp_a4_jump_polarity'         , 'Repulsion Polarity',   8, false, `Got a surprise [for] us`]),
 			P2Map(['sp_a4_finale1'               , 'Finale 1',             9, false, ``]),
 			P2Map(['sp_a4_finale2'               , 'Finale 2',             9, false, ``]),
 			P2Map(['sp_a4_finale3'               , 'Finale 3',             9, false, ``]),
 			P2Map(['sp_a4_finale4'               , 'Finale 4',             9, false, ``]),
-			P2Map(['mp_coop_start'               , 'Calibration',          0, true,  ``]),                                        
+			P2Map(['mp_coop_start'               , 'Calibration',          0, true,  ``]),
+			P2Map(['mp_coop_lobby_3'             , 'Hub',                  0, true,  ``]),
 			P2Map(['mp_coop_doors'               , 'Doors',                1, true,  ``]),
 			P2Map(['mp_coop_race_2'              , 'Buttons',              1, true,  ``]),
 			P2Map(['mp_coop_laser_2'             , 'Lasers',               1, true,  `One of you is doing very [v]ery well`]),
 			P2Map(['mp_coop_rat_maze'            , 'Rat Maze',             1, true,  `Reflected in your final [sc]ore`]),
-			P2Map(['mp_coop_laser_crusher'       , 'Laser Crusher',        1, true,  `Not just flattery, you are gre[a]t at science`]),              
+			P2Map(['mp_coop_laser_crusher'       , 'Laser Crusher',        1, true,  `Not just flattery, you are gre[a]t at science`]),
 			P2Map(['mp_coop_teambts'             , 'Behind The Scenes',    1, true,  ``]),
-			P2Map(['mp_coop_fling_3'             , 'Flings',               2, true,  `Exactly fit an edgeless safet[y] cube`]),
-			P2Map(['mp_coop_infinifling_train'   , 'Infinifling',          2, true,  `Must be very, very prou[d]`]),                            
+			P2Map(['mp_coop_fling_3'             , 'Flings',               2, true,  `Fit an edgeless safet[y] cube`]),
+			P2Map(['mp_coop_infinifling_train'   , 'Infinifling',          2, true,  `Must be very, very prou[d]`]),
 			P2Map(['mp_coop_come_along'          , 'Team Retrieval',       2, true,  ``]),
 			P2Map(['mp_coop_fling_1'             , 'Vertical Flings',      2, true,  ``]),
 			P2Map(['mp_coop_catapult_1'          , 'Catapults',            2, true,  ``]),
@@ -96,7 +102,7 @@ class P2Data {
 			P2Map(['mp_coop_fan'                 , 'Industrial Fan',       2, true,  ``]),
 			P2Map(['mp_coop_wall_intro'          , 'Cooperative Bridges',  3, true,  `Let me give you a cl[ue]`]),
 			P2Map(['mp_coop_wall_2'              , 'Bridge Swap',          3, true,  `Testing track hall of fame for tha[t]`]),
-			P2Map(['mp_coop_catapult_wall_intro' , 'Fling Block',          3, true,  `For completing this test, a reward for [t]esting`]),                  
+			P2Map(['mp_coop_catapult_wall_intro' , 'Fling Block',          3, true,  `For completing this test, a reward for [t]esting`]),
 			P2Map(['mp_coop_wall_block'          , 'Catapult Block',       3, true,  `Described it as impossible, dead[ly], cruel`]),
 			P2Map(['mp_coop_catapult_2'          , 'Bridge Fling',         3, true,  `To not reassemble you. He refu[s]ed`]),
 			P2Map(['mp_coop_turret_walls'        , 'Turret Walls',         3, true,  `Reconfigured it from my original [p]lans`]),
@@ -109,7 +115,7 @@ class P2Data {
 			P2Map(['mp_coop_tbeam_polarity'      , 'Cooperative Polarity', 4, true,  `I trust y[ou]. You are my favorite`]),
 			P2Map(['mp_coop_tbeam_polarity2'     , 'Funnel Hop',           4, true,  `If [O]range had said those things about me`]),
 			P2Map(['mp_coop_tbeam_polarity3'     , 'Advanced Polarity',    4, true,  `So I can trust [you] one hundred percent`]),
-			P2Map(['mp_coop_tbeam_maze'          , 'Funnel Maze',          4, true,  `Before we can go any further, [*] I will need you to complete`]),         
+			P2Map(['mp_coop_tbeam_maze'          , 'Funnel Maze',          4, true,  `Before we can go any further, [*] I will need you to complete`]),
 			P2Map(['mp_coop_tbeam_end'           , 'Turret Warehouse',     4, true,  ``]),
 			P2Map(['mp_coop_paint_come_along'    , 'Repulsion Jumps',      5, true,  `The best cooperative tes[t]ing team`]),
 			P2Map(['mp_coop_paint_redirect'      , 'Double Bounce',        5, true,  `The number one request? [*] Less deadly tests`]),
@@ -120,50 +126,25 @@ class P2Data {
 			P2Map(['mp_coop_paint_speed_catch'   , 'Propulsion Retrieval', 5, true,  `The ratio of humans to monsters is about [*] a million to one.`]),
 			P2Map(['mp_coop_paint_longjump_intro', 'Vault Entrance',       5, true,  ``]),
 			P2Map(['mp_coop_separation_1'        , 'Separation',           6, true,  `For as long as you [d]id`]),
-			P2Map(['mp_coop_tripleaxis'          , 'Triple Axis',          6, true,  `Solving things in the future, but we [d]on't`]),                          
+			P2Map(['mp_coop_tripleaxis'          , 'Triple Axis',          6, true,  `Solving things in the future, but we [d]on't`]),
 			P2Map(['mp_coop_catapult_catch'      , 'Catapult Catch',       6, true,  `I'm marking this art [a]ppreciated`]),
 			P2Map(['mp_coop_2paints_1bridge'     , 'Bridge Gels',          6, true,  ``]),
 			P2Map(['mp_coop_paint_conversion'    , 'Maintenance',          6, true,  ``]),
 			P2Map(['mp_coop_bridge_catch'        , 'Bridge Catch',         6, true,  `Just to get the scheming juices [f]lowing`]),
 			P2Map(['mp_coop_laser_tbeam'         , 'Double Lift',          6, true,  ``]),
-			P2Map(['mp_coop_paint_rat_maze'      , 'Gel Maze',             6, true,  `If I don't see you on the other side, [t]hanks for nothing`]),                    
+			P2Map(['mp_coop_paint_rat_maze'      , 'Gel Maze',             6, true,  `If I don't see you on the other side, [t]hanks for nothing`]),
 			P2Map(['mp_coop_paint_crazy_box'     , 'Crazier Box',          6, true,  ``])
 		];
 	}
 
-	async getMtriggers() {
-		// Get mtriggers from Github (p2sr/portal2-mtriggers)
-		let URLs = this.maps.map(e =>
-			'https://raw.githubusercontent.com/p2sr/portal2-mtriggers/master/' +
-			(e.coop ? 'Coop/Course' : 'SP/Chapter') +
-			e.chapter + '/' +
-			e.filename + '.cfg'
-		);
-
-		if (queryAPI) {
-			let response = await queryAPI(URLs);
-			for (let i = 0; i < response.length; i++) {
-				let map = this.maps[i];
-				this.maps[i].triggers = response[i].split('\n').filter(e =>
-					e.startsWith('sar_speedrun_cc_rule ')
-				).map(e => e.replace('sar_speedrun_cc_rule ', ''))
-			}
-		} else {
-			console.error("PROTOTYPES.JS NOT INCLUDED!");
-		}
-
-		return this;
-	}
-
-	trailingZeroFunc(f) {
+	coordFunc(func) {
 		this.maps = this.maps.map(e => {
 			e.triggers = e.triggers.map(e => {
-				let name = e.substring(0, e.indexOf('"', 1) + 1);
-				let args = e.substring(e.indexOf('"', 1) + 2).split(' ');
-				args = args.map(e => {
+				let name = e.substr(0, e.indexOf('"', 1) + 1);
+				let args = e.substr(e.indexOf('"', 1) + 2).split(' ').map((e, f, g) => {
 					let property = e.split('=');
 					if (property.length > 0 && ['center', 'size', 'angle'].indexOf(property[0]) > -1) {
-						property[1] = property[1].split(',').map(f).join(',');
+						property[1] = property[1].split(',').map(e => func(parseFloat(e), g[0], property[0])).join(',');
 					}
 					return property.join('=');
 				});
@@ -172,53 +153,262 @@ class P2Data {
 			return e;
 		});
 	}
+
 	addTrailingZeroes() {
-		this.trailingZeroFunc(e => parseFloat(e).toFixed(2).toString());
+		this.coordFunc(e => e.toFixed(2).toString());
 	}
+
 	removeTrailingZeroes() {
-		this.trailingZeroFunc(e => parseFloat(e).toString());
+		this.coordFunc(e => e.toString());
+	}
+
+	optimisePortalTriggers() {
+		// portal triggers can be less precise than zones
+		// so we snap center to nearest whole pos
+		// and increase size to make up for any lost edges
+		this.coordFunc((e, t, p) =>
+			t == 'portal'
+				? p == 'center'
+					? Math.round(e)
+					: p == 'size'
+						? Math.ceil(e) + 2
+						: e
+				: e
+		);
+	}
+
+	async getMtriggers() {
+		// Get mtriggers from Github (p2sr/portal2-mtriggers)
+		// This will be obsolete when 1.13 releases, remind me to update it
+		return queryAPI(this.maps.map(e => 
+			'https://raw.githubusercontent.com/p2sr/portal2-mtriggers/master/' +
+			(e.coop ? 'Coop/Course' : 'SP/Chapter') +
+			e.chapter + '/' +
+			e.filename + '.cfg'
+		)).then(e => {
+			let count = e.length;
+			for (let i = 0; i < count; i++) {
+				let map = this.maps[i];
+				map.triggers = e[i].split('\n').filter(e => 
+					e.startsWith('sar_speedrun_cc_rule ')
+				).map(e => e.replace('sar_speedrun_cc_rule ', ''));
+				map.cmNative = map.triggers.length > 0;
+			}
+			return this;
+		});
 	}
 
 	async getWiki() {
 		// Get wiki from portal2.sr (wiki.portal2.sr/api.php)
-		if (Array.prototype.chunkify) {
-			let URLs = this.maps.chunkify(50).map(e => 
-				'https://wiki.portal2.sr/api.php?action=query&format=json&origin=*&prop=revisions&rvprop=content&rvslots=main&titles=' +
-				e.map(e => e.wikiname).join('|')
-			);
-			if (queryAPI) {
-				let response = await queryAPI(URLs, r => r.json());
-				for (let i = 0; i < response.length; i++) {
-					let pages = response[i].query.pages;
-					for (let page in pages) {
-						if (pages.hasOwnProperty(page)) {
-							let map = this.mapWithWikiName(pages[page].title);
-							map.wikicontent = '';
-							if (pages[page].hasOwnProperty('revisions')) {
-								let txt = pages[page].revisions[0].slots.main["*"];
-								if (txt.startsWith('#REDIRECT')) {
-									// No.
-									console.error(`couldn't get wikitext for ${map.wikiname}, got redirected`);
-								} else {
-									map.wikicontent = txt;
-								}
+		let target = this;
+		return queryAPI([...target.maps].chunkify(50).map(e =>
+			'https://wiki.portal2.sr/api.php?action=query&format=json&origin=*&prop=revisions&rvprop=content&rvslots=main&titles=' +
+			e.map(e => e.wikiname).join('|')
+		), r => r.json()).then(e => e.reduce((acc, val) =>
+			acc.concat(Object.keys(val.query.pages).reduce((f, g) => 
+				f.concat(val.query.pages[g])
+			, [])), [])
+		).then(e => {
+			let count = e.length;
+			for (let i = 0; i < count; i++) {
+				let map = target.mapWithProperty('wikiname', e[i].title);
+				map.wikicontent = '';
+				if (e[i].hasOwnProperty('revisions')) {
+					let txt = e[i].revisions[0].slots.main["*"];
+					if (txt.startsWith('#REDIRECT')) {
+						// No redirect handling
+						console.error(`WIKI: Couldn't get ${map.wikiname} : ERROR 302`);
+					} else {
+						map.wikicontent = txt;
+					}
+				} else {
+					console.error(`WIKI: Couldn't get ${map.wikiname} : ERROR 404`);
+				}
+			}
+			return target;
+		});
+	}
+
+	formatWiki() {
+		this.maps.map(e => e.formattedWiki = e.wikicontent.replaceAll('\n', '<br>'));
+		for (let map of this.maps) {
+			if (!map.wikicontent || map.wikicontent == '') continue;
+			[map.formattedWiki, map.categories] = [[], []];
+			let lines = map.wikicontent.split('\n'), lineCount = lines.length;
+			for (let i = 0; i < lineCount; i++) {
+				let [bold, italic] = [false];
+
+				while (lines[i].indexOf("'''") > -1) {
+					lines[i] = lines[i].replace("'''", bold ? "</b>" : "<b>");
+					bold = !bold;
+				} // bolding
+
+				while (lines[i].indexOf("''") > -1) {
+					lines[i] = lines[i].replace("''", italic ? "</i>" : "<i>");
+					italic = !italic;
+				} // italics
+
+				while (lines[i].indexOf('[[') > -1 && lines[i].indexOf(']]') > lines[i].indexOf('[[')) {
+					let start = lines[i].indexOf('[['), end = lines[i].indexOf(']]');
+					let content = lines[i].substring(start, end + 2);
+					if (content.startsWith('[[Category:')) {
+						map.categories.push(lines[i].substring(start + 11, end));
+					} else if (!content.startsWith('[[File:')) {
+							let parts = content.replace('[[', '').replace(']]', '').split('|');
+							let link = parts[0], display = parts.pop();
+							if (link.startsWith('#')) link = map.wikiname + link;
+							link = 'https://wiki.portal2.sr/' + link.replaceAll(' ', '_').replaceAll('"', '%22');
+							lines[i] = lines[i].replace(content, `<a href="${link}" target="_blank">${display}</a>`);
+					}
+					if (start == lines[i].indexOf('[[')) lines[i] = lines[i].replace(content, '');
+				}
+
+				while (lines[i].indexOf('[') > -1 && lines[i].indexOf(']') > lines[i].indexOf('[')) {
+					let start = lines[i].indexOf('['), end = lines[i].indexOf(']') + 1;
+					let content = lines[i].substring(start, end);
+					let link = content.split(' ')[0].substr(1);
+					let display = (content.split(' ').length > 1 ? content.replace(`[${link} `, '') : link).replace(']', '');
+					if (!link.startsWith('http')) break;
+					lines[i] = lines[i].replace(content, `<a href="${link}" target="_blank">${display}</a>`);
+				}
+
+
+				let trimmedLine = lines[i].trim();
+
+				if (trimmedLine.startsWith('{{')) {
+					let startI = i, inside = [], indent = 0, goneIn = false;
+					while ((indent > 0 || !goneIn) && i < lines.length) {
+						goneIn = true;
+						indent += (lines[i].match(/\{\{/g) || []).length;
+						indent -= (lines[i].match(/\}\}/g) || []).length;
+						inside.push(lines[i].trim());
+						i++;
+					}
+					i--;
+					inside = inside.join('\n'), indent = 0;
+					inside = inside.substring(2, inside.length - 2);
+					let insideArgs = [], str = '';
+					for (let j = 0; j < inside.length; j++) {
+						if (inside[j] + inside[j + 1] == '{{') {
+							indent++;
+							j += 2;
+						} else if (inside[j] + inside[j + 1] == '}}') {
+							indent--;
+							j += 2;
+						} else if (inside[j] == '|' && indent == 0) {
+							insideArgs.push(str);
+							str = '';
+						} else {
+							str += inside[j];
+						}
+					}
+					insideArgs.push(str);
+					// do stuff with insideArgs
+					switch (insideArgs[0]) {
+						case 'P2_Video':
+							// youtube embed
+							break;
+						case 'P2_Infobox':
+							// page title
+							map.formattedWiki.push(`<h1 class="p2title">${insideArgs[1]}</h1>`);
+							if (map.coop) {
+								// the only coop map not cm native is calibration
+								map.cmNative = map.splitname != 'Calibration' && map.splitname != 'Hub';
 							} else {
-								console.error(`couldn't get wikitext for ${map.wikiname}, page doesn't exist`);
+								let arr = insideArgs[3].split("\n");
+								for (let i = 0; i < arr.length; i++) {
+									if (arr[i].indexOf('Native to Challenge Mode') > -1) {
+										let part = arr[i].split(" ");
+										map.cmNative = part[part.length - 1] == 'Yes';
+									}
+								}
 							}
+							break;
+						case 'P2 Image':
+							// image (no underscore for some reason)
+							break;
+					}
+
+					continue;
+				} // templates
+
+				if (lines[i].startsWith('#')) {
+					if (!lines[i - 1].startsWith('#')) map.formattedWiki.push('<ol>');
+					map.formattedWiki.push(`<li>${lines[i].substring(1)}</li>`);
+					if (!lines[i + 1].startsWith('#')) map.formattedWiki.push('</ol>');
+					continue;
+				} // ordered lists
+
+				if (lines[i].startsWith('*')) {
+					if (!lines[i - 1].startsWith('*')) map.formattedWiki.push('<ul>');
+					map.formattedWiki.push(`<li>${lines[i].substring(1)}</li>`);
+					if (!lines[i + 1].startsWith('*')) map.formattedWiki.push('</ul>');
+					continue;
+				} // unordered lists
+
+				{
+					let j = 0;
+					while (lines[i][j] + trimmedLine[trimmedLine.length - j - 1] == '==') {j++;}
+					if (j > 0) {
+						map.formattedWiki.push(`<h${j}>${lines[i].substring(j, trimmedLine.length - j)}</h${j}>`);
+						continue;
+					}
+				} // headings
+				map.formattedWiki.push(lines[i]);
+			}
+
+			map.formattedWiki = map.formattedWiki.join('<br>').replaceEvery('<br><br><br>', '<br><br>');
+		}
+	}
+
+	convertMtriggers() {
+		// Convert mtriggers to 1.13+ file format
+		let zip = new JSZip();
+		this.maps.filter(e => 0 < e.triggers.length).map(P2Map => {
+			let mtriggers = [];
+			mtriggers.push('!name ' + P2Map.splitname);
+			mtriggers.push('!map ' + P2Map.filename);
+			mtriggers.push(...P2Map.triggers.map((e, f, g) => {
+				if (e == '"Start" load action=force_start') return '!start load';
+				let name = e.split('"')[1];
+				let args = e.substr(name.length + 3);
+				args = args.replace(' action=stop', '');
+				e = `${name}: ${args}`;
+
+				if (P2Map.coop) {
+
+					if (e == 'Flags 1: flags') {
+						e = 'Flags:\n	[Blue]   finish player=0';
+					} else if (e == 'Flags 2: flags "ccafter=Flags 1"') {
+						e = '	[Orange] finish player=1';
+					}
+
+					// hard code case for turret assassin
+					e = e.replace(' "ccafter=Catapult Orange"', '');
+					if (P2Map.filename != 'mp_coop_turret_ball' ||
+						(e != 'Catapult Orange: entity targetname=faith_plate_player-relay_up inputname=Trigger' &&
+						 e != 'Catapult Blue: entity targetname=faith_plate_player-proxy inputname=OnProxyRelay3')) {
+						if (name.endsWith(' Blue')) {
+							e = e.replace(' Blue: ', ':\n	[Blue]   ');
+						} else if (name.endsWith(' Orange')) {
+							e = '	[Orange] ' + args;
+						} else if (name.startsWith('Blue ')) {
+							e = name.substr(5) + ':\n	[Blue]   ' + args;
+						} else if (name.startsWith('Orange ')) {
+							e = '	[Orange] ' + args;
 						}
 					}
 				}
-			} else {
-				console.error("PROTOTYPES.JS NOT INCLUDED!");
-			}
-		} else {
-			console.error("PROTOTYPES.JS NOT INCLUDED!");
-		}
-		return this;
+				return e;
+			}));
+			console.log(mtriggers.join('\n'));
+			zip.file(P2Map.filename + '.mtr', mtriggers.join('\n'));
+		})
+      	zip.saveAs("mtriggers.zip");
 	}
 
-	mapWithWikiName(wikiname) {
-		let found = this.maps.filter(e => e.wikiname == wikiname);
-		return found[0] ? found[0] : false;
+	mapWithProperty(prop, val) {
+		let found = this.maps.filter(e => e[prop] == val);
+		return found[0] ? found[0] : undefined;
 	}
 }

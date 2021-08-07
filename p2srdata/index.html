@@ -1,39 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <script src="../prototypes.js"></script>
-    <script src="mapdata.js"></script>
-    <title>P2SR Data</title>
-    <link rel="shortcut icon" href="https://wiki.portal2.sr/favicon.ico">
-    <style type="text/css">
-    	html {
-    		background: #18191A;
-    		color: #CCCCCC;
-    		margin: 1% 10%;
-    		word-wrap: break-word;
-    	}
-      .p2title {
-        font-size: 5em;
-        text-align: center;
-      }
-      pre {
-      		white-space: normal;
-        	font-family: Arial, Helvetica, serif;
-      }
-      a {
-          color: #36c;
-          text-decoration: none;
-      }
-      input {
-          width: 100%;
-      }
-      code {
-        	background: #0A0B0B;
-      }
-    </style>
-    <meta charset="utf-8" />
-  </head>
-  <body>
-    <script src="sketch.js"></script> <!-- In body so that it runs after document.load -->
-  </body>
+	<head>
+		<title>P2SR Data</title>
+		<link rel="shortcut icon" href="https://wiki.portal2.sr/favicon.ico">
+		<style type="text/css">
+			html {
+				background: #18191A;
+				color: #CCCCCC;
+				margin: 1% 10%;
+				word-wrap: break-word;
+			}
+			.p2title {
+				font-size: 5em;
+				text-align: center;
+			}
+			pre {
+				white-space: normal;
+				font-family: Arial, Helvetica, serif;
+			}
+			a {
+				color: #36c;
+				text-decoration: none;
+			}
+			input {
+				width: 100%;
+			}
+			code {
+				background: #0A0B0B;
+			}
+		</style>
+		<meta charset="utf-8" />
+		<script src="../prototypes.js"></script>
+		<script src="../jszip.js"></script>
+		<script src="../FileSaver.js"></script>
+		<script src="../P2Data.js"></script>
+		<script src="sketch.js"></script>
+	</head>
+	<body>
+		<input id="slider" type="range" min=0 value=0>
+		<pre></pre>
+	</body>
 </html>

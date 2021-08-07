@@ -1,169 +1,24 @@
-var maps = [], slider, pre;
+let data = new P2Data();
 
-async function doStuff() {
-
-	slider = document.createElement("input")
-	slider.type = "range", slider.min = "0", slider.value = "0";
-	document.body.appendChild(slider);
-
-	pre = document.createElement("pre");
-	pre.style.margin = "none";
-	document.body.appendChild(pre);
-
-	pre.innerHTML = "loading maps..."
-	await addMaps();
-	slider.oninput = function() {
-		let map = maps[slider.value];
+function display() {
+	let map = data.maps[document.querySelector('#slider').value];
 		let desired = [];
-		// desired.push("Categories: " + map.categories.join(", "));
-		desired.push("Mtriggers:<br>" + map.triggers.join("<br>"));
-		desired.push("Fade: " + map.fade);
-		// desired.push("Native to CM: " + (map.cmNative ? "Yes" : "No"));
-		// desired.push(map.formattedWiki);
-		desired.push(`<a href="https://wiki.portal2.sr/index.php?title=${map.wikiname}&action=edit">Edit this page</a><br>
-					  <a href="https://wiki.portal2.sr/index.php?title=${map.wikiname}&action=history">View history of this page</a>`);
-		pre.innerHTML = desired.join("<br><br>");
-	}
-	slider.max = (maps.length - 1).toString();
-	// pre.innerHTML = "loading wiki...";
-	// await updateWikiData();
-	// pre.innerHTML = "loading mtriggers...";
-	// await updateMtriggers();
-
-
-	// pre.innerHTML = maps.map(e => {return e.splitname + "<br>" + e.categories.join(",")}).join("<br><br>")
-
-	slider.oninput();
-
-	console.log("loaded");
-
+		desired.push(map.formattedWiki);
+		desired.push('Categories: ' + map.categories.join(', '));
+		desired.push('Mtriggers:<br><code>' + map.triggers.join('<br>') + '</code>');
+		desired.push('Fade: ' + map.fade);
+		desired.push('Native to CM: ' + (map.cmNative ? 'Yes' : 'No'));
+		desired.push(`<a href="https://wiki.portal2.sr/index.php?title=${map.wikiname}&action=edit" target="_blank">Edit this page</a><br>
+					  <a href="https://wiki.portal2.sr/index.php?title=${map.wikiname}&action=history" target="_blank">View history of this page</a>`);
+		document.querySelector('pre').innerHTML = desired.join('<br><br>').replaceEvery('<br><br><br>', '<br><br>');
 }
 
-function creationString(readable, includeMtriggers, includeWiki) {
-	console.log(maps.map(e => {return `maps.push(${e.selfStr(readable, includeMtriggers, includeWiki)});`}).join("\n"));
+window.onload = async function() {
+	document.querySelector('pre').innerHTML = 'Getting data...';
+	await Promise.all([data.getMtriggers(), data.getWiki()]);
+	document.querySelector('pre').innerHTML = 'Formatting wiki content...';
+	data.formatWiki();
+	document.querySelector('#slider').oninput = () => display();
+	document.querySelector('#slider').max = data.maps.length - 1;
+	display();
 }
-
-function removeAllTrailingZeroes() {
-	maps.forEach(e => e.remTrailingZeroes());
-}
-
-function exportAll() {
-	let t = [];
-	{
-		t = maps.map(e => e.createMtriggerString()).filter(e => e != '').join('\n\n').padByDelim('"');
-
-		console.log(t);
-		t.clip(); // copy categories to clipboard
-		alert("Paste into cfg/sar/mtriggers");
-	}
-
-	{
-		t = maps.filter(e => e.triggers.length > 0).map(e => {return `cond map=${e.filename} sar_speedrun_category "${e.splitname}"`});
-		t = t.join('\n').padByDelim('"');
-
-		console.log(t);
-		t.clip();
-		alert("Paste into cfg/sar/onloads/mtriggers");
-	}
-
-	{
-		t = maps.filter(e => e.fade != '').map(e => {return `cond map=${e.filename} sar_toast_create fade "${e.fade}"`}).join('\n').padByDelim("sar_toast_create");
-		
-		console.log(t);
-		t.clip();
-		alert("Paste into cfg/sar/onloads/fades");
-	}
-	
-}
-
-function allTriggerWordsByUsage() {
-	let allTriggerWords = maps.map(e => {
-		return e.triggers.map(f => {
-			return f.replaceAll(" ", '\n');
-		}).join('\n');
-	}).join('\n').split('\n').sort();
-	//sort by length, descending
-	let a = function(f) {
-		let ret = f;
-		ret = ret.replaceAll("targetname=", "");
-		ret = ret.replaceAll("inputname=", "");
-		ret = ret.replaceAll("center=", "");
-		ret = ret.replaceAll("size=", "");
-		ret = ret.replaceAll("angle=0", "");
-		ret = ret.replaceAll("entity", "");
-		ret = ret.replaceAll("zone", "");
-		ret = ret.replaceAll("portal", "");
-		ret = ret.replaceAll("load", "");
-		return ret;
-	}
-	for (let i = 0; i < allTriggerWords.length; i++) {
-		for (let j = i; j > 0; j--) {
-			let l1 = a(allTriggerWords[j]);
-			let l2 = a(allTriggerWords[j - 1]);
-
-			if (l1.length > l2.length) {
-				[allTriggerWords[j], allTriggerWords[j - 1]] = [allTriggerWords[j - 1], allTriggerWords[j]];
-			} else continue;
-		}
-	}
-	let str = allTriggerWords[0], count = 0, strs = [], counts = [];
-	// count occurrences
-	for (let i = 0; i < allTriggerWords.length; i++) {
-		count = 1
-		while (allTriggerWords[i] == str) {
-			count++;
-			i++;
-		}
-		strs.push(str);
-		counts.push(count);
-		str = allTriggerWords[i];
-	}
-	strs.push(str);
-	counts.push(count);
-	// jank as fuck insertion sort
-	// cbf doing this properly
-	for (let i = 0; i < strs.length; i++) {
-		strs[i] = `${counts[i]} occurrence(s) - ${strs[i]}`
-		for (let j = i; j > 0; j--) {
-			if (counts[j] > counts[j - 1]) {
-				[strs[j], strs[j - 1]] = [strs[j - 1], strs[j]];
-				[counts[j], counts[j - 1]] = [counts[j - 1], counts[j]];
-			} else continue;
-		}
-	}
-	console.log(strs.join('\n'));
-}
-
-function allTriggersByUsage() {
-	let allTriggers = maps.map(e => {return e.triggers.join('\n')}).join('\n').split('\n').sort();
-	let str = allTriggers[0], count = 0, strs = [], counts = [];
-	// count occurences
-	for (let i = 0; i < allTriggers.length; i++) {
-		if (str == allTriggers[i]) {
-			count++;
-		} else {
-			strs.push(str);
-			counts.push(count);
-			count = 1;
-		}
-
-		str = allTriggers[i];
-	}
-	strs.push(str);
-	counts.push(count);
-	// jank as fuck insertion sort
-	// cbf doing this properly
-	for (let i = 0; i < strs.length; i++) {
-		strs[i] = `${counts[i]} occurrence(s) - ${strs[i]}`
-		for (let j = i; j > 0; j--) {
-			if (counts[j] > counts[j - 1]) {
-				[strs[j], strs[j - 1]] = [strs[j - 1], strs[j]];
-				[counts[j], counts[j - 1]] = [counts[j - 1], counts[j]];
-			} else continue;
-		}
-	}
-	console.log(strs.join('\n'));
-}
-
-doStuff();
-
