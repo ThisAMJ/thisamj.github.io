@@ -235,6 +235,10 @@ class P2Data {
 		// Get Challenge Mode leaderboards
 		// This is easily the most intensive fetch function
 		// Use sparingly to appease the portal2.sr hosting service
+		
+		// CORS headers aren't set for the /json page so none of this works
+		return false;
+		
 		return queryAPI(this.maps.map(e => 'https://board.portal2.sr/chamber/' + e.chamberID + '/json'
 		), r => r.json()
 		).then(e => {
