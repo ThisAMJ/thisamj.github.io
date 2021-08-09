@@ -265,7 +265,6 @@ class P2Data {
 		for (let map of this.maps) {
 			if (!map.wikicontent || map.wikicontent == '') continue;
 			[map.formattedWiki, map.categories] = [[], []];
-			console.log(map.wikicontent);
 			let [bold, italic, pre] = [false];
 			let lines = map.wikicontent.split('\n'), lineCount = lines.length;
 			for (let i = 0; i < lineCount; i++) {
