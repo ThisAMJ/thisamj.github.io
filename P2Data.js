@@ -265,9 +265,11 @@ class P2Data {
 		for (let map of this.maps) {
 			if (!map.wikicontent || map.wikicontent == '') continue;
 			[map.formattedWiki, map.categories] = [[], []];
+			console.log(map.wikicontent);
+			let [bold, italic, pre] = [false];
 			let lines = map.wikicontent.split('\n'), lineCount = lines.length;
 			for (let i = 0; i < lineCount; i++) {
-				let [bold, italic] = [false];
+				[bold, italic] = [false];
 
 				while (lines[i].indexOf("'''") > -1) {
 					lines[i] = lines[i].replace("'''", bold ? "</b>" : "<b>");
@@ -278,6 +280,21 @@ class P2Data {
 					lines[i] = lines[i].replace("''", italic ? "</i>" : "<i>");
 					italic = !italic;
 				} // italics
+				
+				if (lines[i].startsWith(' ')) {
+					lines[i] = lines[i].substr(1);
+					if (!pre) {
+						if (i == lines.length - 1) {
+							lines[i] = '<pre>' + lines[i] + '</pre>';
+						} else {
+							lines[i] = '<pre>' + lines[i];
+						}
+						pre = true;
+					}
+				} else if (pre) {
+					map.formattedWiki[map.formattedWiki.length - 1] = lines[i - 1] + '</pre>';
+					pre = false;
+				}
 
 				while (lines[i].indexOf('[[') > -1 && lines[i].indexOf(']]') > lines[i].indexOf('[[')) {
 					let start = lines[i].indexOf('[['), end = lines[i].indexOf(']]');
@@ -387,7 +404,6 @@ class P2Data {
 				} // headings
 				map.formattedWiki.push(lines[i]);
 			}
-
 			map.formattedWiki = map.formattedWiki.join('<br>').replaceEvery('<br><br><br>', '<br><br>');
 		}
 	}
