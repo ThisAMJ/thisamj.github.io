@@ -18,6 +18,7 @@ class P2Data {
 			coop: e[3],
 			triggers: genericTriggers(e[3]),
 			chamberID: e[4],
+			cmboard: [],
 			fade: e[5],
 			wikicontent: '',
 			cmNative: false
@@ -228,6 +229,31 @@ class P2Data {
 			}
 			return target;
 		});
+	}
+	
+	async getBoards() {
+		// Get Challenge Mode leaderboards
+		// This is easily the most intensive fetch function
+		// Use sparingly to appease the portal2.sr hosting service
+		return queryAPI(this.maps.map(e => 'https://board.portal2.sr/chamber/' + e.chamberID + '/json'
+		), r => r.json()
+		).then(e => {
+			for (let i = 0; i < e.length; i++) {
+				let scores = [];
+				//                                                && parseInt(e[i][key].scoreData.scoreRank) <= 10    /* for only top 10 times */
+				for (let key in e[i]) if (e[i].hasOwnProperty(key)) scores.push(e[i][key]);
+				this.maps[i].cmboard = scores.map(e => {
+					e.scoreData.date = new Date(e.scoreData.date + ' +2'); // CEST, UTC +2 hours
+					delete e.scoreData.changelogId;
+					delete e.scoreData.playerRank;
+					delete e.scoreData.note;
+					delete e.scoreData.submission;
+					delete e.userData.avatar;
+					return e;
+				});;
+			}
+			return this;
+		})
 	}
 
 	formatWiki() {
