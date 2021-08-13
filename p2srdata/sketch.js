@@ -15,8 +15,12 @@ function display() {
 }
 
 window.onload = async function() {
-	document.querySelector('pre').innerHTML = 'Getting data...';
-	await Promise.all([data.getMtriggers(), data.getWiki()]);
+	document.querySelector('pre').innerHTML = 'Getting mtriggers...';
+	await data.getMtriggers();
+	document.querySelector('pre').innerHTML = 'Getting wiki...';
+	await data.getWiki();
+	document.querySelector('pre').innerHTML = 'Getting leaderboards...';
+	await data.getBoards();
 	document.querySelector('pre').innerHTML = 'Formatting wiki content...';
 	data.formatWiki();
 	document.querySelector('#slider').oninput = () => display();

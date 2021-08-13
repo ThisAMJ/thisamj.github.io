@@ -4,7 +4,7 @@
    Version:  0.9
 	Author:   Stefan Goessner/2006
 	Web:      http://goessner.net/ 
-   Modified: Jesse Mattson 2021
+   Modified: ThisAMJ 2021
 */
 function xml2json(xml) {
    var X = {

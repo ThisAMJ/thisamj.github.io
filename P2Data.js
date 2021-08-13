@@ -236,10 +236,7 @@ class P2Data {
 		// This is easily the most intensive fetch function
 		// Use sparingly to appease the portal2.sr hosting service
 		
-		// CORS headers aren't set for the /json page so none of this works
-		return false;
-		
-		return queryAPI(this.maps.map(e => 'https://board.portal2.sr/chamber/' + e.chamberID + '/json'
+		return queryAPI(this.maps.map(e => `https://board.portal2.sr/chamber/${e.chamberID}/json`
 		), r => r.json()
 		).then(e => {
 			for (let i = 0; i < e.length; i++) {
@@ -247,14 +244,21 @@ class P2Data {
 				//                                                && parseInt(e[i][key].scoreData.scoreRank) <= 10    /* for only top 10 times */
 				for (let key in e[i]) if (e[i].hasOwnProperty(key)) scores.push(e[i][key]);
 				this.maps[i].cmboard = scores.map(e => {
-					e.scoreData.date = new Date(e.scoreData.date + ' +2'); // CEST, UTC +2 hours
-					delete e.scoreData.changelogId;
-					delete e.scoreData.playerRank;
-					delete e.scoreData.note;
-					delete e.scoreData.submission;
-					delete e.userData.avatar;
+					e.scoreData.runner = e.userData.boardname;
+					e = e.scoreData;
+					e.date = new Date(e.date + ' UTC+02:00'); // CEST, UTC +2 hours
+					e.hasDemo = e.hasDemo == '1';
+					if (e.hasDemo) e.demoID = e.changelogId;
+					e.scoreRank = parseInt(e.scoreRank);
+					e.score = parseInt(e.score) / 100;
+					if (e.pending != '1') delete e.pending;
+					delete e.hasDemo;
+					delete e.changelogId;
+					delete e.playerRank;
+					delete e.note;
+					delete e.submission;
 					return e;
-				});;
+				}).filter(e => !e.hasOwnProperty('pending'));
 			}
 			return this;
 		})

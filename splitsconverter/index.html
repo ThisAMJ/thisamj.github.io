@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Splits Converter</title>
+		<script src="../FileSaver.js"></script>
+		<script src="../jszip.js"></script>
+		<script src="xml2json.js"></script>
+		<script src="splitsconv.js"></script>
+		<style>
+			#drop_zone {
+				border: 1px solid;
+				width: 200px;
+				height: 200px;
+				text-align: center;
+			}
+		</style>
+	</head>
+	
+	<body>
+		<div id="drop_zone" ondrop="dropHandler(event)" ondragover="dragHandler(event)" style="border:1px solid;width:200px;height:200px">
+			Drop splits file/folder here
+		</div>
+		<button onclick="saveSplits()">Export Splits</button>
+	</body>
+</html>
