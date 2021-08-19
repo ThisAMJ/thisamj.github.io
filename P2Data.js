@@ -21,6 +21,8 @@ class P2Data {
 			cmboard: [],
 			fade: e[5],
 			wikicontent: '',
+			categories: [],
+			formattedWiki: '',
 			cmNative: false
 		});
 		this.maps = [
@@ -252,6 +254,7 @@ class P2Data {
 					e.scoreRank = parseInt(e.scoreRank);
 					e.score = parseInt(e.score) / 100;
 					if (e.pending != '1') delete e.pending;
+					if (!e.youtubeID) delete e.youtubeID;
 					delete e.hasDemo;
 					delete e.changelogId;
 					delete e.playerRank;
@@ -261,7 +264,7 @@ class P2Data {
 				}).filter(e => !e.hasOwnProperty('pending'));
 			}
 			return this;
-		})
+		});
 	}
 
 	formatWiki() {
@@ -269,10 +272,10 @@ class P2Data {
 		for (let map of this.maps) {
 			if (!map.wikicontent || map.wikicontent == '') continue;
 			[map.formattedWiki, map.categories] = [[], []];
-			let [bold, italic, pre] = [false];
+			let [pre, gallery] = [false];
 			let lines = map.wikicontent.split('\n'), lineCount = lines.length;
 			for (let i = 0; i < lineCount; i++) {
-				[bold, italic] = [false];
+				let [bold, italic] = [false];
 
 				while (lines[i].indexOf("'''") > -1) {
 					lines[i] = lines[i].replace("'''", bold ? "</b>" : "<b>");
@@ -452,7 +455,7 @@ class P2Data {
 				return e;
 			}));
 			console.log(mtriggers.join('\n'));
-			zip.file(P2Map.filename + '.mtr', mtriggers.join('\n'));
+			zip.file(P2Map.filename + '.p2mtr', mtriggers.join('\n'));
 		})
       	zip.saveAs("mtriggers.zip");
 	}
