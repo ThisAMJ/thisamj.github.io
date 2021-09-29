@@ -6,11 +6,18 @@
 		<meta charset="utf-8" />
 		<style>
 			body, textarea {
-				background: black;
-				color: white;
+				background: #18191a;
+				color: #CCCCCC;
 			}
 			textarea {
+				margin: none;
 				width: 100%;
+				resize: none;
+				border: 1px solid;
+				border-color: #444;
+				box-sizing: border-box;
+				font-family: monospace;
+				font-size: 0.9em;
 			}
 			label {
 				margin-left: 35px;
@@ -22,40 +29,41 @@
 				width:  auto;
 				margin-right: -30px;
 			}
-			input[type="text"] {
+			input[type=text] {
 				width: 25px;
 			}
 			canvas {
 				width: 140px;
 			}
 		</style>
-		<script src="../prototypes.js"></script>
-		<script src="../P2Data.js"></script>
+		<script src="../lib/prototypes.js"></script>
+		<script src="../lib/FileSaver.js"></script>
+		<script src="../lib/jszip.js"></script>
+		<script src="../lib/source.js"></script>
+		<script src="../lib/P2Data.js"></script>
 		<script src="sketch.js"></script>
 	</head>
 	<body>
-		<b>Readable Header:</b><br>
-		<textarea id="txt" rows="39" oninput="txtUpdate()" spellcheck="false"></textarea><br>
-		
-		<b id="outpre">Compiled: (0 Bytes)</b>
+		<p>
+			<b>Readable Header:</b>
+		</p>
+		<textarea id="txt" readonly rows="35" spellcheck="false"></textarea>
+		<p>
+			<b id="outpre">Compiled: (0 Bytes)</b>
+			<label for="liveUpdate" ten>        Compile live? </label>
+			<input type="checkbox" id="liveUpdate" name="liveUpdate" checked onclick="toggleLiveUpdate(true)">
 
-		<label for="liveUpdate" ten>            Compile live? </label>
-		<input type="checkbox" id="liveUpdate" name="liveUpdate" checked onclick="toggleLiveUpdate(true)">
-    
-		<button type="button" onclick="compile()" style="visibility:hidden">Compile</button>
-		
-		<label for="includeHeader">       Include header? </label>
-		<input type="checkbox" id="includeHeader" name="includeHeader" checked onclick="compile()">
-		
-		<label for="includeContent">     Include content? </label>
-		<input type="checkbox" id="includeContent" name="includeContent" checked onclick="compile()">
-		
-		<label for="includeFooter">       Include footer? </label>
-		<input type="checkbox" id="includeFooter" name="includeFooter" checked onclick="compile()"><br>
-		
-		<textarea id="out" readonly rows="20" spellcheck="false"></textarea><br>
-		
-		<b>UTF-16 Image Representation (idk why i did this, but it was easy)</b><br>
-		<canvas></canvas>
+			<button type="button" onclick="compile()" style="visibility:hidden">Compile</button>
+
+			<label for="includeHeader">       Include header? </label>
+			<input type="checkbox" id="includeHeader" name="includeHeader" checked onclick="compile()">
+			
+			<label for="includeContent">     Include content? </label>
+			<input type="checkbox" id="includeContent" name="includeContent" checked onclick="compile()">
+			
+			<label for="includeFooter">       Include footer? </label>
+			<input type="checkbox" id="includeFooter" name="includeFooter" checked onclick="compile()">
+		</p>
+		<textarea id="out" readonly rows="20" spellcheck="false"></textarea>
 	</body>
 </html>

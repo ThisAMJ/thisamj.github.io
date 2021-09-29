@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Source Commands Test</title>
+		<link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/69196954">
+		<meta charset="utf-8" />
+		<style>
+			body, textarea {
+				background: #18191a;
+				color: #CCCCCC;
+			}
+			input[type=checkbox] {
+				margin-right: 3%;
+			}
+			textarea {
+				width: 100%;
+				height: 200px;
+				resize: none;
+				border: 1px solid;
+				border-color: #444;
+				box-sizing: border-box;
+			}
+		</style>
+		<script src="../lib/prototypes.js"></script>
+		<script src="../lib/source.js"></script>
+		<script src="sketch.js"></script>
+	</head>
+	<body>
+		<p id="inputtext">
+			Input command(s) here
+		</p>
+		<textarea id="input" spellcheck="false"></textarea>
+		<p id="argstext">
+			Argument parsing (identical to source engine)
+		</p>
+		<textarea id="args" readonly></textarea>
+		<p id="compressedtext">
+			Compression
+		</p>
+		<p>
+			<label for="minLines">        Minimize lines? </label>
+			<input type="checkbox" id="minLines" name="minLines" onclick="run()">
+			
+			<label for="minQuotes"> Minify inside quotes? </label>
+			<input type="checkbox" id="minQuotes" name="minQuotes" checked onclick="run()">
+			
+			<label for="remTrail">   Remove blank trails? </label>
+			<input type="checkbox" id="remTrail" name="remTrail" checked onclick="run()">
+		</p>
+		<textarea id="compressed" readonly spellcheck="false"></textarea>
+	</body>
+</html>
