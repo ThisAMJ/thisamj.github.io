@@ -66,7 +66,7 @@ function display() {
 					return out.join('');
 				})(map));
 		pushSafe('Fade: ' + (map.fade == '' ? 'None' : map.fade));
-		pushSafe('Native to CM: ' + (map.cmNative ? 'Yes' : map.triggers.length > 0 ? 'Not by default' : 'No'));
+		pushSafe('Native to CM: ' + (map.cmAvailability == 1 ? 'Yes' : map.cmAvailability == 0 ? 'Not by default' : 'No'));
 		pushSafe(map.formattedWiki == '' ? `<h1 class=p2title>${map.splitname}</h1>` : map.formattedWiki);
 		pushSafe('Mtriggers: ' + (map.triggers.length > 0 ? `<br><pre>${map.triggers.join('\n')}</pre>` : 'None'));
 		pushSafe('Categories: ' + map.categories.map(e => linkNewTab('https://wiki.portal2.sr/Category:' + e, e)).join(', '));
