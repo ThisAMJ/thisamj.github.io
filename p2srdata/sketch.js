@@ -1,8 +1,10 @@
 let data = new P2Data();
-
+let mapI = 0;
 
 function display() {
-	let map = data.maps[document.querySelector('#slider').value], desired = [];
+	let desired = [];
+	mapI = Math.max(0, Math.min(data.maps.length - 1, mapI));
+	map = data.maps[mapI];
 	if (map) {
 		let prevXSS = e => e.toString().replaceAll('<script', '&lt;script').replaceAll('</script', '&lt;/script');
 		let pushSafe = e => desired.push(prevXSS(e));
@@ -13,7 +15,7 @@ function display() {
 		let steamLink = e => 'https://www.steamcommunity.com/profiles/' + e.steamID;
 
 		let timeScore = e => `${Math.floor(e.score / 60).toString().padStart(2, '0')}:${Math.floor(e.score % 60).toString().padStart(2, '0')}.${Math.floor(e.score * 1000 % 1000).toString().padEnd(3, '0')}`;
-		let getDate = e => `<abbr title="${e.date.toGMTString()}">${e.date.getDate().toString().padStart(2, '0')}/${e.date.getMonth().toString().padStart(2, '0')}/${e.date.getFullYear()}</abbr>`;
+		let getDate = e => e.date == null ? 'Unknown' : `<abbr title="${e.date.toUTCString()}">${e.date.getUTCDate().toString().padStart(2, '0')}/${(e.date.getUTCMonth() + 1).toString().padStart(2, '0')}/${e.date.getUTCFullYear()}</abbr>`;
 		
 		let grey = e => `<span style="color:#888">${e}</span>`;
 		let td = e => `<td>${e}</td>`;
@@ -24,7 +26,7 @@ function display() {
 		pushSafe((e => {
 					let out = [];
 					if (e.cmboard.length == 0) return '';
-					out.push('Top 10:<br><table style="width:100%"><col style="width:36%"><col style="width:15%"><col style="width:8%"><col style="width:8%"><col style="width:15%"><col style="width:9%"><col style="width:9%"><thead><tr><th>Runner</th><th>Time</th><th>ΔNext</th><th>ΔWR</th><th>Date</th><th>Demo</th><th>Video</th></tr></thead>');
+					out.push(`Top 10:<br><table style="width:100%"><col style="width:36%"><col style="width:15%"><col style="width:8%"><col style="width:8%"><col style="width:15%"><col style="width:9%"><col style="width:9%"><thead><tr><th>Runner${e.coop ? 's' : ''}</th><th>Time</th><th>ΔNext</th><th>ΔWR</th><th>Date</th><th>Demo</th><th>Video</th></tr></thead>`);
 					if (e.coop) {
 						let times = e.cmboard.filter(e => e.scoreRank <= 10).sort((a, b) => a.scoreRank - b.scoreRank);
 						let grouped = [];
@@ -35,7 +37,7 @@ function display() {
 						}
 						for (let e of grouped.slice(0, 10)) {
 							out.push('<tr>');
-							out.push(td(linkNewTab(steamLink(e[0]), e[0].runner) + '<br>' + (e[1] ? linkNewTab(steamLink(e[1], e[1].runner)) : '')));
+							out.push(td(linkNewTab(steamLink(e[0]), e[0].runner) + '<br>' + (e[1] ? linkNewTab(steamLink(e[1]), e[1].runner) : '')));
 							out.push(td(timeScore(e[0])));
 							out.push(td(typeof prev == 'undefined' ? '' : e[0].score == prev ? 'Tie' : `<span style="color:yellow">+${(e[0].score - prev).toFixed(3)}</span>`));
 							out.push(td(typeof wr   == 'undefined' ? '' : e[0].score == wr   ? 'Tie' : `<span style="color:red   ">+${(e[0].score - wr  ).toFixed(3)}</span>`));
@@ -77,16 +79,35 @@ function display() {
 	document.querySelector('pre').innerHTML = desired.join('<br><br>').replaceEvery('<br><br><br>', '<br><br>').replaceEvery('<br><pre>', '<pre>').replaceEvery('</pre><br>', '</pre>');
 }
 
+function searchDisplay() {
+	let search = document.querySelector('#sidebar-search').value, result = '';
+	for (let i = 1; i <= data.chapters.sp.length; i++) {
+		let chaptermaps = data.maps.filter(e => e.chapter == i && !e.coop && (search == '' || e.splitname.toLowerCase().indexOf(search.toLowerCase()) > -1))
+		if (chaptermaps.length > 0) {
+			result += `Chapter ${i}: ${data.chapters.sp[i - 1]}<ul>${chaptermaps.map(e => `<li><a href="#" onclick="mapI=${data.maps.indexOf(e)};display(); return false">${e.splitname}</a></li>`).join('')}</ul>`
+		}
+	}
+	for (let i = 0; i < data.chapters.mp.length; i++) {
+		let chaptermaps = data.maps.filter(e => e.chapter == i && e.coop && (search == '' || e.splitname.toLowerCase().indexOf(search.toLowerCase()) > -1))
+		if (chaptermaps.length > 0) {
+			result += `Course ${i}: ${data.chapters.mp[i]}<ul>${chaptermaps.map(e => `<li><a href="#" onclick="mapI=${data.maps.indexOf(e)};display(); return false">${e.splitname}</a></li>`).join('')}</ul>`
+		}
+	}
+
+	document.querySelector('#sidebar-maps').innerHTML = result;
+}
+function test() {
+	console.log('eyo')
+}
+
 window.onload = async function() {
-	document.querySelector('pre').innerHTML = 'Getting mtriggers...';
-	if (confirm('Download mtriggers? (~74KB)')) await data.getMtriggers();
-	document.querySelector('pre').innerHTML = 'Getting wiki...';
+	searchDisplay()
+	display();
+	await data.getMtriggers();
+	display();
 	if (confirm('Download wiki text? (~60KB)')) await data.getWiki();
-	document.querySelector('pre').innerHTML = 'Getting leaderboards...';
-	if (confirm('Download CM leaderboards? (~1.6MB)')) await data.getBoards();
-	document.querySelector('pre').innerHTML = 'Formatting wiki content...';
 	data.formatWiki();
-	document.querySelector('#slider').oninput = () => display();
-	document.querySelector('#slider').max = data.maps.length - 1;
+	display();
+	if (confirm('Download CM leaderboards? (~1.6MB)')) await data.getBoards();
 	display();
 }
