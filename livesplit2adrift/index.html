@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Livesplit To Adrift Converter</title>
+		<script src="../lib/FileSaver.js"></script>
+		<script src="../lib/jszip.js"></script>
+		<script src="../lib/xml2json.js"></script>
+		<script src="livesplitconv.js"></script>
+	</head>
+	
+	<body>
+		<input id="file-input" type="file" accept=".lss" onchange="fileSelect(event)"/>
+		<button onclick="saveSplits()">Export Splits</button>
+	</body>
+</html>
