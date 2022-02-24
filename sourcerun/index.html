@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Source Command Runner</title>
+		<link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/69196954">
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="stylesheet.css">
+		<script src="../lib/prototypes.js"></script>
+		<script src="../lib/source.js"></script>
+		<script src="sketch.js"></script>
+	</head>
+	<body>
+
+		<div id="tab">
+			<button class="tablinks" onclick="newCFG()">+</button>
+		</div>
+
+		<div id="tabcontents" spellcheck="false"></div>
+		<textarea id="liveconsole" spellcheck="false" onkeydown="liveConsoleType(event)" placeholder="Live Console"></textarea>
+		<p id="options">
+			<label for="game">Playing Game:</label>
+			<select name="game" id="game" onchange="changeGame()">
+				<option value="portal2">Portal 2</option>
+				<option value="srm">Speedrun Mod</option>
+				<option value="mel">PS:Mel</option>
+				<option value="reloaded">Reloaded</option>
+				<option value="aptag">Aperture Tag</option>
+				<option value="twtm">Thinking With Time Machine</option>
+			</select>
+			<button type="button" id="cleardata" onclick="clearAllData()">Clear All Data</button>
+			<button type="button" id="runcurrent" onclick="run(cfg.currentView)">Run Current File</button>
+			<button type="button" id="runfirst" onclick="run(cfg.cfgs[0])">Run First File</button>
+		</p>
+		<div id="texts"></div>
+		<div id="console"></div>
+	</body>
+</html>

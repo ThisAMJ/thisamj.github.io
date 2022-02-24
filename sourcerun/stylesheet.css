@@ -1,0 +1,70 @@
+body, textarea {
+	background: #181818;
+	color: #CCCCCC;
+}
+
+#tab {
+	overflow: hidden;
+	border: 1px solid #444;
+	background: #484848;
+	color: #CCCCCC;
+}
+
+#tab button {
+	background: inherit;
+	color: inherit;
+	float: left;
+	border: none;
+	border-right: 1px solid #888888;
+	padding: 4px 10px;
+	transition: 0.3s;
+}
+
+button {
+	transition: 0.3s;
+	cursor: pointer;
+}
+button:hover, button.active {
+	background: #888 !important;
+	color: #fff !important;
+}
+
+.tabcontent, #in, #liveconsole, #texts, #console {
+	width: 100%;
+	height: 200px;
+	resize: none;
+	font-family: monospace;
+	border: 1px solid #444;
+	box-sizing: border-box;
+	overflow-y: scroll;
+}
+
+.tabcontent {
+	height: 400px;
+}
+
+#liveconsole {
+	height: 2em;
+}
+
+div {
+	margin: 10px 0px;
+}
+
+.tabcontent {
+	display: none;
+}
+
+#cleardata, #runcurrent, #runfirst{
+	width: 26%;
+	height: 2em;
+	font-size:1em;
+	padding: 0px;
+	border: 1px solid #444;
+	background: #484848;
+	color: #CCCCCC;
+}
+
+#texts p, #console p {
+	margin: 0px;
+}
