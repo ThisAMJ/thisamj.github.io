@@ -1,13 +1,42 @@
+* {box-sizing: border-box;}
+
+.position-relative {position: relative !important;}
+.position-fixed {position: fixed !important;}
+.float-left {float: left !important;}
+.float-right {float: right !important;}
+.width-full {width: 100% !important;}
+.width-half {width: 50% !important;}
+.flex {display: flex !important;}
+
+body {
+	margin: 0;
+}
+
 body, textarea {
 	background: #181818;
 	color: #CCCCCC;
 }
 
+select, button {
+	height: 2.5em;
+	border: 1px solid #181818;
+	border-radius: 5px;
+	background: #484848;
+	color: #CCCCCC;
+	transition: 0.3s;
+}
+
 #tab {
-	overflow: hidden;
+	overflow-x: scroll;
+	overflow-y: hidden;
 	border: 1px solid #444;
 	background: #484848;
 	color: #CCCCCC;
+}
+
+select:hover, button:hover, button.active {
+	background: #666 !important;
+	color: #fff !important;
 }
 
 #tab button {
@@ -15,56 +44,96 @@ body, textarea {
 	color: inherit;
 	float: left;
 	border: none;
-	border-right: 1px solid #888888;
+	border-radius: 0;
+	border-right: 1px solid #666;
 	padding: 4px 10px;
-	transition: 0.3s;
-}
-
-button {
-	transition: 0.3s;
 	cursor: pointer;
 }
-button:hover, button.active {
-	background: #888 !important;
-	color: #fff !important;
-}
 
-.tabcontent, #in, #liveconsole, #texts, #console {
+.tabcontent, #in, #liveconsole, #bindarea, #texts, #shadows, #console {
 	width: 100%;
-	height: 200px;
+	height: 20em;
 	resize: none;
 	font-family: monospace;
 	border: 1px solid #444;
 	box-sizing: border-box;
 	overflow-y: scroll;
+	tab-size: 4;
 }
 
 .tabcontent {
-	height: 400px;
+	display: none;
+	height: 87vh;
+	overflow-x: scroll;
+}
+
+#console span {
+	margin: 0;
+	white-space: pre-wrap;
+	word-wrap: anywhere;
+}
+
+#texts {
+	overflow-x: hidden;
+	height: 22rem;
+	font-size:10px;
+}
+
+#texts pre {
+	margin: 0
 }
 
 #liveconsole {
+	border-top:none;
+	margin-top: 0;
+	padding-top: 0.25em;
 	height: 2em;
+	overflow-y: hidden;
+	outline: none;
+}
+
+#bindarea {
+	height: 2em;
+	overflow-y: hidden;
+	color: transparent;
+}
+
+/*
+
+
+#outputs {
+	position: fixed;
+	padding: 0;
+	margin: 0;
+	width:100%;
+}
+
+#texts, #shadows {
+	width:50vw;
+	display: inline-block;
+	float: left;
 }
 
 div {
 	margin: 10px 0px;
 }
 
-.tabcontent {
-	display: none;
-}
 
-#cleardata, #runcurrent, #runfirst{
-	width: 26%;
-	height: 2em;
-	font-size:1em;
-	padding: 0px;
+#cleardata, #runcurrent, #runfirst, #game{
+	width: 25%;
+	height: 4em;
 	border: 1px solid #444;
 	background: #484848;
 	color: #CCCCCC;
 }
 
-#texts p, #console p {
+#texts pre, #console pre {
 	margin: 0px;
 }
+
+#console pre {
+	white-space: pre-wrap;
+	word-wrap: anywhere;
+	padding-left: 1em;
+	text-indent: -1em;
+} */
