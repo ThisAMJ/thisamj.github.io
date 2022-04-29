@@ -26,6 +26,7 @@ function newCFG() {
 
 function changeGame() {
 	game = q('gameSelect').value;
+	src.changeGame(game);
 }
 
 let liveconsolehistory = [];
@@ -71,7 +72,7 @@ window.addEventListener('load', async function() {
 		let s = document.createElement('script');
 		s.src = 'examples/tetris.js'
 		document.body.appendChild(s);
-	}, 300);
+	}, 200);
 	changeGame();
 	let fetchghub = async (repo, filepath, out = '') => {
 		if (!out) out = filepath;
@@ -85,7 +86,7 @@ window.addEventListener('load', async function() {
 			src.cfg.add(filename, false, e);
 		});
 	};
-
+	
 	// await fetchsrconfigs('autoexec');
 	// await fetchsrconfigs('aliases');
 	// await fetchsrconfigs('cm_ghost');

@@ -3,9 +3,11 @@
  */
  
 const sar = {
-	version: '1.12.6',
-	built: '00:06:08 Apr 1 2022',
+	version: '1.12.7-pre2',
+	built: '12:45:28 Apr 16 2022',
 	creatingCategory: '',
+	map: '',
+	prev_map: '',
 	categories: [],
 	aliases: [],
 	functions: [],
@@ -76,13 +78,13 @@ const sar = {
 		eval: function(c) {
 			switch (c.type) {
 				case this.conditions.ORANGE: return false;
-				case this.conditions.COOP: return false;
-				case this.conditions.CM: return false;
-				case this.conditions.SAME_MAP: return false;
+				case this.conditions.COOP: return sar.map.startsWith('mp_coop_');
+				case this.conditions.CM: return src.cvar('sv_bonus_challenge') == 1;
+				case this.conditions.SAME_MAP: return sar.map == sar.prev_map;
 				case this.conditions.WORKSHOP: return false;
-				case this.conditions.MENU: return false;
-				case this.conditions.MAP: return false;
-				case this.conditions.PREV_MAP: return false;
+				case this.conditions.MENU: return sar.map == '';
+				case this.conditions.MAP: return sar.map == c.val;
+				case this.conditions.PREV_MAP: return sar.prev_map == c.val;
 				case this.conditions.GAME: return game == c.val;
 				case this.conditions.NOT: return !this.eval(c.unop_cond);
 				case this.conditions.AND: return this.eval(c.binop_l) && this.eval(c.binop_r);
@@ -338,7 +340,102 @@ const sar = {
 	}
 }
 
-CON_COMMAND('nop', 'nop [args]... - nop ignores all its arguments and does nothing\n');
+{
+	let MK_SAR_ON = function(name, when, immediately) {
+		if (!sar.events) sar.events = {};
+		if (!sar.runevents) sar.runevents = {};
+		sar.events[name] = [];
+		eval(`CON_COMMAND('sar_on_${name}', 'sar_on_${name} <command> [args]... - registers a command to be run ${when}\\n', function(args) {
+			if (args.length < 2) {
+				return src.__.tooFewArgs(args);
+			}
+			let cmd = args.length == 2 ? args[1] : args.cmdStr.slice(args.argLength[0]);
+			sar.events.${name}.push(cmd);
+		});
+		sar.runevents.${name} = function() {
+			for (let cmd of sar.events.${name}) {
+				src.cmd.executeCommand(cmd, ${immediately});
+			}
+		}`);
+	}
+	MK_SAR_ON('load', "on session start", true)
+	MK_SAR_ON('session_end', "on session end", true)
+	MK_SAR_ON('exit', "on game exit", false)
+	MK_SAR_ON('demo_start', "when demo playback starts", false)
+	MK_SAR_ON('demo_stop', "when demo playback stops", false)
+	MK_SAR_ON('flags', "when CM flags are hit", false)
+	MK_SAR_ON('coop_reset_done', "when coop reset is completed", false)
+	MK_SAR_ON('coop_reset_remote', "when coop reset run remotely", false)
+	MK_SAR_ON('coop_spawn', "on coop spawn", true)
+	MK_SAR_ON('config_exec', "on config.cfg exec", true)
+}
+
+// Since I can't simulate the entire game, here's these commands to test map loads or whatevs
+CON_COMMAND('__do_event', '__do_event <event> - Executes a faux event (e.g. __do_event load runs sar_on_load commands)\n', function(args) {
+	if (args.length != 2) {
+		return src.__.wrongArgCount(args);
+	}
+	if (!sar.runevents[args[1]]) {
+		return src.con.err(`__do_event: Event "${args[1]}" does not exist.\n`);
+	}
+	sar.runevents[args[1]]();
+});
+
+sar.has_execd_config = false;
+CON_COMMAND_HOOK('exec', true, function(args) {
+	// let is_config_exec = (args.length == 3 && args[1] == 'config.cfg') || (args.length == 2 && args[1] == 'config_default.cfg')
+	let is_config_exec = args[1] == 'config.cfg' || args[1] == 'config_default.cfg';
+	if (is_config_exec && !sar.has_execd_config) {
+		sar.runevents.config_exec();
+		sar.has_execd_config = true;
+	}
+});
+
+CON_COMMAND('map', 'map <map> - go to map lol\n', function(args) {
+	if (args.length != 2) {
+		return src.__.wrongArgCount(args);
+	}
+	sar.prev_map = sar.map;
+	sar.map = args[1];
+	sar.runevents.load();
+});
+
+CON_COMMAND('changelevel', 'changelevel <map> - go to map lol\n', function(args) {
+	if (args.length != 2) {
+		return src.__.wrongArgCount(args);
+	}
+	sar.prev_map = sar.map;
+	sar.map = args[1];
+	sar.runevents.load();
+});
+
+CON_COMMAND('disconnect', 'disconnect - wtf do you think this does\n', function(args) {
+	if (sar.map == '') {
+		return src.con.err('not connected\n');
+	}
+	sar.prev_map = sar.map;
+	sar.map = ''
+});
+
+CON_COMMAND('restart_level', 'restart_level - restarts level\n', function(args) {
+	if (sar.map == '') {
+		return src.con.err('not connected\n');
+	}
+	sar.runevents.load();
+});
+
+CON_COMMAND('restart', 'restart - restarts level and disables cm\n', function(args) {
+	if (sar.map == '') {
+		return src.con.err('not connected\n');
+	}
+	src.setCvar('sv_bonus_challenge', 0);
+	sar.runevents.load();
+});
+
+CON_COMMAND('nop', 'nop [args]... - nop ignores all its arguments and does nothing\n', () => {});
+
+CON_COMMAND('sar_chat');
+CON_COMMAND('ghost_chat');
 CON_COMMAND('ghost_message', 'ghost_message - send message to other players\n');
 CON_COMMAND('ghost_name', 'ghost_name - change your online name\n');
 CON_COMMAND('ghost_type', `ghost_type <0/1/2/3/4>:
@@ -361,12 +458,6 @@ CON_COMMAND('sar_toast_dismiss_all', 'sar_toast_dismiss_all - dismiss all active
 CON_COMMAND('svar_persist', 'svar_persist <variable> - mark an svar as persistent\n');
 CON_COMMAND('svar_no_persist', 'svar_no_persist <variable> - unmark an svar as persistent\n');
 CON_COMMAND('sar_fast_load_preset', 'set_fast_load_preset <preset> - sets all loading fixes to preset values\n');
-CON_COMMAND('sar_on_exit');
-CON_COMMAND('sar_on_load');
-CON_COMMAND('sar_on_flags');
-CON_COMMAND('sar_on_coop_reset_remote');
-CON_COMMAND('sar_on_coop_reset_done');
-CON_COMMAND('sar_on_coop_spawn');
 CON_COMMAND('sar_speedrun_cc_start');
 CON_COMMAND('sar_speedrun_cc_rule');
 CON_COMMAND('sar_speedrun_cc_finish');
@@ -451,9 +542,8 @@ CON_CVAR('sar_speedrun_offset', 0, 'Start speedruns with this many ticks on the 
 CON_CVAR('sar_speedrun_autostop', 0, 'Automatically stop recording demos when a speedrun finishes. If 2, automatically append the run time to the demo name.\n', 0, 2);
 CON_CVAR('sar_record_at_demo_name', 'chamber', 'Name of the demo automatically recorded.\n');
 
-for (let element of ["tastick", "groundframes", "text", "position", "angles", "portal_angles", "portal_angles_2", "velocity", "velang", "groundspeed", "session", "last_session", "sum", "timer", "avg", "cps", "pause_timer", "demo", "jumps", "portals", "steps", "jump", "jump_peak", "velocity_peak", "trace", "frame", "last_frame", "inspection", "eyeoffset", "duckstate", "grounded"]) {
+for (let element of ['tastick', 'groundframes', 'text', 'position', 'angles', 'portal_angles', 'portal_angles_2', 'velocity', 'velang', 'groundspeed', 'session', 'last_session', 'sum', 'timer', 'avg', 'cps', 'pause_timer', 'demo', 'jumps', 'portals', 'steps', 'jump', 'jump_peak', 'velocity_peak', 'trace', 'frame', 'last_frame', 'inspection', 'eyeoffset', 'duckstate', 'grounded'])
 	CON_CVAR(`sar_hud_${element}`, 0);
-}
 
 CON_CVAR('sar_hud_spacing', 1, 'Spacing between elements of HUD.\n', 0);
 CON_CVAR('sar_hud_x', 2, 'X padding of HUD.\n', 0);
@@ -524,30 +614,12 @@ CON_COMMAND('sar_hud_order_top', 'sar_hud_order_top <name> - orders hud element 
 	sar.println(`Moved HUD element ${args[1]} to top.`)
 });
 
-CON_COMMAND('sar_on_config_exec', 'sar_on_config_exec <command> [args]... - registers a command to be run on config.cfg exec\n', function(args) {
-	if (args.length < 2) {
-		return src.__.tooTewArgs(args);
-	}
-	txt = args.length == 2 ? args[1] : args.cmdStr.slice(args.argLength[0]);
-	src.cmd.executeCommand(txt, false, true);
-});
-
-
-// I've nerfed this out
-// CON_COMMAND('sar_alias_run', '', function(args) {
-	// let alias = sar.aliases.find(e => e.name == args[1]);
-	// if (!alias) {
-		// return src.con.err(`sar_alias_run: Alias ${args[1]} does not exist`);
+// CON_COMMAND('sar_on_config_exec', 'sar_on_config_exec <command> [args]... - registers a command to be run on config.cfg exec\n', function(args) {
+	// if (args.length < 2) {
+		// return src.__.tooTewArgs(args);
 	// }
-	// src.cmd.executeCommand(alias.command + ' ' + args.cmdStr.slice(args.argLengthS[1]));
-// });
-
-// CON_COMMAND('sar_function_run', '', function(args) {
-	// let func = sar.functions.find(e => e.name == args[1]);
-	// if (!func) {
-		// return src.con.err(`sar_function_run: Function ${args[1]} does not exist`);
-	// }
-	// src.cmd.executeCommand(sar.expand(func.command, args.slice(2)).out);
+	// txt = args.length == 2 ? args[1] : args.cmdStr.slice(args.argLength[0]);
+	// src.cmd.executeCommand(txt, false, true);
 // });
 
 CON_COMMAND('sar_alias', 'sar_alias <name> [command] [args]... - create an alias, similar to the \'alias\' command but not requiring quoting. If no command is specified, prints the given alias\n', function(args) {
@@ -737,23 +809,6 @@ ON_PRETICK(function() {
 	}
 });
 
-// CON_COMMAND('sar_on_tick', 'sar_on_tick <command> [args]...', function(args) {
-	// if (args.length < 2) {
-		// return src.__.tooFewArgs(args);
-	// }
-	// let cmd = args.length == 2 ? args[1] : args.cmdStr.slice(args.argLength[0]);
-	// ON_TICK(function() {
-		// src.cmd.executeCommand(cmd);
-	// });
-// });
-
-// CON_COMMAND('sar_on_tick_clear', 'sar_on_tick_clear', function(args) {
-	// if (args.length != 1) {
-		// return src.__.wrongArgCount(args);
-	// }
-	// src.onTickEvents = [];
-// });
-
 CON_CVAR('sar_con_filter', 0, 'Enable the console filter\n');
 CON_CVAR('sar_con_filter_default', 0, 'Whether to allow text through the console filter by default');
 CON_CVAR('sar_con_filter_suppress_blank_lines', 0, 'Whether to suppress blank lines in console\n');
@@ -781,7 +836,7 @@ src.con.print = function(text = '', debugLevel = 0, color = '#FFFFFF') {
 	let lines = text.split('\n');
 	for (let i = 0; i < lines.length; i++) {
 		let line = lines[i];
-		if (sar.matches_filters(line) && (line.trim() != '' || !src.cvar('sar_con_filter_suppress_blank_lines'))) {
+		if (sar.matches_filters(line) && (line != '' || !src.cvar('sar_con_filter_suppress_blank_lines'))) {
 			this.buffer.push([`${line}${i < lines.length - 1 ? '\n' : ''}`, debugLevel, color]);
 		} else {
 			if (line.trim() == '') line = '';
@@ -789,7 +844,6 @@ src.con.print = function(text = '', debugLevel = 0, color = '#FFFFFF') {
 		}
 	}
 };
-
 
 CON_COMMAND('sar_echo', 'sar_echo <color> <string...> - echo a string to console with a given color\n', function(args) {
 	if (args.length < 2) {
@@ -845,7 +899,6 @@ CON_COMMAND('sar_about', 'sar_about - prints info about SAR plugin', function(ar
 	sar.println(`Version: ${sar.version}`);
 	sar.println(`Built: ${sar.built}`);
 });
-
 
 sar.println(`Couldn't open the file. Are you sure the file is here? : "Stats/phunkpaiDWPS.csv"`);
 sar.println(`Loaded SourceAutoRecord, Version ${sar.version}`, undefined, '#55CC55');
