@@ -6,8 +6,6 @@ const sar = {
 	version: '1.12.7-pre2',
 	built: '12:45:28 Apr 16 2022',
 	creatingCategory: '',
-	map: '',
-	prev_map: '',
 	categories: [],
 	aliases: [],
 	functions: [],
@@ -78,13 +76,13 @@ const sar = {
 		eval: function(c) {
 			switch (c.type) {
 				case this.conditions.ORANGE: return false;
-				case this.conditions.COOP: return sar.map.startsWith('mp_coop_');
+				case this.conditions.COOP: return src.map.startsWith('mp_coop_');
 				case this.conditions.CM: return src.cvar('sv_bonus_challenge') == 1;
-				case this.conditions.SAME_MAP: return sar.map == sar.prev_map;
+				case this.conditions.SAME_MAP: return src.map == src.prev_map;
 				case this.conditions.WORKSHOP: return false;
-				case this.conditions.MENU: return sar.map == '';
-				case this.conditions.MAP: return sar.map == c.val;
-				case this.conditions.PREV_MAP: return sar.prev_map == c.val;
+				case this.conditions.MENU: return src.map == '';
+				case this.conditions.MAP: return src.map == c.val;
+				case this.conditions.PREV_MAP: return src.prev_map == c.val;
 				case this.conditions.GAME: return game == c.val;
 				case this.conditions.NOT: return !this.eval(c.unop_cond);
 				case this.conditions.AND: return this.eval(c.binop_l) && this.eval(c.binop_r);
@@ -371,7 +369,7 @@ const sar = {
 }
 
 // Since I can't simulate the entire game, here's these commands to test map loads or whatevs
-CON_COMMAND('__do_event', '__do_event <event> - Executes a faux event (e.g. __do_event load runs sar_on_load commands)\n', function(args) {
+CON_COMMAND('__do_event', '__do_event <event> - Executes a faux event (e.g. "__do_event load" runs sar_on_load commands)\n', function(args) {
 	if (args.length != 2) {
 		return src.__.wrongArgCount(args);
 	}
@@ -380,6 +378,8 @@ CON_COMMAND('__do_event', '__do_event <event> - Executes a faux event (e.g. __do
 	}
 	sar.runevents[args[1]]();
 });
+
+CON_COMMAND('nop', 'nop [args]... - nop ignores all its arguments and does nothing\n', () => {});
 
 sar.has_execd_config = false;
 CON_COMMAND_HOOK('exec', true, function(args) {
@@ -391,48 +391,63 @@ CON_COMMAND_HOOK('exec', true, function(args) {
 	}
 });
 
-CON_COMMAND('map', 'map <map> - go to map lol\n', function(args) {
+CON_COMMAND_HOOK('map', true, function(args) {sar.runevents.load()});
+CON_COMMAND_HOOK('changelevel', true, function(args) {sar.runevents.load()});
+CON_COMMAND_HOOK('restart', true, function(args) {sar.runevents.load()});
+CON_COMMAND_HOOK('restart_level', true, function(args) {sar.runevents.load()});
+
+CON_COMMAND('sar_fast_load_preset', 'set_fast_load_preset <preset> - sets all loading fixes to preset values\n', function(args) {
 	if (args.length != 2) {
 		return src.__.wrongArgCount(args);
 	}
-	sar.prev_map = sar.map;
-	sar.map = args[1];
-	sar.runevents.load();
-});
 
-CON_COMMAND('changelevel', 'changelevel <map> - go to map lol\n', function(args) {
-	if (args.length != 2) {
-		return src.__.wrongArgCount(args);
+	let preset = args[1];
+	let CMD = str => src.cmd.executeCommand(str);
+
+	if (preset == 'none') {
+		CMD("ui_loadingscreen_transition_time 1.0");
+		CMD("ui_loadingscreen_fadein_time 1.0");
+		CMD("ui_loadingscreen_mintransition_time 0.5");
+		CMD("sar_disable_progress_bar_update 0");
+		CMD("sar_prevent_mat_snapshot_recompute 0");
+		CMD("sar_loads_uncap 0");
+		CMD("sar_loads_norender 0");
+	} else if (preset == "sla") {
+		CMD("ui_loadingscreen_transition_time 0.0");
+		CMD("ui_loadingscreen_fadein_time 0.0");
+		CMD("ui_loadingscreen_mintransition_time 0.0");
+		CMD("sar_disable_progress_bar_update 1");
+		CMD("sar_prevent_mat_snapshot_recompute 1");
+		CMD("sar_loads_uncap 0");
+		CMD("sar_loads_norender 0");
+	} else if (preset == "normal") {
+		CMD("ui_loadingscreen_transition_time 0.0");
+		CMD("ui_loadingscreen_fadein_time 0.0");
+		CMD("ui_loadingscreen_mintransition_time 0.0");
+		CMD("sar_disable_progress_bar_update 1");
+		CMD("sar_prevent_mat_snapshot_recompute 1");
+		CMD("sar_loads_uncap 1");
+		CMD("sar_loads_norender 0");
+	} else if (preset == "full") {
+		CMD("ui_loadingscreen_transition_time 0.0");
+		CMD("ui_loadingscreen_fadein_time 0.0");
+		CMD("ui_loadingscreen_mintransition_time 0.0");
+		CMD("sar_disable_progress_bar_update 2");
+		CMD("sar_prevent_mat_snapshot_recompute 1");
+		CMD("sar_loads_uncap 1");
+		CMD("sar_loads_norender 1");
+	} else {
+		sar.println(`Unknown preset ${preset}!\n`);
+		sar.println(src.getCmd(args[0]).helpStr);
 	}
-	sar.prev_map = sar.map;
-	sar.map = args[1];
-	sar.runevents.load();
 });
-
-CON_COMMAND('disconnect', 'disconnect - wtf do you think this does\n', function(args) {
-	if (sar.map == '') {
-		return src.con.err('not connected\n');
-	}
-	sar.prev_map = sar.map;
-	sar.map = ''
-});
-
-CON_COMMAND('restart_level', 'restart_level - restarts level\n', function(args) {
-	if (sar.map == '') {
-		return src.con.err('not connected\n');
-	}
-	sar.runevents.load();
-});
-
-CON_COMMAND('restart', 'restart - restarts level and disables cm\n', function(args) {
-	if (sar.map == '') {
-		return src.con.err('not connected\n');
-	}
-	src.setCvar('sv_bonus_challenge', 0);
-	sar.runevents.load();
-});
-
-CON_COMMAND('nop', 'nop [args]... - nop ignores all its arguments and does nothing\n', () => {});
+CON_CVAR('sar_loads_norender', 0);
+CON_CVAR('sar_loads_uncap', 0);
+if (src.game == 'portal2') {
+	CON_CVAR('ui_loadingscreen_mintransition_time', 0.5);
+	CON_CVAR('ui_loadingscreen_fadein_time', 1);
+	CON_CVAR('ui_loadingscreen_transition_time', 1);
+}
 
 CON_COMMAND('sar_chat');
 CON_COMMAND('ghost_chat');
@@ -457,7 +472,7 @@ CON_COMMAND('sar_toast_net_create', 'sar_toast_net_create <tag> <text> - create 
 CON_COMMAND('sar_toast_dismiss_all', 'sar_toast_dismiss_all - dismiss all active toasts\n');
 CON_COMMAND('svar_persist', 'svar_persist <variable> - mark an svar as persistent\n');
 CON_COMMAND('svar_no_persist', 'svar_no_persist <variable> - unmark an svar as persistent\n');
-CON_COMMAND('sar_fast_load_preset', 'set_fast_load_preset <preset> - sets all loading fixes to preset values\n');
+
 CON_COMMAND('sar_speedrun_cc_start');
 CON_COMMAND('sar_speedrun_cc_rule');
 CON_COMMAND('sar_speedrun_cc_finish');

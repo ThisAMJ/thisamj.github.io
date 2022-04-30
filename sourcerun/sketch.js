@@ -4,12 +4,15 @@ const con = src.con;
 function clearAllData() {
 	con.clear();
 	sar.texts = [];
+	for (let cmd of [...sar.aliases, ...sar.functions]) {
+		src.Unregister(cmd)
+	}
 	sar.aliases = [];
 	sar.functions = [];
 	// TODO: Fix redeclaration of const sar
 	// src.plugins = [];
 	src.binds = [];
-	src.onTickEvents = [];
+	src.onTickEvents = {pre: [], post: []};
 	src.cmd.buffer = [];
 }
 
@@ -82,9 +85,7 @@ window.addEventListener('load', async function() {
 	}
 	let fetchsrconfigs = async (filename) => {
 		filename = filename.replace('.cfg', '');
-		await fetchghub('p2sr/srconfigs', filename + '.cfg').then(e => {
-			src.cfg.add(filename, false, e);
-		});
+		await fetchghub('p2sr/srconfigs', filename + '.cfg');
 	};
 	
 	// await fetchsrconfigs('autoexec');
