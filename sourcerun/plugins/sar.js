@@ -5,6 +5,7 @@
 const sar = {
 	version: '1.12.7-pre2',
 	built: '12:45:28 Apr 16 2022',
+	platform: ~navigator.userAgent.indexOf('Windows') ? 'win' : /(Linux|X11(?!.*CrOS))/.test(navigator.userAgent) ? 'lin' : '?',
 	creatingCategory: '',
 	categories: [],
 	aliases: [],
@@ -336,6 +337,15 @@ const sar = {
 	GetColor: function(colstr = '') {
 		return `#${colstr}`;
 	}
+}
+
+sar.fonts = [];
+switch (sar.platform) {
+	case 'win':
+		sar.fonts = []
+		break;
+	case 'lin':
+		sar.fonts = ['', 'Courier New', 'Courier New', 'Courier New', 'Courier New', 'Lucida Console', 'Lucida Console', 'Lucida Console', 'Lucida Console', 'Lucida Console', 'Lucida Console', 'Tahoma', 'Tahoma']
 }
 
 {
@@ -769,6 +779,17 @@ CON_COMMAND('svar_capture', 'svar_capture <variable> <command> [args]... - captu
 	// Just set it to 1, I'm not implementing console reading (for now at least)
 	sar.SetSvar(args[1], 1);
 });
+
+CON_COMMAND('sar_font_get_name', 'sar_font_get_name <idx> - gets the name of the nth font index\n', function(args) {
+	if (args.length != 2) {
+		return src.__.wrongArgCount(args);
+	}
+	let idx = parseInt(args[1]);
+	if (isNaN(idx) || !sar.fonts[idx]) {
+		return sar.println('Invalid font index');
+	}
+	return sar.println(sar.fonts[idx]);
+}
 
 CON_COMMAND('sar_hud_set_text', 'sar_hud_set_text <id> <text>... - sets and shows the nth text value in the HUD\n', function(args) {
 	if (args.length < 3) {
