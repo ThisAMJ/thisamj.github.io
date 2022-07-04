@@ -1,46 +1,41 @@
-var splits = null;
+var splits = null, fromType = 'Livesplit';
 const dom = new DOMParser();
 
-async function dropHandler(event) {
-	event.preventDefault();
-	if (event.dataTransfer.items) {
-		for (let i = 0; i < event.dataTransfer.items.length; i++) {
-			if (event.dataTransfer.items[i].kind == 'file') {
-				let file = event.dataTransfer.items[i].getAsFile();
-				let ext = file.name.split('.').pop();
-				if (file.type == '') continue;
-				let content = await file.text();
-				let fromType;
-				switch (ext) {
-					case 'lss':
-						fromType = 'Livesplit';
-						break;
-					case 'sls': // slt splits extension?
-						fromType = 'SLT';
-						break;
-					case 'zip':
-						let zip = new JSZip();
-						console.log(await zip.loadAsync(content));
-					default:
-						fromType = 'Adrift';
-				}
-				console.log(ext, content);
-			}
-		}
+function fileSelect(event) {
+	let file = event.target.files[0];
+	let ext = file.name.split('.').pop();
+	switch (ext) {
+		case 'lss':
+			fromType = 'Livesplit';
+			break;
+		case 'txt': // slt splits extension?
+			fromType = 'SLT';
+			break;
+		case 'zip':
+			
+			console.log('hi');
+		default:
+			fromType = 'Adrift';
 	}
+
+	let reader = new FileReader();
+	reader.addEventListener('load', event => fileLoad(event.target.result, ext), false);
+	reader.readAsText(file);
 }
 
-let dragHandler = event => event.preventDefault();
-
-function fileSelect(event) {
-	var file = event.target.files[0];
-
-	var reader = new FileReader();
-	reader.addEventListener('load', event => {
-		splits = xml2json(dom.parseFromString(event.target.result, 'text/xml'));
-		console.log(splits);
-	});
-	reader.readAsText(file);
+async function fileLoad(content, ext) {
+	let zip;
+	if (ext == 'zip') {
+		zip = new JSZip();
+		console.log(await zip.loadAsync(content));
+	}
+	if (ext == 'lss') {
+		splits = xml2json(dom.parseFromString(content, 'text/xml'));
+	}
+	if (ext == 'txt') {
+		splits = JSON.parse(content);
+	}
+	console.log(splits);
 }
 
 function convertTime(from, fromType, toType) {
@@ -61,6 +56,7 @@ function convertTime(from, fromType, toType) {
 		case 'Livesplit':
 			// Livesplit uses HH:MM:SS.MMM
 			return `${Math.floor(secs / 3600)}:${Math.floor(secs / 60)}:${(secs % 60).toFixed(3)}`;
+			// return `${Math.floor(secs / 3600).toString().padStart(2, '0')}:${Math.floor(secs / 60).toString().padStart(2, '0')}:${(secs % 60).toFixed(3).toString().padStart(6, '0')}`;
 		case 'Adrift':
 			// Adrift uses microseconds (1 millionth of a second)
 			return Math.round(secs * 1000000);

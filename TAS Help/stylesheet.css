@@ -1,0 +1,30 @@
+* {box-sizing: border-box;}
+
+.position-relative {position: relative !important;}
+.position-fixed {position: fixed !important;}
+.float-left {float: left !important;}
+.float-right {float: right !important;}
+.width-full {width: 100% !important;}
+.width-half {width: 50% !important;}
+.flex {display: flex !important;}
+
+body, textarea {
+	background: #181818;
+	color: #CCCCCC;
+}
+
+textarea {
+    border: 1px solid #444;
+}
+
+#timetoticks, #tickstotime {
+	resize: none;
+	width: 10em;
+	height: 2em;
+}
+
+#absoluteticks, #relativeticks {
+	resize: none;
+	width: 30em;
+	height: 30em;
+}

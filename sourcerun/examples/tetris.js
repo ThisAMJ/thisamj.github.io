@@ -1,6 +1,6 @@
 (function() {
 if (!src) return false;
-src.cfg.add('autoexec', true, `// It's important that tetris is only initialised once
+src.cfg.add('autoexec', `// It's important that tetris is only initialised once
 svar_set sartris_root "minigames/tetris"
 exec util
 lcg_set_state ${Math.floor(Math.random() * 10000)}
@@ -13,7 +13,7 @@ bind w "sartris_player_rot 1"
 bind s "sartris_player_move 0 1"
 bind d "sartris_player_move 1 0"
 `);
-	src.cfg.add('minigames/tetris/runonce', false, `
+	src.cfg.add('minigames/tetris/runonce', `
 svar_set sartris_version "0.0.3"
 svar_set sartris_build "22/02/2022"
 sar_function sartris_about "echo $'SARtris Classic v$sartris_version (Built $sartris_build)$'; echo $'Created and maintained by AMJ$'; echo $'More information (not yet) available at thisamj.github.io/sartris$'"
@@ -68,7 +68,7 @@ sar_function sartris_tick "svar_add sartris_gravity 1; svar_mod sartris_gravity 
 sar_on_tick "sartris_draw"
 
 svar_set sartris_init 0`);
-	src.cfg.add('minigames/tetris/display', false, `// minigameDisplayHgt = Height of minigame in hud lines
+	src.cfg.add('minigames/tetris/display', `// minigameDisplayHgt = Height of minigame in hud lines
 // svar_set minigameDisplayIdx 0
 // sar_expand repeat "sar_expand sar_expand sar_hud_set_text $$minigameDisplayIdx $$$$minigameDisplayBuf$$minigameDisplayIdx; svar_add minigameDisplayIdx 1" $minigameDisplayHgt
 
@@ -115,7 +115,7 @@ sar_function __sartris_next_draw "svar_add __tmp_x 1; svar_add __tmp_y 1; svar_a
 // sar_function sartris_nbuf_reset "svar_set __sartris_dbuf_0 $'  NEXT: $'; svar_set __sartris_dbuf_1 $'$sartris_tex_empty_x4$'; svar_set __sartris_dbuf_2 $'$sartris_tex_empty_x4$'; svar_set __sartris_dbuf_3 $'$sartris_tex_empty_x4$'; svar_set __sartris_dbuf_4 $'$sartris_tex_empty_x4$'"
 sar_function sartris_draw "svar_set __stris_dii 0; svar_set __stris_dih $sartris_hud_offset; repeat $'sartris_draw_row; svar_add __stris_dii 1; svar_add __stris_dih 1$' 20"
 sar_function sartris_draw_row "sar_expand sar_hud_set_text $__stris_dih $'$$sartris_dbuf_$__stris_dii$-_0$$sartris_dbuf_$__stris_dii$-_1$$sartris_dbuf_$__stris_dii$-_2$$sartris_dbuf_$__stris_dii$-_3$$sartris_dbuf_$__stris_dii$-_4$$sartris_dbuf_$__stris_dii$-_5$$sartris_dbuf_$__stris_dii$-_6$$sartris_dbuf_$__stris_dii$-_7$$sartris_dbuf_$__stris_dii$-_8$$sartris_dbuf_$__stris_dii$-_9  $$sartris_nbuf_$__stris_dii$'"`);
-	src.cfg.add('minigames/tetris/tetrominoes', false, `// tetrominoes for tetris
+	src.cfg.add('minigames/tetris/tetrominoes', `// tetrominoes for tetris
 
 //                   0-6    0-3  0-3  
 // stored as __mino_<piece><rot><block>_{x,y}
@@ -208,7 +208,7 @@ __mino_definerot2 6 -1 0 0 0 0 1 1 1
 __mino_definerot3 6 1 -1 0 0 1 0 0 1
 
 sar_function __mino_definerot0 nop; sar_function __mino_definerot1 nop; sar_function __mino_definerot2 nop; sar_function __mino_definerot3 nop; sar_function __mino_definedefinerot nop`);
-	src.cfg.add('util', false, `
+	src.cfg.add('util', `
 // If cond "$1" is true, do $2, otherwise do $3
 sar_function __choose "cond $'$1$' $'$2$'; cond $'!($1)$' $'$3$'"
 

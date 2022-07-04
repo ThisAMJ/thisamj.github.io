@@ -1,0 +1,55 @@
+* {box-sizing: border-box;}
+
+.position-relative {position: relative !important;}
+.position-fixed {position: fixed !important;}
+.float-left {float: left !important;}
+.float-right {float: right !important;}
+.width-full {width: 100% !important;}
+.width-half {width: 50% !important;}
+.flex {display: flex !important;}
+
+body {
+	margin: 0;
+}
+
+body, textarea {
+	background: #181818;
+	color: #CCCCCC;
+}
+
+#container {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 75%;
+	height: 50%;
+	transform: translate(-50%, -50%);
+	border: 5px solid #333333;
+	border-radius: 25px;
+	/* padding: 10px; */
+}
+
+#desc {
+	text-align: center;
+}
+
+#drop_zone {
+	position: absolute;
+	bottom: calc(6% + 30px);
+	border: 1px solid;
+	width: 95% !important;
+	left: 2.5%;
+	height: 40%;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 400%;
+	font-size: 40px;
+}
+
+#button {
+	position: absolute;
+	width: 95% !important;
+	left: 2.5%;
+	bottom: 3%;
+	height: 30px;
+}

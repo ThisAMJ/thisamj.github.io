@@ -14,126 +14,105 @@ body {
 
 body, textarea {
 	background: #181818;
-	color: #CCCCCC;
+	color: #CCC;
 }
 
-select, button {
-	height: 2.5em;
-	border: 1px solid #181818;
-	border-radius: 5px;
-	background: #484848;
-	color: #CCCCCC;
-	transition: 0.3s;
-}
-
-#tab {
-	overflow-x: scroll;
-	overflow-y: hidden;
-	border: 1px solid #444;
-	background: #484848;
-	color: #CCCCCC;
-}
-
-select:hover, button:hover, button.active {
-	background: #666 !important;
+select:hover, button:hover, button.active, .content-tab-selected, .cfg-tab-selected {
+	background: #484848 !important;
 	color: #fff !important;
-}
-
-#tab button {
-	background: inherit;
-	color: inherit;
-	float: left;
-	border: none;
-	border-radius: 0;
-	border-right: 1px solid #666;
-	padding: 4px 10px;
 	cursor: pointer;
 }
 
-.tabcontent, #in, #liveconsole, #bindarea, #texts, #shadows, #console {
-	width: 100%;
-	height: 20em;
+.nav {
+	margin: 0.5% 0.5%;
+	padding: 0 0.5%;
+	background: #222;
+	border: 2px solid #222;
+	border-radius: 5px;
+	font-size: 15px;
+	height: 3.4em;
+	user-select: none;
+}
+
+.nav button {
+	padding: 0.5%;
+	border: none;
+	background: #222;
+	color: #CCC;
+	transition: 0.3s;
+}
+
+#new-cfg, #cfg-tabs button {
+	padding: 0 0.5em;
+	border-right: 1px solid #444;
+}
+
+#left-content, #right-content {
+	margin: 0 0.5%;
+}
+
+select {
+	background: #181818;
+	color: #CCC;
+	border: 2px solid #222;
+}
+
+button {
+	background: #222;
+	color: #CCC;
+	border: 2px solid #181818;
+}
+
+#cfg-content, #console, #liveconsole, #bindarea, #console-autocomplete, #sar-hud {
+	height: 40em;
 	resize: none;
 	font-family: monospace;
 	border: 1px solid #444;
-	box-sizing: border-box;
 	overflow-y: scroll;
 	tab-size: 4;
 }
 
-.tabcontent {
-	display: none;
-	height: 87vh;
-	overflow-x: scroll;
-}
-
-#console span {
-	margin: 0;
-	white-space: pre-wrap;
-	word-wrap: anywhere;
-}
-
-#texts {
-	overflow-x: hidden;
-	height: 22rem;
-	font-size:10px;
-}
-
-#texts pre {
-	margin: 0
-}
-
-#liveconsole {
-	border-top:none;
-	margin-top: 0;
-	padding-top: 0.25em;
-	height: 2em;
+#sar-hud {
+	height: auto;
 	overflow-y: hidden;
-	outline: none;
+}
+
+#sar-hud pre {
+	margin: 0;
 }
 
 #bindarea {
-	height: 2em;
-	overflow-y: hidden;
-	color: transparent;
+	caret-color: transparent;
 }
 
-/*
-
-
-#outputs {
-	position: fixed;
-	padding: 0;
+#console span, #cfg-content {
 	margin: 0;
-	width:100%;
-}
-
-#texts, #shadows {
-	width:50vw;
-	display: inline-block;
-	float: left;
-}
-
-div {
-	margin: 10px 0px;
-}
-
-
-#cleardata, #runcurrent, #runfirst, #game{
-	width: 25%;
-	height: 4em;
-	border: 1px solid #444;
-	background: #484848;
-	color: #CCCCCC;
-}
-
-#texts pre, #console pre {
-	margin: 0px;
-}
-
-#console pre {
 	white-space: pre-wrap;
 	word-wrap: anywhere;
-	padding-left: 1em;
-	text-indent: -1em;
-} */
+}
+
+#bindarea {
+	height: 1.5em;
+	overflow-y: hidden;
+}
+
+#liveconsole {
+	border-top: none;
+	border-bottom: none;
+	margin-top: 0;
+	height: 1.5em;
+	overflow-y: hidden;
+	outline: none;
+	display: block;
+}
+
+#console-autocomplete {
+	height: auto;
+	border-top: none;
+	margin-top: 0;
+	font-family: monospace;
+	border: 1px solid #444;
+	white-space: pre-wrap;
+	word-wrap: anywhere;
+	overflow-y: hidden;
+}

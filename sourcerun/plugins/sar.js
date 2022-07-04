@@ -9,10 +9,60 @@ const sar = {
 	categories: [],
 	aliases: [],
 	functions: [],
-	svars: [],
-	texts: [],
-	textOutputs: [],
+
+	svars: {},
+	persistentSvars: [],
+	
+	hud: {
+		getPrecision: function(velocity = false) {
+			let p = velocity ? parseInt(src.cvar('sar_hud_velocity_precision')) : parseInt(src.cvar('sar_hud_precision'));
+			if (p < 0) p = 0;
+			if (parseInt(src.cvar('sv_cheats')) != 1) {
+				let max = velocity ? 2 : 6;
+				if (p > max) p = max;
+			}
+			return p;
+		},
+		order: [],
+		texts: [],
+		output: null,
+		draw: function() {
+			if (!this.output) return false;
+			let hud_elements = {}, out = [], tmp, tmp2 = (0).toFixed(this.getPrecision()), tmp3 = (0).toFixed(this.getPrecision(true));
+			
+			tmp = parseInt(src.cvar('sar_hud_position'));
+			if (!isNaN(tmp) && tmp != 0) {
+				hud_elements.position = src.map == '' ? [] : `pos: ${tmp2} ${tmp2} ${tmp2}`;
+			}
+			
+			tmp = parseInt(src.cvar('sar_hud_velocity'));
+			if (!isNaN(tmp) && tmp != 0) {
+				hud_elements.velocity = src.map == '' ? [] : `vel: ${tmp3} ${tmp3} ${tmp3}`;
+			}
+			
+			tmp = parseInt(src.cvar('sar_hud_angles'));
+			if (!isNaN(tmp) && tmp != 0) {
+				hud_elements.angles = src.map == '' ? [] : `ang: ${tmp2} ${tmp2}`
+			}
+			
+			hud_elements.text = sar.hud.texts.filter(e => e.shown).sort((a, b) => a.id - b.id).map(e => e.formatted);
+			for (let ele of this.order) {
+				if (hud_elements[ele]) {
+					if (typeof hud_elements[ele] == 'string') {
+						out.push(...hud_elements[ele].split('\n'));
+					} else {
+						// Assume array
+						out.push(...hud_elements[ele]);
+					}
+				}
+			}
+			out = out.map(e => `<pre>${e}</pre>`).join('');
+			if (this.output.innerHTML != out) this.output.innerHTML = out;
+		},
+	},
+	
 	seqs: [],
+	
 	con_filters: [],
 	con_filtering: undefined,
 	matches_filter: function(text, filter) {
@@ -20,7 +70,7 @@ const sar = {
 		// LOLLLL
 		return !filter
 			? true
-			: !text
+			: typeof text != 'string'
 				? false
 				: filter[0] == '^' && filter[filter.length - 1] == '$'
 					? filter.slice(1, -1) == text
@@ -28,7 +78,7 @@ const sar = {
 						? text.startsWith(filter.slice(1))
 						: filter[filter.length - 1] == '$'
 							? text.endsWith(filter.slice(0, -1))
-							: text == filter;
+							: ~text.indexOf(filter);
 		
 	},
 	matches_filters: function(text) {
@@ -37,8 +87,9 @@ const sar = {
 		if (this.con_filtering) {
 			let match = this.con_filtering.allow;
 			if (this.matches_filter(text, this.con_filtering.to)) {
-				src.con.log(`Finishing persistent filter rule from "${this.con_filtering.from}" to "${this.con_filtering.to}"\n`, 3, '#88FF88');
+				let con_filtering = JSON.parse(JSON.stringify(this.con_filtering));
 				this.con_filtering = undefined;
+				src.con.log(`Finishing persistent filter rule from "${con_filtering.from}" to "${con_filtering.to}"\n`, 3, '#88FF88');
 			}
 			return match;
 		}
@@ -52,8 +103,7 @@ const sar = {
 				return rule.allow;
 			}
 		}
-		
-		return src.cvar('sar_con_filter_default');
+		return src.cvar('sar_con_filter_default') == 1;
 	},
 	
 	cond: {
@@ -83,7 +133,7 @@ const sar = {
 				case this.conditions.MENU: return src.map == '';
 				case this.conditions.MAP: return src.map == c.val;
 				case this.conditions.PREV_MAP: return src.prev_map == c.val;
-				case this.conditions.GAME: return game == c.val;
+				case this.conditions.GAME: return src.game == c.val;
 				case this.conditions.NOT: return !this.eval(c.unop_cond);
 				case this.conditions.AND: return this.eval(c.binop_l) && this.eval(c.binop_r);
 				case this.conditions.OR: return this.eval(c.binop_l) || this.eval(c.binop_r);
@@ -279,9 +329,8 @@ const sar = {
 					continue;
 				}
 				sub = true;
-				let svar = text.substr(i + 1, len);
-				let value = this.svars.find(e => e.name == svar);
-				if (value) str += value.val;
+				let value = this.GetSvar(text.substr(i + 1, len));
+				if (value) str += value;
 				i += len;
 				continue;
 			}
@@ -312,21 +361,28 @@ const sar = {
 		}
 		hudText.formatted = txt + '</span>'.repeat(spans);
 	},
+
+	LoadPersistentSvars: function() {
+		(localStorage.getItem('sar.persistentSvars') || '').replaceAll('\n\n', '').split(/\r?\n/).chunkify(2).forEach(e => {
+			if (e[0] != '') this.SetSvar(e[0], e[1] || '');
+		});
+	},
+
+	SavePersistentSvars: function() {
+		localStorage.setItem('sar.persistentSvars', sar.persistentSvars.map(e => `${e}\n${sar.GetSvar(e)}\n`).join(''));
+	},
 	
 	SvarExists: function(name) {
-		return this.svars.find(e => e.name == name);
+		return this.svars.hasOwnProperty(name);
 	},
 	
 	SetSvar: function(name, val) {
-		name = name;
-		val = val.toString();
-		let existing = this.svars.find(e => e.name == name);
-		existing ? existing.val = val : this.svars.push({name: name, val: val});
+		this.svars[name] = val.toString();
+		if (this.persistentSvars.length != 0) this.SavePersistentSvars();
 	},
 	
 	GetSvar: function(name) {
-		let existing = this.svars.find(e => e.name == name);
-		return existing ? existing.val : '';
+		return this.svars[name] || '';
 	},
 	
 	println: function(text, debugLevel = 0, color = '#EECC44') {
@@ -336,6 +392,17 @@ const sar = {
 	GetColor: function(colstr = '') {
 		return `#${colstr}`;
 	}
+};
+
+sar.LoadPersistentSvars();
+
+ON_TICK(function() {
+	sar.hud.draw();
+});
+
+for (let ele of ['tastick', 'groundframes', 'text', 'position', 'angles', 'portal_angles', 'portal_angles_2', 'velocity', 'velang', 'groundspeed', 'session', 'last_session', 'sum', 'timer', 'avg', 'cps', 'pause_timer', 'demo', 'jumps', 'portals', 'steps', 'jump', 'jump_peak', 'velocity_peak', 'trace', 'frame', 'last_frame', 'inspection', 'eyeoffset', 'duckstate', 'grounded']) {
+	sar.hud.order.push(ele);
+	if (ele != 'text') CON_CVAR(`sar_hud_${ele}`, 0);
 }
 
 {
@@ -351,7 +418,8 @@ const sar = {
 			sar.events.${name}.push(cmd);
 		});
 		sar.runevents.${name} = function() {
-			for (let cmd of sar.events.${name}) {
+			for (let i = sar.events.${name}.length; i >= 0; i--) {
+				let cmd = sar.events.${name}[i];
 				src.cmd.executeCommand(cmd, ${immediately});
 			}
 		}`);
@@ -391,10 +459,10 @@ CON_COMMAND_HOOK('exec', true, function(args) {
 	}
 });
 
-CON_COMMAND_HOOK('map', true, function(args) {sar.runevents.load()});
-CON_COMMAND_HOOK('changelevel', true, function(args) {sar.runevents.load()});
-CON_COMMAND_HOOK('restart', true, function(args) {sar.runevents.load()});
-CON_COMMAND_HOOK('restart_level', true, function(args) {sar.runevents.load()});
+CON_COMMAND_HOOK('map', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents.load()});
+CON_COMMAND_HOOK('changelevel', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents.load()});
+CON_COMMAND_HOOK('restart', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents.load()});
+CON_COMMAND_HOOK('restart_level', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents.load()});
 
 CON_COMMAND('sar_fast_load_preset', 'set_fast_load_preset <preset> - sets all loading fixes to preset values\n', function(args) {
 	if (args.length != 2) {
@@ -403,47 +471,24 @@ CON_COMMAND('sar_fast_load_preset', 'set_fast_load_preset <preset> - sets all lo
 
 	let preset = args[1];
 	let CMD = str => src.cmd.executeCommand(str);
-
-	if (preset == 'none') {
-		CMD("ui_loadingscreen_transition_time 1.0");
-		CMD("ui_loadingscreen_fadein_time 1.0");
-		CMD("ui_loadingscreen_mintransition_time 0.5");
-		CMD("sar_disable_progress_bar_update 0");
-		CMD("sar_prevent_mat_snapshot_recompute 0");
-		CMD("sar_loads_uncap 0");
-		CMD("sar_loads_norender 0");
-	} else if (preset == "sla") {
-		CMD("ui_loadingscreen_transition_time 0.0");
-		CMD("ui_loadingscreen_fadein_time 0.0");
-		CMD("ui_loadingscreen_mintransition_time 0.0");
-		CMD("sar_disable_progress_bar_update 1");
-		CMD("sar_prevent_mat_snapshot_recompute 1");
-		CMD("sar_loads_uncap 0");
-		CMD("sar_loads_norender 0");
-	} else if (preset == "normal") {
-		CMD("ui_loadingscreen_transition_time 0.0");
-		CMD("ui_loadingscreen_fadein_time 0.0");
-		CMD("ui_loadingscreen_mintransition_time 0.0");
-		CMD("sar_disable_progress_bar_update 1");
-		CMD("sar_prevent_mat_snapshot_recompute 1");
-		CMD("sar_loads_uncap 1");
-		CMD("sar_loads_norender 0");
-	} else if (preset == "full") {
-		CMD("ui_loadingscreen_transition_time 0.0");
-		CMD("ui_loadingscreen_fadein_time 0.0");
-		CMD("ui_loadingscreen_mintransition_time 0.0");
-		CMD("sar_disable_progress_bar_update 2");
-		CMD("sar_prevent_mat_snapshot_recompute 1");
-		CMD("sar_loads_uncap 1");
-		CMD("sar_loads_norender 1");
-	} else {
+	if (!~['none', 'normal', 'sla', 'full'].indexOf(preset)) {
 		sar.println(`Unknown preset ${preset}!\n`);
 		sar.println(src.getCmd(args[0]).helpStr);
+		return;
 	}
+	CMD('ui_loadingscreen_transition_time ' + (preset == 'none' ? '1.0' : '0.0'));
+	CMD('ui_loadingscreen_fadein_time ' + (preset == 'none' ? '1.0' : '0.0'));
+	CMD('ui_loadingscreen_mintransition_time ' + (preset == 'none' ? '0.5' : '0.0'));
+	CMD('sar_disable_progress_bar_update ' + (preset == 'none' ? '0' : preset == 'full' ? '2' : '1'));
+	CMD('sar_prevent_mat_snapshot_recompute ' + (preset == 'none' ? '0' : '1'));
+	CMD('sar_loads_uncap ' + ((preset == 'normal' || preset == 'full') ? '1' : '0'));
+	CMD('sar_loads_norender ' + (preset == 'full' ? '1' : '0'));
+}, function(args) {
+	return ['none', 'normal', 'sla', 'full'].filter(e => ~e.indexOf(args[1] || ''));
 });
 CON_CVAR('sar_loads_norender', 0);
 CON_CVAR('sar_loads_uncap', 0);
-if (src.game == 'portal2') {
+if (src.game != 'srm') {
 	CON_CVAR('ui_loadingscreen_mintransition_time', 0.5);
 	CON_CVAR('ui_loadingscreen_fadein_time', 1);
 	CON_CVAR('ui_loadingscreen_transition_time', 1);
@@ -470,8 +515,6 @@ CON_COMMAND('sar_toast_setpos', 'sar_toast_setpos <bottom|top> <left|center|righ
 CON_COMMAND('sar_toast_create', 'sar_toast_create <tag> <text> - create a toast\n');
 CON_COMMAND('sar_toast_net_create', 'sar_toast_net_create <tag> <text> - create a toast, also sending it to your coop partner\n');
 CON_COMMAND('sar_toast_dismiss_all', 'sar_toast_dismiss_all - dismiss all active toasts\n');
-CON_COMMAND('svar_persist', 'svar_persist <variable> - mark an svar as persistent\n');
-CON_COMMAND('svar_no_persist', 'svar_no_persist <variable> - unmark an svar as persistent\n');
 
 CON_COMMAND('sar_speedrun_cc_start');
 CON_COMMAND('sar_speedrun_cc_rule');
@@ -557,9 +600,6 @@ CON_CVAR('sar_speedrun_offset', 0, 'Start speedruns with this many ticks on the 
 CON_CVAR('sar_speedrun_autostop', 0, 'Automatically stop recording demos when a speedrun finishes. If 2, automatically append the run time to the demo name.\n', 0, 2);
 CON_CVAR('sar_record_at_demo_name', 'chamber', 'Name of the demo automatically recorded.\n');
 
-for (let element of ['tastick', 'groundframes', 'text', 'position', 'angles', 'portal_angles', 'portal_angles_2', 'velocity', 'velang', 'groundspeed', 'session', 'last_session', 'sum', 'timer', 'avg', 'cps', 'pause_timer', 'demo', 'jumps', 'portals', 'steps', 'jump', 'jump_peak', 'velocity_peak', 'trace', 'frame', 'last_frame', 'inspection', 'eyeoffset', 'duckstate', 'grounded'])
-	CON_CVAR(`sar_hud_${element}`, 0);
-
 CON_CVAR('sar_hud_spacing', 1, 'Spacing between elements of HUD.\n', 0);
 CON_CVAR('sar_hud_x', 2, 'X padding of HUD.\n', 0);
 CON_CVAR('sar_hud_y', 2, 'Y padding of HUD.\n', 0);
@@ -585,15 +625,10 @@ CON_CVAR('sar_tas_tools_force', 0, 'Force tool playback for TAS scripts; primari
 CON_CVAR('sar_tas_autosave_raw', 0, 'Enables automatic saving of raw, processed TAS scripts.\n');
 CON_CVAR('sar_tas_pauseat', 0, 'Pauses the TAS playback on specified tick.\n', 0);
 CON_CVAR('sar_tas_skipto', 0, 'Fast-forwards the TAS playback until given playback tick.\n', 0);
-CON_CVAR('sar_tas_playbackrate', 1, 'The rate at which to play back TAS scripts.\n', 0.02)
-CON_CVAR('sar_tas_restore_fps', 1, 'Restore fps_max and host_framerate after TAS playback.\n')
-CON_CVAR('sar_tas_interpolate', 0, 'Preserve client interpolation in TAS playback.\n')
+CON_CVAR('sar_tas_playbackrate', 1, 'The rate at which to play back TAS scripts.\n', 0.02);
+CON_CVAR('sar_tas_restore_fps', 1, 'Restore fps_max and host_framerate after TAS playback.\n');
+CON_CVAR('sar_tas_interpolate', 0, 'Preserve client interpolation in TAS playback.\n');
 
-ON_TICK(function() {
-	let txts = sar.texts.filter(e => e.shown).sort((a, b) => a.id - b.id).map(e => `<pre>${e.formatted}</pre>`).join('');
-	for (let output of sar.textOutputs) 
-		if (output.innerHTML != txts) output.innerHTML = txts;
-});
 
 CON_COMMAND('sar_speedrun_cc_start', 'sar_speedrun_cc_start <category name> [default options]... - start the category creator\n', function(args) {
 	if (args.length < 2) {
@@ -615,19 +650,37 @@ CON_COMMAND('sar_speedrun_category', 'sar_speedrun_category [category] - get or 
 	sar.println(`Using category '${args[1]}'`);
 });
 
+sar.hud.ordercompletion = function(args) {
+	return sar.hud.order.filter(e => ~e.indexOf(args[1] || ''));
+}
+
 CON_COMMAND('sar_hud_order_bottom', 'sar_hud_order_bottom <name> - orders hud element to bottom\n', function(args) {
 	if (args.length != 2) {
 		return src.__.wrongArgCount(args);
 	}
+	
+	if (!sar.hud.order.includes(args[1].toLowerCase())) {
+		return src.con.err(`sar_hud_order_bottom: Unknown HUD element ${args[1]}!\n`);
+	}
+	
+	sar.hud.order = [...sar.hud.order.filter(e => e != args[1].toLowerCase()), args[1].toLowerCase()];
+	
 	sar.println(`Moved HUD element ${args[1]} to bottom.`)
-});
+}, sar.hud.ordercompletion);
 
 CON_COMMAND('sar_hud_order_top', 'sar_hud_order_top <name> - orders hud element to top\n', function(args) {
 	if (args.length != 2) {
 		return src.__.wrongArgCount(args);
 	}
+	
+	if (!sar.hud.order.includes(args[1].toLowerCase())) {
+		return src.con.err(`sar_hud_order_bottom: Unknown HUD element ${args[1]}!\n`);
+	}
+	
+	sar.hud.order = [args[1].toLowerCase(), ...sar.hud.order.filter(e => e != args[1].toLowerCase())];
+	
 	sar.println(`Moved HUD element ${args[1]} to top.`)
-});
+}, sar.hud.ordercompletion);
 
 // CON_COMMAND('sar_on_config_exec', 'sar_on_config_exec <command> [args]... - registers a command to be run on config.cfg exec\n', function(args) {
 	// if (args.length < 2) {
@@ -695,7 +748,7 @@ CON_COMMAND('cond', 'cond <condition> <command> [args]... - runs a command only 
 	
 	let condition = sar.cond.parse(cond_str, args.cmdStr);
 
-	if (!condition) return src.con.err(`cond: Condition parsing failed\n`);
+	if (!condition) return src.con.err(`cond: Condition parsing failed (${cond_str})\n`);
 
 	if (sar.cond.eval(condition)) src.cmd.executeCommand(command);
 
@@ -730,6 +783,24 @@ CON_COMMAND('svar_count', 'svar_count - prints a count of all the defined svars\
 	}
 });
 
+CON_COMMAND('svar_persist', 'svar_persist <variable> - mark an svar as persistent\n', function(args) {
+	if (args.length != 2) {
+		return src.__.wrongArgCount(args);
+	}
+
+	if (!sar.persistentSvars.includes(args[1])) sar.persistentSvars.push(args[1]);
+	sar.SavePersistentSvars();
+
+});
+CON_COMMAND('svar_no_persist', 'svar_no_persist <variable> - unmark an svar as persistent\n', function(args) {
+	if (args.length != 2) {
+		return src.__.wrongArgCount(args);
+	}
+
+	sar.persistentSvars = sar.persistentSvars.filter(e => e != args[1]);
+	sar.SavePersistentSvars();
+});
+
 // Svar Arithmetic
 {
 	// it's so tempting to just allow floating point :(
@@ -759,16 +830,34 @@ CON_COMMAND('svar_from_cvar', 'svar_from_cvar <variable> <cvar> - capture a cvar
 		return src.__.wrongArgCount(args);
 	}
 	let cvar = src.cvar(args[2]);
-	if (cvar != undefined) sar.SetSvar(args[1], cvar.toString().replaceAll('\n', ''));
+	if (cvar != undefined) sar.SetSvar(args[1], cvar.toString().replace('/\n/g', ''));
 });
 
-CON_COMMAND('svar_capture', 'svar_capture <variable> <command> [args]... - capture a command\'s output and place it into an svar, removing newlines\n', function(args) {
-	if (args.length != 3) {
-		return src.__.wrongArgCount(args);
-	}
-	// Just set it to 1, I'm not implementing console reading (for now at least)
-	sar.SetSvar(args[1], 1);
+sar.capture = {
+	target: '', len: 0
+}
+CON_COMMAND('_sar_svar_capture_stop', 'Internal SAR command. Do not use\n', function() {
+	let out = src.con.buffer.slice(sar.capture.len); // Get the console buffer since capture
+	out = out.map(e => e[0]); // Get the text components
+	out = out.join(''); // Squish into one string
+	out = out.replace(/\n/g, ''); // Remove newlines
+	sar.SetSvar(sar.capture.target, out);
 });
+CON_COMMAND('svar_capture', 'svar_capture <variable> <command> [args]... - capture a command\'s output and place it into an svar, removing newlines\n', function(args) {
+	if (args.length < 3) {
+		return src.__.tooFewArgs(args);
+	}
+	
+	let cmd = args.length == 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]);
+		
+	// Console reading - use the buffer
+	sar.capture.target = args[1];
+	sar.capture.len = src.con.buffer.length;
+	src.cmd.executeCommand('_sar_svar_capture_stop');
+	src.cmd.executeCommand(cmd);
+});
+
+CON_CVAR('sar_hud_text', '', 'DEPRECATED: Use sar_hud_set_text\n'); // No I'm not implementing the deprecated behaviour.
 
 CON_COMMAND('sar_hud_set_text', 'sar_hud_set_text <id> <text>... - sets and shows the nth text value in the HUD\n', function(args) {
 	if (args.length < 3) {
@@ -778,7 +867,7 @@ CON_COMMAND('sar_hud_set_text', 'sar_hud_set_text <id> <text>... - sets and show
 	let id = src.__.atoi(args[1]);
 	if (id < 0) return src.con.err(`sar_hud_set_text: Tried to set negative hud index ${id}\n`);
 	let val = args.length == 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]);
-	let existing = sar.texts.find(e => e.id == id);
+	let existing = sar.hud.texts.find(e => e.id == id);
 	if (existing) {
 		existing.txt = val;
 		return sar.formatHudText(existing)
@@ -789,14 +878,14 @@ CON_COMMAND('sar_hud_set_text', 'sar_hud_set_text <id> <text>... - sets and show
 		shown: true
 	};
 	sar.formatHudText(txt);
-	sar.texts.push(txt);
+	sar.hud.texts.push(txt);
 });
 
 CON_COMMAND('sar_hud_show_text', 'sar_hud_show_text <id> - shows the nth text value in the HUD\n', function(args) {
 	if (args.length != 2) {
 		return src.__.wrongArgCount(args);
 	}
-	let existing = sar.texts.find(e => e.id == args[1]);
+	let existing = sar.hud.texts.find(e => e.id == args[1]);
 	if (existing) existing.shown = true;
 });
 
@@ -804,7 +893,7 @@ CON_COMMAND('sar_hud_hide_text', 'sar_hud_hide_text <id> - hides the nth text va
 	if (args.length != 2) {
 		return src.__.wrongArgCount(args);
 	}
-	let existing = sar.texts.find(e => e.id == args[1]);
+	let existing = sar.hud.texts.find(e => e.id == args[1]);
 	if (existing) existing.shown = false;
 });
 
@@ -846,18 +935,66 @@ CON_COMMAND('sar_con_filter_reset', 'sar_con_filter_reset - clear the console fi
 	sar.con_filters = [];
 });
 
+src.con.flush = function() {
+	if (!!this.output) {
+		let shouldScroll = this.output.scrollTop >= this.output.scrollHeight - this.output.offsetHeight;
+		while (this.buffer.length > 0) {
+			let text = this.buffer.shift();
+			// If text[3] is truthy, it was `clear`
+			if (text[3]) {
+				this.output.innerHTML = '';
+				continue;
+			}
+			
+			if (!text[4]) continue; // con_filter just blocks display
+			
+			if (this.parent.cvar('developer') >= text[1]) {
+				let lines = text[0].split('\n');
+				for (let i = 0; i < lines.length; i++) {
+					let line = lines[i];
+					let ele = document.createElement('span');
+					ele.style.color = text[2];
+					ele.innerText = line;
+					
+					if (line != '') this.output.appendChild(ele);
+					if (i < lines.length - 1) this.output.appendChild(document.createElement('br'));
+				}
+			}
+		}
+		while (this.output.childElementCount > 2 * this.historyCount) this.output.removeChild(this.output.firstChild)
+		if (shouldScroll) this.output.scrollTop = this.output.scrollHeight;
+	}
+}
+
 src.con.print = function(text = '', debugLevel = 0, color = '#FFFFFF') {
 	// TODO: print('\n') should finish current line
 	let lines = text.split('\n');
 	for (let i = 0; i < lines.length; i++) {
-		let line = lines[i];
+		let line = lines[i], display = false;
+		if (i == lines.length - 1 && line == '') continue;
 		if (sar.matches_filters(line) && (line != '' || !src.cvar('sar_con_filter_suppress_blank_lines'))) {
-			this.buffer.push([`${line}${i < lines.length - 1 ? '\n' : ''}`, debugLevel, color]);
-		} else {
-			if (line.trim() == '') line = '';
-			this.buffer.push([line, 3, '#888888']);
+			if (i < lines.length - 1) line += '\n';
+			display = true;
+		} else if (line.trim() != '' && line.trim() != '\n') {
+			line += '\n';
+			debugLevel = 3;
+			color = '#888888';
+			display = true;
 		}
+		// if (line == '\n') continue;
+		// console.log([line, debugLevel, color, false, display]);
+		this.buffer.push([line, debugLevel, color, false, display]);
 	}
+	
+	// let lines = text.split('\n');
+	// for (let i = 0; i < lines.length; i++) {
+		// let line = lines[i];
+		// if (sar.matches_filters(line) && (line != '' || !src.cvar('sar_con_filter_suppress_blank_lines'))) {
+			// this.buffer.push([`${line}${i < lines.length - 1 ? '\n' : ''}`, debugLevel, color]);
+		// } else {
+			// if (line.trim() != '') this.buffer.push([line, 3, '#888888']);
+		// }
+	// }
 };
 
 CON_COMMAND('sar_echo', 'sar_echo <color> <string...> - echo a string to console with a given color\n', function(args) {
@@ -890,7 +1027,7 @@ CON_COMMAND('sar_echo_nolf', 'sar_echo_nolf <color> <string...> - echo a string 
 
 CON_COMMAND('sar_about', 'sar_about - prints info about SAR plugin', function(args) {
 	let gamestr = 'Unknown';
-	switch (game) {
+	switch (src.game) {
 		case 'portal2':
 		case 'srm':
 			gamestr = 'Portal 2 (8491)';

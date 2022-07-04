@@ -1,6 +1,6 @@
 ({
 if (!src) return false;
-src.cfg.add('mtriggers/SP/01_the-courtesy-call/01_container-ride', false, `sar_speedrun_cc_start "Container Ride" map=sp_a1_intro1 action=split
+src.cfg.add('mtriggers/SP/01_the-courtesy-call/01_container-ride', `sar_speedrun_cc_start "Container Ride" map=sp_a1_intro1 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Sleep" entity targetname=return_to_bed_button inputname=Kill
@@ -15,7 +15,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a1_intro1" sar_speedrun_category "Container Ride"
 `);
-src.cfg.add('mtriggers/SP/01_the-courtesy-call/02_portal-carousel', false, `sar_speedrun_cc_start "Portal Carousel" map=sp_a1_intro2 action=split
+src.cfg.add('mtriggers/SP/01_the-courtesy-call/02_portal-carousel', `sar_speedrun_cc_start "Portal Carousel" map=sp_a1_intro2 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=@entry_door-proxy inputname=OnProxyRelay2
@@ -35,7 +35,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a1_intro2" sar_speedrun_category "Portal Carousel"
 `);
-src.cfg.add('mtriggers/SP/01_the-courtesy-call/03_portal-gun', false, `sar_speedrun_cc_start "Portal Gun" map=sp_a1_intro3 action=split
+src.cfg.add('mtriggers/SP/01_the-courtesy-call/03_portal-gun', `sar_speedrun_cc_start "Portal Gun" map=sp_a1_intro3 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -49,7 +49,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a1_intro3" sar_speedrun_category "Portal Gun"
 `);
-src.cfg.add('mtriggers/SP/01_the-courtesy-call/04_smooth-jazz', false, `sar_speedrun_cc_start "Smooth Jazz" map=sp_a1_intro4 action=split
+src.cfg.add('mtriggers/SP/01_the-courtesy-call/04_smooth-jazz', `sar_speedrun_cc_start "Smooth Jazz" map=sp_a1_intro4 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -64,7 +64,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a1_intro4" sar_speedrun_category "Smooth Jazz"
 `);
-src.cfg.add('mtriggers/SP/01_the-courtesy-call/05_cube-momentum', false, `sar_speedrun_cc_start "Cube Momentum" map=sp_a1_intro5 action=split
+src.cfg.add('mtriggers/SP/01_the-courtesy-call/05_cube-momentum', `sar_speedrun_cc_start "Cube Momentum" map=sp_a1_intro5 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -78,7 +78,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a1_intro5" sar_speedrun_category "Cube Momentum"
 `);
-src.cfg.add('mtriggers/SP/01_the-courtesy-call/06_future-starter', false, `sar_speedrun_cc_start "Future Starter" map=sp_a1_intro6 action=split
+src.cfg.add('mtriggers/SP/01_the-courtesy-call/06_future-starter', `sar_speedrun_cc_start "Future Starter" map=sp_a1_intro6 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=room_1_entry_door-proxy inputname=OnProxyRelay2
@@ -92,7 +92,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a1_intro6" sar_speedrun_category "Future Starter"
 `);
-src.cfg.add('mtriggers/SP/01_the-courtesy-call/07_secret-panel', false, `sar_speedrun_cc_start "Secret Panel" map=sp_a1_intro7 action=split
+src.cfg.add('mtriggers/SP/01_the-courtesy-call/07_secret-panel', `sar_speedrun_cc_start "Secret Panel" map=sp_a1_intro7 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -105,7 +105,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a1_intro7" sar_speedrun_category "Secret Panel"
 `);
-src.cfg.add('mtriggers/SP/01_the-courtesy-call/08_wakeup', false, `sar_speedrun_cc_start "Wakeup" map=sp_a1_wakeup action=split
+src.cfg.add('mtriggers/SP/01_the-courtesy-call/08_wakeup', `sar_speedrun_cc_start "Wakeup" map=sp_a1_wakeup action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=training_door inputname=Open
@@ -120,7 +120,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a1_wakeup" sar_speedrun_category "Wakeup"
 `);
-src.cfg.add('mtriggers/SP/01_the-courtesy-call/09_incinerator', false, `sar_speedrun_cc_start "Incinerator" map=sp_a2_intro action=split
+src.cfg.add('mtriggers/SP/01_the-courtesy-call/09_incinerator', `sar_speedrun_cc_start "Incinerator" map=sp_a2_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Incinerator Room" entity targetname=chute_1_relay inputname=Trigger
@@ -133,7 +133,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_intro" sar_speedrun_category "Incinerator"
 `);
-src.cfg.add('mtriggers/SP/02_the-cold-boot/01_laser-intro', false, `sar_speedrun_cc_start "Laser Intro" map=sp_a2_laser_intro action=split
+src.cfg.add('mtriggers/SP/02_the-cold-boot/01_laser-intro', `sar_speedrun_cc_start "Laser Intro" map=sp_a2_laser_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -146,7 +146,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_laser_intro" sar_speedrun_category "Laser Intro"
 `);
-src.cfg.add('mtriggers/SP/02_the-cold-boot/02_laser-stairs', false, `sar_speedrun_cc_start "Laser Stairs" map=sp_a2_laser_stairs action=split
+src.cfg.add('mtriggers/SP/02_the-cold-boot/02_laser-stairs', `sar_speedrun_cc_start "Laser Stairs" map=sp_a2_laser_stairs action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -158,7 +158,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_laser_stairs" sar_speedrun_category "Laser Stairs"
 `);
-src.cfg.add('mtriggers/SP/02_the-cold-boot/03_dual-lasers', false, `sar_speedrun_cc_start "Dual Lasers" map=sp_a2_dual_lasers action=split
+src.cfg.add('mtriggers/SP/02_the-cold-boot/03_dual-lasers', `sar_speedrun_cc_start "Dual Lasers" map=sp_a2_dual_lasers action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -169,7 +169,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_dual_lasers" sar_speedrun_category "Dual Lasers"
 `);
-src.cfg.add('mtriggers/SP/02_the-cold-boot/04_laser-over-goo', false, `sar_speedrun_cc_start "Laser Over Goo" map=sp_a2_laser_over_goo action=split
+src.cfg.add('mtriggers/SP/02_the-cold-boot/04_laser-over-goo', `sar_speedrun_cc_start "Laser Over Goo" map=sp_a2_laser_over_goo action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Panels Trigger" entity targetname=InstanceAuto69-corridor_repair-proxy inputname=OnProxyRelay1
@@ -182,7 +182,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_laser_over_goo" sar_speedrun_category "Laser Over Goo"
 `);
-src.cfg.add('mtriggers/SP/02_the-cold-boot/05_catapult-intro', false, `sar_speedrun_cc_start "Catapult Intro" map=sp_a2_catapult_intro action=split
+src.cfg.add('mtriggers/SP/02_the-cold-boot/05_catapult-intro', `sar_speedrun_cc_start "Catapult Intro" map=sp_a2_catapult_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Cube Push" entity targetname=hallway_sim_go inputname=Trigger
@@ -197,7 +197,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_catapult_intro" sar_speedrun_category "Catapult Intro"
 `);
-src.cfg.add('mtriggers/SP/02_the-cold-boot/06_trust-fling', false, `sar_speedrun_cc_start "Trust Fling" map=sp_a2_trust_fling action=split
+src.cfg.add('mtriggers/SP/02_the-cold-boot/06_trust-fling', `sar_speedrun_cc_start "Trust Fling" map=sp_a2_trust_fling action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Panels Trigger" entity targetname=wall_panel_1-proxy inputname=OnProxyRelay1
@@ -211,7 +211,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_trust_fling" sar_speedrun_category "Trust Fling"
 `);
-src.cfg.add('mtriggers/SP/02_the-cold-boot/07_pit-flings', false, `sar_speedrun_cc_start "Pit Flings" map=sp_a2_pit_flings action=split
+src.cfg.add('mtriggers/SP/02_the-cold-boot/07_pit-flings', `sar_speedrun_cc_start "Pit Flings" map=sp_a2_pit_flings action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -224,7 +224,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_pit_flings" sar_speedrun_category "Pit Flings"
 `);
-src.cfg.add('mtriggers/SP/02_the-cold-boot/08_fizzler-intro', false, `sar_speedrun_cc_start "Fizzler Intro" map=sp_a2_fizzler_intro action=split
+src.cfg.add('mtriggers/SP/02_the-cold-boot/08_fizzler-intro', `sar_speedrun_cc_start "Fizzler Intro" map=sp_a2_fizzler_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -236,7 +236,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_fizzler_intro" sar_speedrun_category "Fizzler Intro"
 `);
-src.cfg.add('mtriggers/SP/03_the-return/01_ceiling-catapult', false, `sar_speedrun_cc_start "Ceiling Catapult" map=sp_a2_sphere_peek action=split
+src.cfg.add('mtriggers/SP/03_the-return/01_ceiling-catapult', `sar_speedrun_cc_start "Ceiling Catapult" map=sp_a2_sphere_peek action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Catapult" entity targetname=launch_sound2b inputname=PlaySound
@@ -249,7 +249,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_sphere_peek" sar_speedrun_category "Ceiling Catapult"
 `);
-src.cfg.add('mtriggers/SP/03_the-return/02_ricochet', false, `sar_speedrun_cc_start "Ricochet" map=sp_a2_ricochet action=split
+src.cfg.add('mtriggers/SP/03_the-return/02_ricochet', `sar_speedrun_cc_start "Ricochet" map=sp_a2_ricochet action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=entry_music inputname=PlaySound
@@ -262,7 +262,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_ricochet" sar_speedrun_category "Ricochet"
 `);
-src.cfg.add('mtriggers/SP/03_the-return/03_bridge-intro', false, `sar_speedrun_cc_start "Bridge Intro" map=sp_a2_bridge_intro action=split
+src.cfg.add('mtriggers/SP/03_the-return/03_bridge-intro', `sar_speedrun_cc_start "Bridge Intro" map=sp_a2_bridge_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_52-proxy inputname=OnProxyRelay2
@@ -276,7 +276,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_bridge_intro" sar_speedrun_category "Bridge Intro"
 `);
-src.cfg.add('mtriggers/SP/03_the-return/04_bridge-the-gap', false, `sar_speedrun_cc_start "Bridge The Gap" map=sp_a2_bridge_the_gap action=split
+src.cfg.add('mtriggers/SP/03_the-return/04_bridge-the-gap', `sar_speedrun_cc_start "Bridge The Gap" map=sp_a2_bridge_the_gap action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -288,7 +288,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_bridge_the_gap" sar_speedrun_category "Bridge The Gap"
 `);
-src.cfg.add('mtriggers/SP/03_the-return/05_turret-intro', false, `sar_speedrun_cc_start "Turret Intro" map=sp_a2_turret_intro action=split
+src.cfg.add('mtriggers/SP/03_the-return/05_turret-intro', `sar_speedrun_cc_start "Turret Intro" map=sp_a2_turret_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -305,7 +305,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_turret_intro" sar_speedrun_category "Turret Intro"
 `);
-src.cfg.add('mtriggers/SP/03_the-return/06_laser-relays', false, `sar_speedrun_cc_start "Laser Relays" map=sp_a2_laser_relays action=split
+src.cfg.add('mtriggers/SP/03_the-return/06_laser-relays', `sar_speedrun_cc_start "Laser Relays" map=sp_a2_laser_relays action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Floor Panels Trigger" entity targetname=animset01_start_rl inputname=Trigger
@@ -317,7 +317,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_laser_relays" sar_speedrun_category "Laser Relays"
 `);
-src.cfg.add('mtriggers/SP/03_the-return/07_turret-blocker', false, `sar_speedrun_cc_start "Turret Blocker" map=sp_a2_turret_blocker action=split
+src.cfg.add('mtriggers/SP/03_the-return/07_turret-blocker', `sar_speedrun_cc_start "Turret Blocker" map=sp_a2_turret_blocker action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=info_sign-proxy inputname=OnProxyRelay1
@@ -329,7 +329,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_turret_blocker" sar_speedrun_category "Turret Blocker"
 `);
-src.cfg.add('mtriggers/SP/03_the-return/08_laser-vs-turret', false, `sar_speedrun_cc_start "Laser vs Turret" map=sp_a2_laser_vs_turret action=split
+src.cfg.add('mtriggers/SP/03_the-return/08_laser-vs-turret', `sar_speedrun_cc_start "Laser vs Turret" map=sp_a2_laser_vs_turret action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -348,7 +348,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_laser_vs_turret" sar_speedrun_category "Laser vs Turret"
 `);
-src.cfg.add('mtriggers/SP/03_the-return/09_pull-the-rug', false, `sar_speedrun_cc_start "Pull The Rug" map=sp_a2_pull_the_rug action=split
+src.cfg.add('mtriggers/SP/03_the-return/09_pull-the-rug', `sar_speedrun_cc_start "Pull The Rug" map=sp_a2_pull_the_rug action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -361,7 +361,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_pull_the_rug" sar_speedrun_category "Pull The Rug"
 `);
-src.cfg.add('mtriggers/SP/04_the-surprise/01_column-blocker', false, `sar_speedrun_cc_start "Column Blocker" map=sp_a2_column_blocker action=split
+src.cfg.add('mtriggers/SP/04_the-surprise/01_column-blocker', `sar_speedrun_cc_start "Column Blocker" map=sp_a2_column_blocker action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -378,7 +378,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_column_blocker" sar_speedrun_category "Column Blocker"
 `);
-src.cfg.add('mtriggers/SP/04_the-surprise/02_laser-chaining', false, `sar_speedrun_cc_start "Laser Chaining" map=sp_a2_laser_chaining action=split
+src.cfg.add('mtriggers/SP/04_the-surprise/02_laser-chaining', `sar_speedrun_cc_start "Laser Chaining" map=sp_a2_laser_chaining action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -392,7 +392,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_laser_chaining" sar_speedrun_category "Laser Chaining"
 `);
-src.cfg.add('mtriggers/SP/04_the-surprise/03_triple-laser', false, `sar_speedrun_cc_start "Triple Laser" map=sp_a2_triple_laser action=split
+src.cfg.add('mtriggers/SP/04_the-surprise/03_triple-laser', `sar_speedrun_cc_start "Triple Laser" map=sp_a2_triple_laser action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -404,7 +404,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_triple_laser" sar_speedrun_category "Triple Laser"
 `);
-src.cfg.add('mtriggers/SP/04_the-surprise/04_jailbreak', false, `sar_speedrun_cc_start "Jailbreak" map=sp_a2_bts1 action=split
+src.cfg.add('mtriggers/SP/04_the-surprise/04_jailbreak', `sar_speedrun_cc_start "Jailbreak" map=sp_a2_bts1 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=chamber_door-proxy inputname=OnProxyRelay2
@@ -418,7 +418,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_bts1" sar_speedrun_category "Jailbreak"
 `);
-src.cfg.add('mtriggers/SP/04_the-surprise/05_escape', false, `sar_speedrun_cc_start "Escape" map=sp_a2_bts2 action=split
+src.cfg.add('mtriggers/SP/04_the-surprise/05_escape', `sar_speedrun_cc_start "Escape" map=sp_a2_bts2 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Turret Trigger" entity targetname=player_clip inputname=Enable
@@ -430,7 +430,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_bts2" sar_speedrun_category "Escape"
 `);
-src.cfg.add('mtriggers/SP/05_the-escape/01_turret-factory', false, `sar_speedrun_cc_start "Turret Factory" map=sp_a2_bts3 action=split
+src.cfg.add('mtriggers/SP/05_the-escape/01_turret-factory', `sar_speedrun_cc_start "Turret Factory" map=sp_a2_bts3 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Landing" entity targetname=lookat_entryhall_target_rl inputname=Trigger
@@ -446,7 +446,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_bts3" sar_speedrun_category "Turret Factory"
 `);
-src.cfg.add('mtriggers/SP/05_the-escape/02_turret-sabotage', false, `sar_speedrun_cc_start "Turret Sabotage" map=sp_a2_bts4 action=split
+src.cfg.add('mtriggers/SP/05_the-escape/02_turret-sabotage', `sar_speedrun_cc_start "Turret Sabotage" map=sp_a2_bts4 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Second Conveyor" entity targetname=light_01 inputname=TurnOn
@@ -460,7 +460,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_bts4" sar_speedrun_category "Turret Sabotage"
 `);
-src.cfg.add('mtriggers/SP/05_the-escape/03_neurotoxin-sabotage', false, `sar_speedrun_cc_start "Neurotoxin Sabotage" map=sp_a2_bts5 action=split
+src.cfg.add('mtriggers/SP/05_the-escape/03_neurotoxin-sabotage', `sar_speedrun_cc_start "Neurotoxin Sabotage" map=sp_a2_bts5 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=airlock_door_01-proxy inputname=OnProxyRelay1
@@ -473,7 +473,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_bts5" sar_speedrun_category "Neurotoxin Sabotage"
 `);
-src.cfg.add('mtriggers/SP/05_the-escape/04_core', false, `sar_speedrun_cc_start "Core" map=sp_a2_core action=split
+src.cfg.add('mtriggers/SP/05_the-escape/04_core', `sar_speedrun_cc_start "Core" map=sp_a2_core action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "First Room" entity targetname=music_sp_a2_core_b1 inputname=PlaySound
@@ -488,7 +488,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a2_core" sar_speedrun_category "Core"
 `);
-src.cfg.add('mtriggers/SP/06_the-fall/01_underground', false, `sar_speedrun_cc_start "Underground" map=sp_a3_01 action=split
+src.cfg.add('mtriggers/SP/06_the-fall/01_underground', `sar_speedrun_cc_start "Underground" map=sp_a3_01 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Second Portal Passthrough" entity targetname=ambient_sp_a3_01_b3 inputname=PlaySound
@@ -504,7 +504,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a3_01" sar_speedrun_category "Underground"
 `);
-src.cfg.add('mtriggers/SP/06_the-fall/02_cave-johnson', false, `sar_speedrun_cc_start "Cave Johnson" map=sp_a3_03 action=split
+src.cfg.add('mtriggers/SP/06_the-fall/02_cave-johnson', `sar_speedrun_cc_start "Cave Johnson" map=sp_a3_03 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Catwalk Portal Entry" zone center=-6107.5,279.05,-4800.82 size=72.95,300.99,382.31 angle=0
@@ -515,7 +515,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a3_03" sar_speedrun_category "Cave Johnson"
 `);
-src.cfg.add('mtriggers/SP/06_the-fall/03_repulsion-intro', false, `sar_speedrun_cc_start "Repulsion Intro" map=sp_a3_jump_intro action=split
+src.cfg.add('mtriggers/SP/06_the-fall/03_repulsion-intro', `sar_speedrun_cc_start "Repulsion Intro" map=sp_a3_jump_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Lights Trigger" entity targetname=@dark_column_flicker_start inputname=Trigger
@@ -532,7 +532,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a3_jump_intro" sar_speedrun_category "Repulsion Intro"
 `);
-src.cfg.add('mtriggers/SP/06_the-fall/04_bomb-flings', false, `sar_speedrun_cc_start "Bomb Flings" map=sp_a3_bomb_flings action=split
+src.cfg.add('mtriggers/SP/06_the-fall/04_bomb-flings', `sar_speedrun_cc_start "Bomb Flings" map=sp_a3_bomb_flings action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Railing" zone center=-256.1,335.97,-1281.08 size=255.42,351.87,253.79 angle=0
@@ -543,7 +543,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a3_bomb_flings" sar_speedrun_category "Bomb Flings"
 `);
-src.cfg.add('mtriggers/SP/06_the-fall/05_crazy-box', false, `sar_speedrun_cc_start "Crazy Box" map=sp_a3_crazy_box action=split
+src.cfg.add('mtriggers/SP/06_the-fall/05_crazy-box', `sar_speedrun_cc_start "Crazy Box" map=sp_a3_crazy_box action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "First Room" entity targetname=ambient_sp_a3_crazy_box_b1 inputname=PlaySound
@@ -555,7 +555,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a3_crazy_box" sar_speedrun_category "Crazy Box"
 `);
-src.cfg.add('mtriggers/SP/06_the-fall/06_potatos', false, `sar_speedrun_cc_start "PotatOS" map=sp_a3_transition01 action=split
+src.cfg.add('mtriggers/SP/06_the-fall/06_potatos', `sar_speedrun_cc_start "PotatOS" map=sp_a3_transition01 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door" entity targetname=pumproom_door_bottom_button inputname=Lock
@@ -568,7 +568,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a3_transition01" sar_speedrun_category "PotatOS"
 `);
-src.cfg.add('mtriggers/SP/07_the-reunion/01_propulsion-intro', false, `sar_speedrun_cc_start "Propulsion Intro" map=sp_a3_speed_ramp action=split
+src.cfg.add('mtriggers/SP/07_the-reunion/01_propulsion-intro', `sar_speedrun_cc_start "Propulsion Intro" map=sp_a3_speed_ramp action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Long Shot" portal center=-68,-639.96,896.17 size=5,127.75,127.29 angle=0
@@ -579,7 +579,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a3_speed_ramp" sar_speedrun_category "Propulsion Intro"
 `);
-src.cfg.add('mtriggers/SP/07_the-reunion/02_propulsion-flings', false, `sar_speedrun_cc_start "Propulsion Flings" map=sp_a3_speed_flings action=split
+src.cfg.add('mtriggers/SP/07_the-reunion/02_propulsion-flings', `sar_speedrun_cc_start "Propulsion Flings" map=sp_a3_speed_flings action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Blue Gel Bounce" zone center=2815.6,-109.17,-303.28 size=192.37,153.96,97.37 angle=0
@@ -590,7 +590,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a3_speed_flings" sar_speedrun_category "Propulsion Flings"
 `);
-src.cfg.add('mtriggers/SP/07_the-reunion/03_conversion-intro', false, `sar_speedrun_cc_start "Conversion Intro" map=sp_a3_portal_intro action=split
+src.cfg.add('mtriggers/SP/07_the-reunion/03_conversion-intro', `sar_speedrun_cc_start "Conversion Intro" map=sp_a3_portal_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "First Room" entity targetname=1970s_door1door_lower inputname=Close
@@ -603,7 +603,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a3_portal_intro" sar_speedrun_category "Conversion Intro"
 `);
-src.cfg.add('mtriggers/SP/07_the-reunion/04_three-gels', false, `sar_speedrun_cc_start "Three Gels" map=sp_a3_end action=split
+src.cfg.add('mtriggers/SP/07_the-reunion/04_three-gels', `sar_speedrun_cc_start "Three Gels" map=sp_a3_end action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Fling" zone center=-1105.75,256.12,-3879.9 size=99.12,191.69,127.73 angle=0
@@ -614,7 +614,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a3_end" sar_speedrun_category "Three Gels"
 `);
-src.cfg.add('mtriggers/SP/08_the-itch/01_test', false, `sar_speedrun_cc_start "Test" map=sp_a4_intro action=split
+src.cfg.add('mtriggers/SP/08_the-itch/01_test', `sar_speedrun_cc_start "Test" map=sp_a4_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -630,7 +630,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_intro" sar_speedrun_category "Test"
 `);
-src.cfg.add('mtriggers/SP/08_the-itch/02_funnel-intro', false, `sar_speedrun_cc_start "Funnel Intro" map=sp_a4_tb_intro action=split
+src.cfg.add('mtriggers/SP/08_the-itch/02_funnel-intro', `sar_speedrun_cc_start "Funnel Intro" map=sp_a4_tb_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -643,7 +643,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_tb_intro" sar_speedrun_category "Funnel Intro"
 `);
-src.cfg.add('mtriggers/SP/08_the-itch/03_ceiling-button', false, `sar_speedrun_cc_start "Ceiling Button" map=sp_a4_tb_trust_drop action=split
+src.cfg.add('mtriggers/SP/08_the-itch/03_ceiling-button', `sar_speedrun_cc_start "Ceiling Button" map=sp_a4_tb_trust_drop action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -657,7 +657,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_tb_trust_drop" sar_speedrun_category "Ceiling Button"
 `);
-src.cfg.add('mtriggers/SP/08_the-itch/04_wall-button', false, `sar_speedrun_cc_start "Wall Button" map=sp_a4_tb_wall_button action=split
+src.cfg.add('mtriggers/SP/08_the-itch/04_wall-button', `sar_speedrun_cc_start "Wall Button" map=sp_a4_tb_wall_button action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -670,7 +670,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_tb_wall_button" sar_speedrun_category "Wall Button"
 `);
-src.cfg.add('mtriggers/SP/08_the-itch/05_polarity', false, `sar_speedrun_cc_start "Polarity" map=sp_a4_tb_polarity action=split
+src.cfg.add('mtriggers/SP/08_the-itch/05_polarity', `sar_speedrun_cc_start "Polarity" map=sp_a4_tb_polarity action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -682,7 +682,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_tb_polarity" sar_speedrun_category "Polarity"
 `);
-src.cfg.add('mtriggers/SP/08_the-itch/06_funnel-catch', false, `sar_speedrun_cc_start "Funnel Catch" map=sp_a4_tb_catch action=split
+src.cfg.add('mtriggers/SP/08_the-itch/06_funnel-catch', `sar_speedrun_cc_start "Funnel Catch" map=sp_a4_tb_catch action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -695,7 +695,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_tb_catch" sar_speedrun_category "Funnel Catch"
 `);
-src.cfg.add('mtriggers/SP/08_the-itch/07_stop-the-box', false, `sar_speedrun_cc_start "Stop The Box" map=sp_a4_stop_the_box action=split
+src.cfg.add('mtriggers/SP/08_the-itch/07_stop-the-box', `sar_speedrun_cc_start "Stop The Box" map=sp_a4_stop_the_box action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=door_0-proxy inputname=OnProxyRelay2
@@ -707,7 +707,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_stop_the_box" sar_speedrun_category "Stop The Box"
 `);
-src.cfg.add('mtriggers/SP/08_the-itch/08_laser-catapult', false, `sar_speedrun_cc_start "Laser Catapult" map=sp_a4_laser_catapult action=split
+src.cfg.add('mtriggers/SP/08_the-itch/08_laser-catapult', `sar_speedrun_cc_start "Laser Catapult" map=sp_a4_laser_catapult action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=@entry_door-proxy inputname=OnProxyRelay2
@@ -721,7 +721,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_laser_catapult" sar_speedrun_category "Laser Catapult"
 `);
-src.cfg.add('mtriggers/SP/08_the-itch/09_laser-platform', false, `sar_speedrun_cc_start "Laser Platform" map=sp_a4_laser_platform action=split
+src.cfg.add('mtriggers/SP/08_the-itch/09_laser-platform', `sar_speedrun_cc_start "Laser Platform" map=sp_a4_laser_platform action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=entrance_door-proxy inputname=OnProxyRelay2
@@ -733,7 +733,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_laser_platform" sar_speedrun_category "Laser Platform"
 `);
-src.cfg.add('mtriggers/SP/08_the-itch/10_propulsion-catch', false, `sar_speedrun_cc_start "Propulsion Catch" map=sp_a4_speed_tb_catch action=split
+src.cfg.add('mtriggers/SP/08_the-itch/10_propulsion-catch', `sar_speedrun_cc_start "Propulsion Catch" map=sp_a4_speed_tb_catch action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Chamber Trigger" zone center=-608.05,1675.93,-127.98 size=287.79,104.09,127.98 angle=0
@@ -746,7 +746,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_speed_tb_catch" sar_speedrun_category "Propulsion Catch"
 `);
-src.cfg.add('mtriggers/SP/08_the-itch/11_repulsion-polarity', false, `sar_speedrun_cc_start "Repulsion Polarity" map=sp_a4_jump_polarity action=split
+src.cfg.add('mtriggers/SP/08_the-itch/11_repulsion-polarity', `sar_speedrun_cc_start "Repulsion Polarity" map=sp_a4_jump_polarity action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Pipe Trigger" entity targetname=diag_jump_polarity_sorry inputname=Trigger
@@ -757,7 +757,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_jump_polarity" sar_speedrun_category "Repulsion Polarity"
 `);
-src.cfg.add('mtriggers/SP/09_the-part-where-he-kills-you/01_finale-1', false, `sar_speedrun_cc_start "Finale 1" map=sp_a4_finale1 action=split
+src.cfg.add('mtriggers/SP/09_the-part-where-he-kills-you/01_finale-1', `sar_speedrun_cc_start "Finale 1" map=sp_a4_finale1 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Catapult Trigger" entity targetname=launch_sound1 inputname=PlaySound
@@ -770,7 +770,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_finale1" sar_speedrun_category "Finale 1"
 `);
-src.cfg.add('mtriggers/SP/09_the-part-where-he-kills-you/02_finale-2', false, `sar_speedrun_cc_start "Finale 2" map=sp_a4_finale2 action=split
+src.cfg.add('mtriggers/SP/09_the-part-where-he-kills-you/02_finale-2', `sar_speedrun_cc_start "Finale 2" map=sp_a4_finale2 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Chamber Trigger" entity targetname=shake_chamber_move inputname=StartShake
@@ -785,7 +785,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_finale2" sar_speedrun_category "Finale 2"
 `);
-src.cfg.add('mtriggers/SP/09_the-part-where-he-kills-you/03_finale-3', false, `sar_speedrun_cc_start "Finale 3" map=sp_a4_finale3 action=split
+src.cfg.add('mtriggers/SP/09_the-part-where-he-kills-you/03_finale-3', `sar_speedrun_cc_start "Finale 3" map=sp_a4_finale3 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Trigger" entity targetname=airlock_door2_brush inputname=Disable
@@ -800,7 +800,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_finale3" sar_speedrun_category "Finale 3"
 `);
-src.cfg.add('mtriggers/SP/09_the-part-where-he-kills-you/04_finale-4', false, `sar_speedrun_cc_start "Finale 4" map=sp_a4_finale4 action=split
+src.cfg.add('mtriggers/SP/09_the-part-where-he-kills-you/04_finale-4', `sar_speedrun_cc_start "Finale 4" map=sp_a4_finale4 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Elevator" entity targetname=breaker_socket_button inputname=Kill
@@ -813,7 +813,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=sp_a4_finale4" sar_speedrun_category "Finale 4"
 `);
-src.cfg.add('mtriggers/Coop/01_team-building/01_doors', false, `sar_speedrun_cc_start "Doors" map=mp_coop_doors action=split
+src.cfg.add('mtriggers/Coop/01_team-building/01_doors', `sar_speedrun_cc_start "Doors" map=mp_coop_doors action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Portal" portal center=-10272.05,-544.03,64.15 size=127.9,1,127.99 angle=0
@@ -827,7 +827,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_doors" sar_speedrun_category "Doors"
 `);
-src.cfg.add('mtriggers/Coop/01_team-building/02_buttons', false, `sar_speedrun_cc_start "Buttons" map=mp_coop_race_2 action=split
+src.cfg.add('mtriggers/Coop/01_team-building/02_buttons', `sar_speedrun_cc_start "Buttons" map=mp_coop_race_2 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Mid Room Blue" entity targetname=entry_airlock-relay_blue_in inputname=Trigger
@@ -844,7 +844,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_race_2" sar_speedrun_category "Buttons"
 `);
-src.cfg.add('mtriggers/Coop/01_team-building/03_lasers', false, `sar_speedrun_cc_start "Lasers" map=mp_coop_laser_2 action=split
+src.cfg.add('mtriggers/Coop/01_team-building/03_lasers', `sar_speedrun_cc_start "Lasers" map=mp_coop_laser_2 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Mid Room Blue" entity targetname=airlock_1-relay_blue_in inputname=Trigger
@@ -859,7 +859,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_laser_2" sar_speedrun_category "Lasers"
 `);
-src.cfg.add('mtriggers/Coop/01_team-building/04_rat-maze', false, `sar_speedrun_cc_start "Rat Maze" map=mp_coop_rat_maze action=split
+src.cfg.add('mtriggers/Coop/01_team-building/04_rat-maze', `sar_speedrun_cc_start "Rat Maze" map=mp_coop_rat_maze action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Maze" entity targetname=blue_player_points_rl inputname=Enable
@@ -872,7 +872,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_rat_maze" sar_speedrun_category "Rat Maze"
 `);
-src.cfg.add('mtriggers/Coop/01_team-building/05_laser-crusher', false, `sar_speedrun_cc_start "Laser Crusher" map=mp_coop_laser_crusher action=split
+src.cfg.add('mtriggers/Coop/01_team-building/05_laser-crusher', `sar_speedrun_cc_start "Laser Crusher" map=mp_coop_laser_crusher action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "End Hop" zone center=2630.95,-1135.87,80.33 size=77.85,287.33,161.4 angle=0
@@ -885,7 +885,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_laser_crusher" sar_speedrun_category "Laser Crusher"
 `);
-src.cfg.add('mtriggers/Coop/01_team-building/06_behind-the-scenes', false, `sar_speedrun_cc_start "Behind The Scenes" map=mp_coop_teambts action=split
+src.cfg.add('mtriggers/Coop/01_team-building/06_behind-the-scenes', `sar_speedrun_cc_start "Behind The Scenes" map=mp_coop_teambts action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Lever 1" entity targetname=lever_1-proxy inputname=OnProxyRelay3
@@ -897,7 +897,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_teambts" sar_speedrun_category "Behind The Scenes"
 `);
-src.cfg.add('mtriggers/Coop/02_mass-and-velocity/01_flings', false, `sar_speedrun_cc_start "Flings" map=mp_coop_fling_3 action=split
+src.cfg.add('mtriggers/Coop/02_mass-and-velocity/01_flings', `sar_speedrun_cc_start "Flings" map=mp_coop_fling_3 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Blue Start" zone center=223.69,911.99,288 size=64.44,415.94,319.94 angle=0 player=0
@@ -913,7 +913,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_fling_3" sar_speedrun_category "Flings"
 `);
-src.cfg.add('mtriggers/Coop/02_mass-and-velocity/02_infinifling', false, `sar_speedrun_cc_start "Infinifling" map=mp_coop_infinifling_train action=split
+src.cfg.add('mtriggers/Coop/02_mass-and-velocity/02_infinifling', `sar_speedrun_cc_start "Infinifling" map=mp_coop_infinifling_train action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Button" entity targetname=panel_fling_wall_timer inputname=Start
@@ -927,7 +927,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_infinifling_train" sar_speedrun_category "Infinifling"
 `);
-src.cfg.add('mtriggers/Coop/02_mass-and-velocity/03_team-retrieval', false, `sar_speedrun_cc_start "Team Retrieval" map=mp_coop_come_along action=split
+src.cfg.add('mtriggers/Coop/02_mass-and-velocity/03_team-retrieval', `sar_speedrun_cc_start "Team Retrieval" map=mp_coop_come_along action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Panels" entity targetname=button1-proxy inputname=OnProxyRelay1
@@ -941,7 +941,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_come_along" sar_speedrun_category "Team Retrieval"
 `);
-src.cfg.add('mtriggers/Coop/02_mass-and-velocity/04_vertical-flings', false, `sar_speedrun_cc_start "Vertical Flings" map=mp_coop_fling_1 action=split
+src.cfg.add('mtriggers/Coop/02_mass-and-velocity/04_vertical-flings', `sar_speedrun_cc_start "Vertical Flings" map=mp_coop_fling_1 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Portal Entry" zone center=160,-96,-32 size=128,128,64 angle=0
@@ -955,7 +955,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_fling_1" sar_speedrun_category "Vertical Flings"
 `);
-src.cfg.add('mtriggers/Coop/02_mass-and-velocity/05_catapults', false, `sar_speedrun_cc_start "Catapults" map=mp_coop_catapult_1 action=split
+src.cfg.add('mtriggers/Coop/02_mass-and-velocity/05_catapults', `sar_speedrun_cc_start "Catapults" map=mp_coop_catapult_1 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Catapult" entity targetname=catapult_3-proxy inputname=OnProxyRelay3
@@ -969,7 +969,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_catapult_1" sar_speedrun_category "Catapults"
 `);
-src.cfg.add('mtriggers/Coop/02_mass-and-velocity/06_multifling', false, `sar_speedrun_cc_start "Multifling" map=mp_coop_multifling_1 action=split
+src.cfg.add('mtriggers/Coop/02_mass-and-velocity/06_multifling', `sar_speedrun_cc_start "Multifling" map=mp_coop_multifling_1 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Mid Room Door" entity targetname=button2-proxy inputname=OnProxyRelay2
@@ -985,7 +985,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_multifling_1" sar_speedrun_category "Multifling"
 `);
-src.cfg.add('mtriggers/Coop/02_mass-and-velocity/07_fling-crushers', false, `sar_speedrun_cc_start "Fling Crushers" map=mp_coop_fling_crushers action=split
+src.cfg.add('mtriggers/Coop/02_mass-and-velocity/07_fling-crushers', `sar_speedrun_cc_start "Fling Crushers" map=mp_coop_fling_crushers action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Door Activation" entity targetname=transition_exit_doorway_1 inputname=Open
@@ -1001,7 +1001,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_fling_crushers" sar_speedrun_category "Fling Crushers"
 `);
-src.cfg.add('mtriggers/Coop/02_mass-and-velocity/08_industrial-fan', false, `sar_speedrun_cc_start "Industrial Fan" map=mp_coop_fan action=split
+src.cfg.add('mtriggers/Coop/02_mass-and-velocity/08_industrial-fan', `sar_speedrun_cc_start "Industrial Fan" map=mp_coop_fan action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Fan Deactivation" entity targetname=@relay_loop_sound_stop inputname=Trigger
@@ -1015,7 +1015,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_fan" sar_speedrun_category "Industrial Fan"
 `);
-src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/01_cooperative-bridges', false, `sar_speedrun_cc_start "Cooperative Bridges" map=mp_coop_wall_intro action=split
+src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/01_cooperative-bridges', `sar_speedrun_cc_start "Cooperative Bridges" map=mp_coop_wall_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Starting Wall" zone center=-95.84,-2366.62,-255.72 size=191.61,130.69,254.67 angle=0
@@ -1031,7 +1031,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_wall_intro" sar_speedrun_category "Cooperative Bridges"
 `);
-src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/02_bridge-swap', false, `sar_speedrun_cc_start "Bridge Swap" map=mp_coop_wall_2 action=split
+src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/02_bridge-swap', `sar_speedrun_cc_start "Bridge Swap" map=mp_coop_wall_2 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Reportal" zone center=-768,-16,192 size=128,16,128 angle=0 player=1
@@ -1044,7 +1044,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_wall_2" sar_speedrun_category "Bridge Swap"
 `);
-src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/03_fling-block', false, `sar_speedrun_cc_start "Fling Block" map=mp_coop_catapult_wall_intro action=split
+src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/03_fling-block', `sar_speedrun_cc_start "Fling Block" map=mp_coop_catapult_wall_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Sphere Button" entity targetname=@cube_dropper inputname=Trigger
@@ -1060,7 +1060,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_catapult_wall_intro" sar_speedrun_category "Fling Block"
 `);
-src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/04_catapult-block', false, `sar_speedrun_cc_start "Catapult Block" map=mp_coop_wall_block action=split
+src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/04_catapult-block', `sar_speedrun_cc_start "Catapult Block" map=mp_coop_wall_block action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Blue Catapult" entity targetname=faith_plate_up-proxy inputname=OnProxyRelay3 player=0
@@ -1076,7 +1076,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_wall_block" sar_speedrun_category "Catapult Block"
 `);
-src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/05_bridge-fling', false, `sar_speedrun_cc_start "Bridge Fling" map=mp_coop_catapult_2 action=split
+src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/05_bridge-fling', `sar_speedrun_cc_start "Bridge Fling" map=mp_coop_catapult_2 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Middle Trigger Blue" entity targetname=airlock_1-relay_blue_in inputname=Trigger
@@ -1091,7 +1091,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_catapult_2" sar_speedrun_category "Bridge Fling"
 `);
-src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/06_turret-walls', false, `sar_speedrun_cc_start "Turret Walls" map=mp_coop_turret_walls action=split
+src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/06_turret-walls', `sar_speedrun_cc_start "Turret Walls" map=mp_coop_turret_walls action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Slope" zone center=-752,-1152,768 size=224,128,384 angle=0
@@ -1106,7 +1106,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_turret_walls" sar_speedrun_category "Turret Walls"
 `);
-src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/07_turret-assassin', false, `sar_speedrun_cc_start "Turret Assassin" map=mp_coop_turret_ball action=split
+src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/07_turret-assassin', `sar_speedrun_cc_start "Turret Assassin" map=mp_coop_turret_ball action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Catapult Orange" entity targetname=faith_plate_player-proxy inputname=OnProxyRelay3 player=1
@@ -1122,7 +1122,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_turret_ball" sar_speedrun_category "Turret Assassin"
 `);
-src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/08_bridge-testing', false, `sar_speedrun_cc_start "Bridge Testing" map=mp_coop_wall_5 action=split
+src.cfg.add('mtriggers/Coop/03_hard-light-surfaces/08_bridge-testing', `sar_speedrun_cc_start "Bridge Testing" map=mp_coop_wall_5 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "First Room" entity targetname=Ptemplate_ball_training inputname=ForceSpawn
@@ -1138,7 +1138,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_wall_5" sar_speedrun_category "Bridge Testing"
 `);
-src.cfg.add('mtriggers/Coop/04_excursion-funnels/01_cooperative-funnels', false, `sar_speedrun_cc_start "Cooperative Funnels" map=mp_coop_tbeam_redirect action=split
+src.cfg.add('mtriggers/Coop/04_excursion-funnels/01_cooperative-funnels', `sar_speedrun_cc_start "Cooperative Funnels" map=mp_coop_tbeam_redirect action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Wall Button" entity targetname=button_platform inputname=pressin
@@ -1152,7 +1152,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_tbeam_redirect" sar_speedrun_category "Cooperative Funnels"
 `);
-src.cfg.add('mtriggers/Coop/04_excursion-funnels/02_funnel-drill', false, `sar_speedrun_cc_start "Funnel Drill" map=mp_coop_tbeam_drill action=split
+src.cfg.add('mtriggers/Coop/04_excursion-funnels/02_funnel-drill', `sar_speedrun_cc_start "Funnel Drill" map=mp_coop_tbeam_drill action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Catapult" entity targetname=catapult-proxy inputname=OnProxyRelay1
@@ -1168,7 +1168,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_tbeam_drill" sar_speedrun_category "Funnel Drill"
 `);
-src.cfg.add('mtriggers/Coop/04_excursion-funnels/03_funnel-catch-coop', false, `sar_speedrun_cc_start "Funnel Catch Coop" map=mp_coop_tbeam_catch_grind_1 action=split
+src.cfg.add('mtriggers/Coop/04_excursion-funnels/03_funnel-catch-coop', `sar_speedrun_cc_start "Funnel Catch Coop" map=mp_coop_tbeam_catch_grind_1 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Ground" zone center=-96,-2848,-576 size=100,100,50 angle=0 player=1
@@ -1184,7 +1184,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_tbeam_catch_grind_1" sar_speedrun_category "Funnel Catch Coop"
 `);
-src.cfg.add('mtriggers/Coop/04_excursion-funnels/04_funnel-laser', false, `sar_speedrun_cc_start "Funnel Laser" map=mp_coop_tbeam_laser_1 action=split
+src.cfg.add('mtriggers/Coop/04_excursion-funnels/04_funnel-laser', `sar_speedrun_cc_start "Funnel Laser" map=mp_coop_tbeam_laser_1 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Catapult" entity targetname=faithplate-proxy inputname=OnProxyRelay1
@@ -1197,7 +1197,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_tbeam_laser_1" sar_speedrun_category "Funnel Laser"
 `);
-src.cfg.add('mtriggers/Coop/04_excursion-funnels/05_cooperative-polarity', false, `sar_speedrun_cc_start "Cooperative Polarity" map=mp_coop_tbeam_polarity action=split
+src.cfg.add('mtriggers/Coop/04_excursion-funnels/05_cooperative-polarity', `sar_speedrun_cc_start "Cooperative Polarity" map=mp_coop_tbeam_polarity action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "End Trigger Blue" entity targetname=team_door-team_proxy inputname=OnProxyRelay1
@@ -1209,7 +1209,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_tbeam_polarity" sar_speedrun_category "Cooperative Polarity"
 `);
-src.cfg.add('mtriggers/Coop/04_excursion-funnels/06_funnel-hop', false, `sar_speedrun_cc_start "Funnel Hop" map=mp_coop_tbeam_polarity2 action=split
+src.cfg.add('mtriggers/Coop/04_excursion-funnels/06_funnel-hop', `sar_speedrun_cc_start "Funnel Hop" map=mp_coop_tbeam_polarity2 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Crouch Fly Blue" fly player=0
@@ -1223,7 +1223,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_tbeam_polarity2" sar_speedrun_category "Funnel Hop"
 `);
-src.cfg.add('mtriggers/Coop/04_excursion-funnels/07_advanced-polarity', false, `sar_speedrun_cc_start "Advanced Polarity" map=mp_coop_tbeam_polarity3 action=split
+src.cfg.add('mtriggers/Coop/04_excursion-funnels/07_advanced-polarity', `sar_speedrun_cc_start "Advanced Polarity" map=mp_coop_tbeam_polarity3 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Panel Trigger" entity targetname=platform_exit-proxy inputname=OnProxyRelay1
@@ -1236,7 +1236,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_tbeam_polarity3" sar_speedrun_category "Advanced Polarity"
 `);
-src.cfg.add('mtriggers/Coop/04_excursion-funnels/08_funnel-maze', false, `sar_speedrun_cc_start "Funnel Maze" map=mp_coop_tbeam_maze action=split
+src.cfg.add('mtriggers/Coop/04_excursion-funnels/08_funnel-maze', `sar_speedrun_cc_start "Funnel Maze" map=mp_coop_tbeam_maze action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Crouch Fly" fly
@@ -1251,7 +1251,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_tbeam_maze" sar_speedrun_category "Funnel Maze"
 `);
-src.cfg.add('mtriggers/Coop/04_excursion-funnels/09_turret-warehouse', false, `sar_speedrun_cc_start "Turret Warehouse" map=mp_coop_tbeam_end action=split
+src.cfg.add('mtriggers/Coop/04_excursion-funnels/09_turret-warehouse', `sar_speedrun_cc_start "Turret Warehouse" map=mp_coop_tbeam_end action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Conveyor Hop" zone center=440.75,-105.61,105.85 size=142.44,434.3,203.13 angle=0
@@ -1265,7 +1265,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_tbeam_end" sar_speedrun_category "Turret Warehouse"
 `);
-src.cfg.add('mtriggers/Coop/05_mobility-gels/01_repulsion-jumps', false, `sar_speedrun_cc_start "Repulsion Jumps" map=mp_coop_paint_come_along action=split
+src.cfg.add('mtriggers/Coop/05_mobility-gels/01_repulsion-jumps', `sar_speedrun_cc_start "Repulsion Jumps" map=mp_coop_paint_come_along action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Boost" zone center=64,32,344 size=640,448,440 angle=0
@@ -1279,7 +1279,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_paint_come_along" sar_speedrun_category "Repulsion Jumps"
 `);
-src.cfg.add('mtriggers/Coop/05_mobility-gels/02_double-bounce', false, `sar_speedrun_cc_start "Double Bounce" map=mp_coop_paint_redirect action=split
+src.cfg.add('mtriggers/Coop/05_mobility-gels/02_double-bounce', `sar_speedrun_cc_start "Double Bounce" map=mp_coop_paint_redirect action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Gel Drop" entity targetname=paint_sprayer inputname=Start
@@ -1294,7 +1294,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_paint_redirect" sar_speedrun_category "Double Bounce"
 `);
-src.cfg.add('mtriggers/Coop/05_mobility-gels/03_bridge-repulsion', false, `sar_speedrun_cc_start "Bridge Repulsion" map=mp_coop_paint_bridge action=split
+src.cfg.add('mtriggers/Coop/05_mobility-gels/03_bridge-repulsion', `sar_speedrun_cc_start "Bridge Repulsion" map=mp_coop_paint_bridge action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Long Shot" portal center=-635,-192,575 size=10,128,128 angle=0
@@ -1308,7 +1308,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_paint_bridge" sar_speedrun_category "Bridge Repulsion"
 `);
-src.cfg.add('mtriggers/Coop/05_mobility-gels/04_wall-repulsion', false, `sar_speedrun_cc_start "Wall Repulsion" map=mp_coop_paint_walljumps action=split
+src.cfg.add('mtriggers/Coop/05_mobility-gels/04_wall-repulsion', `sar_speedrun_cc_start "Wall Repulsion" map=mp_coop_paint_walljumps action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Middle Room Blue" entity targetname=airlock_1-relay_blue_in inputname=Trigger
@@ -1322,7 +1322,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_paint_walljumps" sar_speedrun_category "Wall Repulsion"
 `);
-src.cfg.add('mtriggers/Coop/05_mobility-gels/05_propulsion-crushers', false, `sar_speedrun_cc_start "Propulsion Crushers" map=mp_coop_paint_speed_fling action=split
+src.cfg.add('mtriggers/Coop/05_mobility-gels/05_propulsion-crushers', `sar_speedrun_cc_start "Propulsion Crushers" map=mp_coop_paint_speed_fling action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Button Activation" entity targetname=paint_sprayer1_start inputname=Trigger
@@ -1336,7 +1336,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_paint_speed_fling" sar_speedrun_category "Propulsion Crushers"
 `);
-src.cfg.add('mtriggers/Coop/05_mobility-gels/06_turret-ninja', false, `sar_speedrun_cc_start "Turret Ninja" map=mp_coop_paint_red_racer action=split
+src.cfg.add('mtriggers/Coop/05_mobility-gels/06_turret-ninja', `sar_speedrun_cc_start "Turret Ninja" map=mp_coop_paint_red_racer action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Cube Drop" entity targetname=cube_dropper inputname=Trigger
@@ -1352,7 +1352,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_paint_red_racer" sar_speedrun_category "Turret Ninja"
 `);
-src.cfg.add('mtriggers/Coop/05_mobility-gels/07_propulsion-retrieval', false, `sar_speedrun_cc_start "Propulsion Retrieval" map=mp_coop_paint_speed_catch action=split
+src.cfg.add('mtriggers/Coop/05_mobility-gels/07_propulsion-retrieval', `sar_speedrun_cc_start "Propulsion Retrieval" map=mp_coop_paint_speed_catch action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Gel Drop" entity targetname=paint_sprayer2_start inputname=Trigger
@@ -1367,7 +1367,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_paint_speed_catch" sar_speedrun_category "Propulsion Retrieval"
 `);
-src.cfg.add('mtriggers/Coop/05_mobility-gels/08_vault-entrance', false, `sar_speedrun_cc_start "Vault Entrance" map=mp_coop_paint_longjump_intro action=split
+src.cfg.add('mtriggers/Coop/05_mobility-gels/08_vault-entrance', `sar_speedrun_cc_start "Vault Entrance" map=mp_coop_paint_longjump_intro action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Second Room Blue" zone center=304,-4547.79,961.06 size=287.95,120.36,125.74 angle=0 player=0
@@ -1380,7 +1380,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_paint_longjump_intro" sar_speedrun_category "Vault Entrance"
 `);
-src.cfg.add('mtriggers/Coop/06_art-therapy/01_separation', false, `sar_speedrun_cc_start "Separation" map=mp_coop_separation_1 action=split
+src.cfg.add('mtriggers/Coop/06_art-therapy/01_separation', `sar_speedrun_cc_start "Separation" map=mp_coop_separation_1 action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Cube Drop" entity targetname=reflecto_cube_dropper-proxy inputname=OnProxyRelay1
@@ -1395,7 +1395,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_separation_1" sar_speedrun_category "Separation"
 `);
-src.cfg.add('mtriggers/Coop/06_art-therapy/02_triple-axis', false, `sar_speedrun_cc_start "Triple Axis" map=mp_coop_tripleaxis action=split
+src.cfg.add('mtriggers/Coop/06_art-therapy/02_triple-axis', `sar_speedrun_cc_start "Triple Axis" map=mp_coop_tripleaxis action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Crusher" entity targetname=crusher_sequence_start_rl inputname=Trigger
@@ -1410,7 +1410,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_tripleaxis" sar_speedrun_category "Triple Axis"
 `);
-src.cfg.add('mtriggers/Coop/06_art-therapy/03_catapult-catch', false, `sar_speedrun_cc_start "Catapult Catch" map=mp_coop_catapult_catch action=split
+src.cfg.add('mtriggers/Coop/06_art-therapy/03_catapult-catch', `sar_speedrun_cc_start "Catapult Catch" map=mp_coop_catapult_catch action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Cube Area" zone center=976,-416,-192 size=352,160,128 angle=0
@@ -1424,7 +1424,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_catapult_catch" sar_speedrun_category "Catapult Catch"
 `);
-src.cfg.add('mtriggers/Coop/06_art-therapy/04_bridge-gels', false, `sar_speedrun_cc_start "Bridge Gels" map=mp_coop_2paints_1bridge action=split
+src.cfg.add('mtriggers/Coop/06_art-therapy/04_bridge-gels', `sar_speedrun_cc_start "Bridge Gels" map=mp_coop_2paints_1bridge action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Middle Trigger Blue" entity targetname=entry_airlock-relay_blue_in inputname=Trigger
@@ -1439,7 +1439,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_2paints_1bridge" sar_speedrun_category "Bridge Gels"
 `);
-src.cfg.add('mtriggers/Coop/06_art-therapy/05_maintenance', false, `sar_speedrun_cc_start "Maintenance" map=mp_coop_paint_conversion action=split
+src.cfg.add('mtriggers/Coop/06_art-therapy/05_maintenance', `sar_speedrun_cc_start "Maintenance" map=mp_coop_paint_conversion action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Portal Room" zone center=-1378.28,3262.04,182.64 size=187.19,316.02,124.72 angle=0
@@ -1454,7 +1454,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_paint_conversion" sar_speedrun_category "Maintenance"
 `);
-src.cfg.add('mtriggers/Coop/06_art-therapy/06_bridge-catch', false, `sar_speedrun_cc_start "Bridge Catch" map=mp_coop_bridge_catch action=split
+src.cfg.add('mtriggers/Coop/06_art-therapy/06_bridge-catch', `sar_speedrun_cc_start "Bridge Catch" map=mp_coop_bridge_catch action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Button Jump" zone center=146.89,1343.92,14.03 size=37.33,127.5,12 angle=0
@@ -1473,7 +1473,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_bridge_catch" sar_speedrun_category "Bridge Catch"
 `);
-src.cfg.add('mtriggers/Coop/06_art-therapy/07_double-lift', false, `sar_speedrun_cc_start "Double Lift" map=mp_coop_laser_tbeam action=split
+src.cfg.add('mtriggers/Coop/06_art-therapy/07_double-lift', `sar_speedrun_cc_start "Double Lift" map=mp_coop_laser_tbeam action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Crouch Fly Blue" fly player=0
@@ -1487,7 +1487,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_laser_tbeam" sar_speedrun_category "Double Lift"
 `);
-src.cfg.add('mtriggers/Coop/06_art-therapy/08_gel-maze', false, `sar_speedrun_cc_start "Gel Maze" map=mp_coop_paint_rat_maze action=split
+src.cfg.add('mtriggers/Coop/06_art-therapy/08_gel-maze', `sar_speedrun_cc_start "Gel Maze" map=mp_coop_paint_rat_maze action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Portal Entry" zone center=-573.35,-0.1,703.71 size=69.24,255.73,127.07 angle=0
@@ -1501,7 +1501,7 @@ sar_speedrun_cc_finish
 
 sar_on_load cond "!var:no_mtriggers=1 & cm & map=mp_coop_paint_rat_maze" sar_speedrun_category "Gel Maze"
 `);
-src.cfg.add('mtriggers/Coop/06_art-therapy/09_crazier-box', false, `sar_speedrun_cc_start "Crazier Box" map=mp_coop_paint_crazy_box action=split
+src.cfg.add('mtriggers/Coop/06_art-therapy/09_crazier-box', `sar_speedrun_cc_start "Crazier Box" map=mp_coop_paint_crazy_box action=split
 
 sar_speedrun_cc_rule "Start" load action=force_start
 sar_speedrun_cc_rule "Cube Preserve" zone center=64,416,768 size=64,192,256 angle=0 player=1

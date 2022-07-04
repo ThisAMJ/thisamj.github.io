@@ -2,14 +2,10 @@
 <html>
 	<head>
 		<title>Splits Converter</title>
-		<style>
-			#drop_zone {
-				border: 1px solid;
-				width: 200px;
-				height: 200px;
-				text-align: center;
-			}
-		</style>
+		<link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/69196954">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" href="stylesheet.css">
 		<script src="../lib/FileSaver.js"></script>
 		<script src="../lib/jszip.js"></script>
 		<script src="../lib/xml2json.js"></script>
@@ -17,9 +13,14 @@
 	</head>
 	
 	<body>
-		<div id="drop_zone" ondrop="dropHandler(event)" ondragover="dragHandler(event)">
-			Drop splits file/folder here
+		<div id="container">
+			<div id="desc">
+				<h1>Splits Converter</h1>
+				This is the LiveSplit/Adrift/SourceLiveTimer speedrun splits converter. Page under construction!<br>
+				Functional below (afaik) is LiveSplit -> Adrift.
+			</div>
+			<input class="width-full" id="drop_zone" type="file" accept=".lss" onchange="fileSelect(event)">
+			<button class="width-full" id="button" onclick="saveSplits()">Export Splits</button>
 		</div>
-		<button onclick="saveSplits()">Export Splits</button>
 	</body>
 </html>
