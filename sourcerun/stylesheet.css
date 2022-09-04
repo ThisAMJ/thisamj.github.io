@@ -19,7 +19,7 @@ body, textarea {
 
 select:hover, button:hover, button.active, .content-tab-selected, .cfg-tab-selected {
 	background: #484848 !important;
-	color: #fff !important;
+	color: #FFF !important;
 	cursor: pointer;
 }
 
@@ -30,7 +30,7 @@ select:hover, button:hover, button.active, .content-tab-selected, .cfg-tab-selec
 	border: 2px solid #222;
 	border-radius: 5px;
 	font-size: 15px;
-	height: 3.4em;
+	height: auto;
 	user-select: none;
 }
 
@@ -42,7 +42,7 @@ select:hover, button:hover, button.active, .content-tab-selected, .cfg-tab-selec
 	transition: 0.3s;
 }
 
-#new-cfg, #cfg-tabs button {
+#new-cfg, #remove-cfg, #cfg-tabs button {
 	padding: 0 0.5em;
 	border-right: 1px solid #444;
 }
@@ -63,7 +63,7 @@ button {
 	border: 2px solid #181818;
 }
 
-#cfg-content, #console, #liveconsole, #bindarea, #console-autocomplete, #sar-hud {
+#cfg-content, #console, #bindarea, #sar-hud, #console-autocomplete, #liveconsole-complete, #liveconsole {
 	height: 40em;
 	resize: none;
 	font-family: monospace;
@@ -83,6 +83,7 @@ button {
 
 #bindarea {
 	caret-color: transparent;
+	overflow-y: none;
 }
 
 #console span, #cfg-content {
@@ -91,19 +92,26 @@ button {
 	word-wrap: anywhere;
 }
 
-#bindarea {
-	height: 1.5em;
-	overflow-y: hidden;
-}
-
-#liveconsole {
+.stack {
+	display: grid;
 	border-top: none;
 	border-bottom: none;
 	margin-top: 0;
-	height: 1.5em;
-	overflow-y: hidden;
 	outline: none;
-	display: block;
+	display: grid;
+}
+.stack>* {
+	grid-column: 1;
+	grid-row: 1;
+	background: none;
+}
+
+#liveconsole-complete {
+	color: #555;
+}
+
+#liveconsole, #liveconsole-complete, #bindarea {
+	height: 2em;
 }
 
 #console-autocomplete {

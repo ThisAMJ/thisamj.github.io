@@ -12,32 +12,39 @@
 	</head>
 	<body>
 		<div class="position-relative flex">
-			<div class="float-left width-half nav">
-				<button class="btn-left" id="btn-left-cfg" onclick="changeTab(true, 'cfg')">CFG</button>
-				<button class="btn-left" id="btn-left-control" onclick="changeTab(true, 'control')">Control Panel</button>
+			<div class="float-left width-half nav nav-left">
+				<button class="nav-btn nav-btn-left"  id="nav-btn-left-cfg"     onclick="changeTab('left', 'cfg')">CFG</button>
+				<button class="nav-btn nav-btn-left"  id="nav-btn-left-control" onclick="changeTab('left', 'control')">Control Panel</button>
 				<br>
-				<button class="btn-left" id="btn-left-sarhud" onclick="changeTab(true, 'sarhud')">SAR Hud</button>
+				<button class="nav-btn nav-btn-left"  id="nav-btn-left-sarhud"  onclick="changeTab('left', 'sarhud')">SAR Hud</button>
 			</div>
-			<div class="float-right width-half nav">
-				<button class="btn-right" id="btn-right-con" onclick="changeTab(false, 'con')">Console</button>
-				<button class="btn-right" id="btn-right-cmds" onclick="changeTab(false, 'cmds')">Commands</button>
+			<div class="float-right width-half nav nav-right">
+				<button class="nav-btn nav-btn-right" id="nav-btn-right-con"    onclick="changeTab('right', 'con')">Console</button>
+				<button class="nav-btn nav-btn-right" id="nav-btn-right-cmds"   onclick="changeTab('right', 'cmds')">Commands</button>
 				<br>
-				<button class="btn-right" id="btn-right-stats" onclick="changeTab(false, 'stats')">Statistics</button>
+				<button class="nav-btn nav-btn-right" id="nav-btn-right-stats"  onclick="changeTab('right', 'stats')">Statistics</button>
 			</div>
 		</div>
 		
 		<div class="position-relative flex">
 			<div class="float-left width-half" id="left-content">
-				<div class="width-full content-tab-left" id="left-cfg">
+				<div class="width-full content-tab-left" id="content-tab-left-cfg">
+				
 					<button onclick="runSelected()">Run Selected CFG</button>
+					
+					<!-- TODO: Tree view of cfg -->
 					<div class="width-full nav">
 						<button class="btn-cfg" id="new-cfg" onclick="newCFG()">+</button>
+						
 						<span id="cfg-tabs"></span>
-						<button class="btn-cfg" id="remove-cfg" onclick="removeCFG()">-</button>
+						
+						<button class="btn-cfg" id="remove-cfg" onclick="removeCFG()" hidden>-</button>
 					</div>
+					
 					<div class="width-full" id="cfg-content" spellcheck="false" contenteditable oninput="editCFG()"></div>
+					
 				</div>
-				<div class="width-full content-tab-left" id="left-control">
+				<div class="width-full content-tab-left" id="content-tab-left-control">
 					<div class="float-left width-half" style="margin-bottom: 0">
 						Playing game: <select id="game-select" onchange="changeGame()">
 							<option value="portal2">Portal 2</option>
@@ -50,20 +57,22 @@
 						</select>
 					</div>
 				</div>
-				<div class="width-full content-tab-left" id="left-sarhud">
+				<div class="width-full content-tab-left" id="content-tab-left-sarhud">
 					<div id="sar-hud"></div>
 				</div>
 			</div>
 			<div class="float-right width-half" id="right-content">
-				<div class="width-full content-tab-right" id="right-con">
-					<textarea class="width-full" id="bindarea" spellcheck="false" onkeydown="keyDown(event)" onkeyup="keyUp(event)" placeholder="Keyboard Input"></textarea>
-					<hr>
+				<div class="width-full content-tab-right" id="content-tab-right-con">
+					<textarea class="width-full" id="bindarea" spellcheck="false" onkeydown="bindKeyPress(event, true)" onkeyup="bindKeyPress(event, false)" placeholder="Keyboard Input"></textarea>
 					<div class="width-full" id="console"></div>
-					<textarea class="width-full" id="liveconsole" spellcheck="false" onkeydown="consoleType(event)" onkeyup="consoleTypeAfter()" placeholder="Live Console"></textarea>
+					<div class="width-full stack">
+						<textarea class="width-full" id="liveconsole-complete"></textarea>
+						<textarea class="width-full" id="liveconsole" spellcheck="false" onkeydown="consoleKeyPress(event, true)" onkeyup="consoleKeyPress(event, false)" placeholder="Live Console" data-placeholder="Live Console"></textarea>
+					</div>
 					<div class="width-full" id="console-autocomplete"></div>
 				</div>
-				<div class="width-full content-tab-right" id="right-cmds"></div>
-				<div class="width-full content-tab-right" id="right-stats"></div>
+				<div class="width-full content-tab-right" id="content-tab-right-cmds"></div>
+				<div class="width-full content-tab-right" id="content-tab-right-stats"></div>
 			</div>
 		</div>
 	</body>
