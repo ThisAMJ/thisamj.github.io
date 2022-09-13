@@ -98,28 +98,6 @@ const sar = {
 		},
 	},
 	
-	aliases: [],
-	functions: [],
-	
-	hwaits: [],
-	
-	svars: {},
-	persistentSvars: [],
-	
-	GetSvar: function(name) {
-		return this.svars[Object.keys(this.svars).find(e => e === name)] || '';
-	},
-	SetSvar: function(name, val) {
-		this.svars[name] = val;
-		if (this.persistentSvars.find(e => e.toLowerCase() === name.toLowerCase())) this.SavePersistentSvars();
-	},
-	SavePersistentSvars: function() {
-		let s = {};
-		for (let svar of this.persistentSvars) {
-			s[svar] = this.GetSvar(svar);
-		}
-		localStorage.setItem('sar.persistentSvars', JSON.stringify(s))
-	},
 	
 	hud: {
 		texts: [],
@@ -141,7 +119,7 @@ const sar = {
 			
 			let curColor = null, out = '';
 			
-			for (let i = 0; i < str.length; i++) {
+			for (let i = 0, j = str.length; i < j; i++) {
 				if (str[i] === '#') {
 					++i;
 					if (str[i] === '#') {
@@ -207,51 +185,583 @@ const sar = {
 		},
 	},
 	
-	con: {
-		filters: [],
-		filtering: null,
-		
-		matches_filters: function(text) {
-			if (!src.cmd.cvar('sar_con_filter')) return true;
-			
-			if (this.filtering) {
-				let match = this.filtering.allow;
-				if (this.matches_filter(text, this.filtering.to)) {
-					let was_filtering = JSON.parse(JSON.stringify(this.filtering));
-					this.filtering = undefined;
-					src.con.log(`Finishing persistent filter rule from "${was_filtering.from}" to "${was_filtering.to}"\n`, 3, '#88FF88');
+	expand: function(text, args) {
+		// if (text.encases('"', '"')) text = text.slice(1, -1);
+		let str = '', sub = false, i = -1;
+		while (++i < text.length) {
+			if (text[i] == '$') {
+				let c = text[i + 1];
+				if (c == '$') {
+					str += c;
+					i++;
+					continue;
 				}
-				return match;
-			}
-			
-			for (let rule of this.filters) {
-				if (this.matches_filter(text, rule.from)) {
-					if (!this.matches_filter(text, rule.to)) {
-						src.con.log(`Starting persistent filter rule from "${rule.from}" to "${rule.to}"\n`, 3, '#88FF88');
-						this.filtering = rule;
+				if (c == "'") {
+					str += '"';
+					i++;
+					continue;
+				}
+				if (c == '-') {
+					i++;
+					continue;
+				}
+				if (c == '+') {
+					sub = true;
+					i++;
+					let arg = Number(text[i + 1]);
+					i++;
+					while (parseInt(text[i + 1]) >= 0 && parseInt(text[i++]) <= 9) {
+						arg = arg * 10 + text[i];
 					}
-					return rule.allow;
+					str += args.cmdStr.slice(args.argLengthS[arg]);
+					continue;
 				}
+				if (c >= 1 && c <= 9) {
+					sub = true;
+					let arg = Number(c);
+					i++;
+					while (parseInt(text[i + 1]) >= 0 && parseInt(text[i++]) <= 9) {
+						arg = arg * 10 + text[i];
+					}
+					if (args[arg + 1]) str += args[arg + 1];
+					continue;
+				}
+				if (c == '#') {
+					sub = true;
+					str += args.length - 2;
+					i++;
+					continue;
+				}
+				let len = 0;
+				while (true) {
+					let ch = text[i + ++len];
+					if (ch >= 'a' && ch <= 'z') continue;
+					if (ch >= 'A' && ch <= 'Z') continue;
+					if (ch >= '0' && ch <= '9') continue;
+					if (ch == '_' || ch == '-') continue;
+					break;
+				}
+				if (--len == 0) {
+					str += '$';
+					continue;
+				}
+				sub = true;
+				let value = this.GetSvar(text.substr(i + 1, len));
+				if (value) str += value;
+				i += len;
+				continue;
 			}
-			return src.cmd.cvar('sar_con_filter_default') == 1;
-		},
-		
-		matches_filter: function(text, rule) {
-			return !rule
-				? true
-				: typeof text !== 'string'
-					? false
-					: rule[0] === '^' && rule[rule.length - 1] === '$'
-						? rule.slice(1, -1) === text
-						: rule[0] === '^'
-							? text.startsWith(rule.slice(1))
-							: rule[rule.length - 1] === '$'
-								? text.endsWith(rule.slice(0, -1))
-								: ~text.indexOf(rule);
+			str += text[i];
 		}
+		return {out: str, sub: sub};
 	},
 	
-	cond: {
+	printHelp: function(args) {
+		let convar = src.cmd.getConvar(args[0]);
+		if (!convar || !convar.helpStr) return;
+		sar.println(convar.helpStr);
+	},
+	
+	GetColor: function(colstr = '') {
+		return `#${colstr}`;
+	},
+	
+	println: function(text, debugLevel = 0, color = '#EECC44') {
+		src.con.log(`${text}`, debugLevel, color);
+	},
+	
+	atoi: function(val) {
+		let i = parseInt(val);
+		if (isNaN(i) || !isFinite(i)) return 0;
+		return Math.max(-2147483648, Math.min(2147483647, val));
+	},
+	signedint: function(val) {
+		let i = parseInt(val);
+		if (isNaN(i) || !isFinite(i)) return 0;
+		while (i < -2147483648) i += 4294967296;
+		while (i > 2147483647) i -= 4294967296;
+		return i;
+	},
+};
+
+{ // hwait
+
+	sar.hwaits = [];
+
+	ON_PRETICK(function() {
+		for (let i = 0; i < sar.hwaits.length; i++) {
+			let hwait = sar.hwaits[i];
+			if (hwait.ticks <= 0) {
+				src.cmd.executeCommand(hwait.cmd);
+				sar.hwaits.splice(i--, 1);
+				continue;
+			}
+			hwait.ticks--;
+		}
+	});
+
+	CON_COMMAND_F('hwait', 'hwait <tick> <command> [args...] - run a command after the given number of host ticks\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length < 3) {
+			return sar.printHelp(args);
+		}
+		let ticks = sar.atoi(args[1]);
+		let cmd = args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]);
+		if (ticks <= 0) {
+			src.cmd.executeCommand(cmd);
+		} else {
+			sar.hwaits.push({
+				ticks: ticks,
+				cmd: cmd
+			});
+		}
+	});
+	
+	CON_COMMAND('seq', 'seq <commands>... - runs a sequence of commands one tick after one another\n', function(args) {
+		if (args.length < 2) {
+			return sar.printHelp(args);
+		}
+		let cmds = args.slice(1), i = 0;
+		for (let cmd of cmds) {
+			i++;
+			sar.hwaits.push({
+				ticks: i,
+				cmd: cmd
+			});
+		}
+	});
+} // hwait
+
+CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does nothing\n', FCVAR_DONTRECORD, () => {});
+
+{ // hud
+	CON_CVAR('sar_hud_precision', 3);
+	CON_CVAR('sar_hud_velocity_precision', 2);
+	CON_CVAR('sar_hud_font_color', '255 255 255 255');
+	
+	sar.ticks = 0;
+	sar.hud.rainbow = false;
+	CON_CVAR('sar_hud_rainbow', -1, 'Enables the rainbow HUD mode. -1 = default, 0 = disable, 1 = enable.\n', FCVAR_NONE, -1, 1);
+	if (new Date().getMonth() === 5) { // June
+		if (Math.floor(Math.random() * 50 + 1)) {
+			sar.hud.rainbow = true;
+		}
+	}
+	
+	ON_TICK(function() {
+		switch (src.cmd.cvar('sar_hud_rainbow')) {
+			case '0':
+				sar.hud.rainbow = false;
+				break;
+			case '1':
+				sar.hud.rainbow = true;
+				break;
+		}
+		sar.hud.draw();
+	});
+	
+	sar.hud.defaultorder = [];
+	for (let ele of ['tastick', 'groundframes', 'text', 'position', 'angles', 'portal_angles', 'portal_angles_2', 'velocity', 'velang', 'groundspeed', 'session', 'last_session', 'sum', 'timer', 'avg', 'cps', 'pause_timer', 'demo', 'jumps', 'portals', 'steps', 'jump', 'jump_peak', 'velocity_peak', 'trace', 'frame', 'last_frame', 'inspection', 'eyeoffset', 'duckstate', 'grounded']) {
+		sar.hud.defaultorder.push(ele);
+		if (ele != 'text') CON_CVAR(`sar_hud_${ele}`, 0);
+	}
+	sar.hud.order = sar.hud.defaultorder;
+	
+	CON_COMMAND('sar_hud_set_text', 'sar_hud_set_text <id> <text>... - sets and shows the nth text value in the HUD\n', function(args) {
+		if (args.length < 3) {
+			return sar.printHelp(args);
+		}
+		let id = sar.atoi(args[1]);
+		if (id === -1) {
+			return sar.printHelp(args);
+		}
+		let txt = sar.hud.formatText(args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]));
+		let existing = sar.hud.texts.find(e => e.id === id)
+		if (existing) {
+			return existing.txt = txt;
+		}
+		let component = {
+			id: id,
+			txt: txt,
+			color: null,
+			shown: true
+		};
+		sar.hud.texts.push(component);
+	});
+	
+	CON_COMMAND('sar_hud_set_text_color', 'sar_hud_set_text_color <id> [color] - sets the color of the nth text value in the HUD. Reset by not giving color.\n', function(args) {
+		if (args.length < 2 || args.length > 3) {
+			return sar.printHelp(args);
+		}
+		let id = sar.atoi(args[1]);
+		let existing = sar.hud.texts.find(e => e.id === id);
+		if (args.length === 2) {
+			existing.color = null;
+		} else {
+			existing.color = args[2];
+		}
+	});
+	
+	CON_COMMAND('sar_hud_show_text', 'sar_hud_show_text <id> - shows the nth text value in the HUD\n', function(args) {
+		if (args.length < 2) {
+			return sar.printHelp(args);
+		}
+		if (args[1] === 'all') {
+			return sar.hud.texts.map(e => e.shown = true);
+		}
+		let existing = sar.hud.texts.find(e => e.id === sar.atoi(args[1]));
+		if (existing) existing.shown = true;
+	});
+
+	CON_COMMAND('sar_hud_hide_text', 'sar_hud_hide_text <id> - hides the nth text value in the HUD\n', function(args) {
+		if (args.length < 2) {
+			return sar.printHelp(args);
+		}
+		if (args[1] === 'all') {
+			return sar.hud.texts.map(e => e.shown = false);
+		}
+		let existing = sar.hud.texts.find(e => e.id === sar.atoi(args[1]));
+		if (existing) existing.shown = false;
+	});
+	
+	CON_COMMAND('sar_hud_order_bottom', 'sar_hud_order_bottom <name> - orders hud element to bottom\n', function(args) {
+		if (args.length !== 2) {
+			return sar.println(`Set!\n`);
+		}
+		
+		if (!sar.hud.order.includes(args[1].toLowerCase())) {
+			return src.con.err(`Unknown HUD element name!\n`);
+		}
+		
+		sar.hud.order = [...sar.hud.order.filter(e => e.toLowerCase() !== args[1].toLowerCase()), args[1].toLowerCase()];
+		
+		sar.println(`Moved HUD element ${args[1]} to bottom.\n`)
+	}, sar.hud.ordercompletion);
+
+	CON_COMMAND('sar_hud_order_top', 'sar_hud_order_top <name> - orders hud element to top\n', function(args) {
+		if (args.length !== 2) {
+			return sar.println(`Orders hud element to top: sar_hud_order_top <name>\n`);
+		}
+		
+		if (!sar.hud.order.includes(args[1].toLowerCase())) {
+			return src.con.err(`Unknown HUD element name!\n`);
+		}
+		
+		sar.hud.order = [args[1].toLowerCase(), ...sar.hud.order.filter(e => e != args[1].toLowerCase())];
+		
+		sar.println(`Moved HUD element ${args[1]} to top.\n`)
+	}, sar.hud.ordercompletion);
+	
+	CON_COMMAND('sar_hud_order_reset', 'sar_hud_order_reset - resets order of hud element\n', function(args) {
+		sar.hud.order = sar.hud.defaultorder;
+		sar.println(`Reset default HUD element order!\n`);
+	});
+} // hud
+
+{ // svar operations
+
+	sar.svars = {};
+	sar.persistentSvars = [];
+	sar.SavePersistentSvars = function() {
+		let s = {};
+		for (let svar of sar.persistentSvars) {
+			s[svar] = sar.GetSvar(svar);
+		}
+		localStorage.setItem('sar.persistentSvars', JSON.stringify(s))
+	};
+	sar.GetSvar = function(name) {
+		return (sar.svars[Object.keys(sar.svars).find(e => e === name)] || '').toString();
+	};
+	sar.SetSvar = function(name, val) {
+		sar.svars[name] = val.toString();
+		if (sar.persistentSvars.find(e => e.toLowerCase() === name.toLowerCase())) sar.SavePersistentSvars();
+	};
+	sar.svars = JSON.parse(localStorage.getItem('sar.persistentSvars') || '{}');
+
+	CON_COMMAND_F('svar_set', 'svar_set <variable> <value> - set a svar (SAR variable) to a given value\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length < 3) {
+			return sar.printHelp(args);
+		}
+		
+		sar.SetSvar(args[1], args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]));
+	});
+	
+	CON_COMMAND_F('svar_substr', 'svar_substr <variable> <from> [len] - sets a svar to its substring.\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length < 3 || args.length > 4) {
+			return sar.printHelp(args);
+		}
+		
+		let val = sar.GetSvar(args[1]);
+		let from = sar.atoi(args[2]);
+		let len = args.length === 4 ? sar.atoi(args[3]) : val.length;
+		
+		if (from < 0) from += val.length;
+		if (from < 0 || from > val.length) {
+			return sar.println(`Substring index out of bounds of variable\n`);
+		}
+		if (len < 0) {
+			return sar.println(`Negative length of substring\n`);
+		}
+		val = val.substr(from, len);
+		sar.SetSvar(args[1], val);
+	});
+
+	CON_COMMAND_F('svar_get', 'svar_get <variable> - get the value of a svar\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 2) {
+			return sar.printHelp(args);
+		}
+		sar.println(`${args[1]} = ${sar.GetSvar(args[1])}\n`);
+	});
+
+	CON_COMMAND_F('svar_from_cvar', 'svar_from_cvar <variable> <cvar> - capture a cvar\'s value and place it into an svar, removing newlines\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 3) {
+			return sar.printHelp(args);
+		}
+		
+		let cvar = src.cmd.getConvar(args[2])
+		if (cvar && !cvar.isCommand) {
+			sar.SetSvar(args[1], cvar.value.toString().replace(/\n/g, ''));
+		}
+	});
+	
+	sar.capture = {
+		target: '', len: 0
+	};
+	CON_COMMAND_F('_sar_svar_capture_stop', 'Internal SAR command. Do not use\n', FCVAR_DONTRECORD | FCVAR_HIDDEN, function(args) {
+		let out = src.con.buffer.slice(sar.capture.len); // Get the console buffer since capture
+		out = out.filter(e => e[1] <= src.cmd.cvar('developer')); // Filter to developer level
+		out = out.map(e => e[0]); // Get the text components
+		out = out.join(''); // Squish into one string
+		out = out.replace(/\n/g, ''); // Remove newlines
+		sar.SetSvar(sar.capture.target, out);
+		sar.capture = {
+			target: '', len: 0
+		};
+		src.cmd.getConvar(args[0]).flags |= FCVAR_HIDDEN;
+	});
+	CON_COMMAND_F('svar_capture', 'svar_capture <variable> <command> [args]... - capture a command\'s output and place it into an svar, removing newlines\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length < 3) {
+			return src.__.tooFewArgs(args);
+		}
+		
+		let cmd = args.length == 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]);
+			
+		// Console reading - use the buffer
+		sar.capture.target = args[1];
+		sar.capture.len = src.con.buffer.length;
+		src.cmd.getConvar('_sar_svar_capture_stop').flags &= ~FCVAR_HIDDEN;
+		src.cmd.executeCommand('_sar_svar_capture_stop');
+		src.cmd.executeCommand(cmd);
+	});
+
+	CON_COMMAND_F('svar_persist', 'svar_persist <variable> - mark an svar as persistent\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 2) {
+			return sar.printHelp(args);
+		}
+		if (!~sar.persistentSvars.indexOf(args[1])) {
+			sar.persistentSvars.push(args[1]);
+		}
+		sar.SavePersistentSvars();
+	});
+
+	CON_COMMAND_F('svar_no_persist', 'svar_no_persist <variable> - unmark an svar as persistent\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 2) {
+			return sar.printHelp(args);
+		}
+		sar.persistentSvars = sar.persistentSvars.filter(e => e !== args[1]);
+		sar.SavePersistentSvars();
+	});
+
+	{
+		let SVAR_OP = function(name, op, disallowSecondZero = false) {
+			CON_COMMAND_F(`svar_${name}`, `svar_${name} <variable> <variable|value> - perform the given operation on an svar\n`, FCVAR_DONTRECORD, function(args) {
+				if (args.length !== 3) {
+					return sar.printHelp(args);
+				}
+				let pInt = (x) => sar.atoi(x);
+				let cur = sar.svars.hasOwnProperty(args[1]) ? pInt(sar.svars[args[1]]) : 0;
+				let other = sar.svars.hasOwnProperty(args[2]) ? pInt(sar.svars[args[2]]) : pInt(args[2]);
+				sar.SetSvar(args[1], (disallowSecondZero && other === 0) ? 0 : sar.signedint(eval(`cur ${op} other`)));
+			});
+		};
+		
+		SVAR_OP('add', '+');
+		SVAR_OP('sub', '-');
+		SVAR_OP('mul', '*');
+		SVAR_OP('div', '/', true);
+		SVAR_OP('mod', '%', true);
+	}
+} // svar operations
+
+{ // sar_on_things
+
+	
+	sar.event_execs = {};
+	sar.runevents = function(event) {
+		if (!sar.event_execs[event]) {
+			return src.con.err(`Event "${event}" does not exist.\n`);
+		}
+		for (let exec of sar.event_execs[event]) {
+			src.cmd.executeCommand(exec);
+		}
+	}
+
+	let MK_SAR_ON = function(name, when, immediately) {
+		sar.event_execs[name] = [];
+		CON_COMMAND_F(`sar_on_${name}`, `sar_on_${name} <command> [args]... - registers a command to be run ${when}\n`, FCVAR_DONTRECORD, function(args) {
+			if (args.length < 2) {
+				return sar.printHelp(args);
+			}
+			let cmd = args.length === 2 ? args[1] : args.cmdStr.slice(args.argLengthS[0]);
+			sar.event_execs[name].push(cmd);
+		});
+		CON_COMMAND_F(`sar_on_${name}_clear`, `sar_on_${name}_clear - clears commands registered on event "${name}"\n`, FCVAR_DONTRECORD, function(args) {
+			sar.println(`Cleared ${sar.event_execs[name].length} commands from event "${name}"\n`);
+			sar.event_execs[name] = [];
+		});
+	}
+	
+	MK_SAR_ON('load',              'on session start',                   true);
+	MK_SAR_ON('session_end',       'on session end',                     true);
+	MK_SAR_ON('exit',              'on game exit',                       true);
+	MK_SAR_ON('demo_start',        'when demo playback starts',          false);
+	MK_SAR_ON('demo_stop',         'when demo playback stops',           false);
+	MK_SAR_ON('flags',             'when CM flags are hit',              false);
+	MK_SAR_ON('coop_reset_done',   'when coop reset is completed',       false);
+	MK_SAR_ON('coop_reset_remote', 'when coop reset run remotely',       false);
+	MK_SAR_ON('coop_spawn',        'on coop spawn',                      true);
+	MK_SAR_ON('config_exec',       'on config.cfg exec',                 true);
+	MK_SAR_ON('tas_start',         'when TAS script playback starts',    true);
+	MK_SAR_ON('tas_end',           'when TAS script playback ends',      true);
+	MK_SAR_ON('pb',                'when auto-submitter detects PB',     true);
+	MK_SAR_ON('not_pb',            'when auto-submitter detects not PB', true);
+	
+	// Since I can't simulate the entire game, here's these commands to test map loads or whatevs
+	CON_COMMAND('__do_event', '__do_event <event> - Executes a faux event (e.g. "__do_event load" runs sar_on_load commands)\n', function(args) {
+		if (args.length !== 2) {
+			return sar.printHelp(args);
+		}
+		
+		sar.runevents(args[1]);
+		
+	}, function(args) {
+		if (args.length === 1) return Object.keys(sar.event_execs);
+		if (args.length === 2) return Object.keys(sar.event_execs).filter(e => ~e.indexOf(args[1]));
+	});
+	
+	sar.hasConfigExeced = false;
+	CON_COMMAND_HOOK('exec', true, function(args) {
+		if (args[1] === 'config.cfg' && !sar.hasConfigExeced) {
+			sar.hasConfigExeced = true;
+			sar.runevents('config_exec');
+		}
+	})
+} // sar_on_things
+
+{ // functions / aliases
+
+	sar.aliases = [];
+	sar.functions = [];
+
+	CON_COMMAND_F('sar_function', 'sar_function <name> [command] [args]... - create a function, replacing $1, $2 etc up to $9 in the command string with the respective argument. If no command is specified, prints the given function\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length < 2) {
+			return sar.printHelp(args);
+		}
+		
+		let func = sar.functions.find(e => e.name.toLowerCase() === args[1].toLowerCase());
+		
+		if (args.length === 2) {
+			if (func) {
+				sar.println(`${func.cmd}\n`);
+			} else {
+				sar.println(`Function ${args[1]} does not exist\n`);
+			}
+			return;
+		}
+		
+		let cmd = args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]);
+		
+		if (func) {
+			func.cmd = cmd;
+		} else {
+			if (src.cmd.getConvar(args[1])) {
+				return sar.println(`Command ${args[1]} already exists! Cannot shadow.\n`);
+			}
+			CON_COMMAND(args[1], 'SAR function command.\n', function(args) {
+				src.cmd.executeCommand(`sar_function_run ${args.cmdStr}`);
+			});
+			sar.functions.push({
+				name: args[1],
+				cmd: cmd
+			});
+		}
+	});
+
+	CON_COMMAND_F('sar_function_run', 'sar_function_run <name> [args]... - run a function with the given arguments\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length < 2) {
+			return sar.printHelp(args);
+		}
+		let it = sar.functions.find(e => e.name.toLowerCase() === args[1].toLowerCase());
+		if (!it) return src.con.err(`Function ${args[1]} does not exist\n`);
+		src.cmd.executeCommand(sar.expand(it.cmd, args).out);
+	});
+
+	CON_COMMAND_F('sar_expand', 'sar_expand [cmd]... - run a command after expanding svar substitutions\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length < 2) {
+			return sar.printHelp(args);
+		}
+		let cmd = args.length === 2 ? args[1] : args.cmdStr.slice(args.argLengthS[0]);
+		src.cmd.executeCommand(sar.expand(cmd, []).out);
+	})
+
+	CON_COMMAND_F('sar_alias', 'sar_alias <name> [command] [args]... - create an alias, similar to the \'alias\' command but not requiring quoting. If no command is specified, prints the given alias\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length < 2) {
+			return sar.printHelp(args);
+		}
+		
+		let alias = sar.aliases.find(e => e.name.toLowerCase() === args[1].toLowerCase());
+		
+		if (args.length === 2) {
+			if (alias) {
+				sar.println(`${alias.cmd}\n`);
+			} else {
+				sar.println(`Alias ${args[1]} does not exist\n`);
+			}
+			return;
+		}
+		
+		let cmd = args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]);
+		
+		// TODO: Work with __delete
+		if (alias) {
+			alias.cmd = cmd;
+		} else {
+			if (src.cmd.getConvar(args[1])) {
+				return sar.println(`Command ${args[1]} already exists! Cannot shadow.\n`);
+			}
+			CON_COMMAND(args[1], 'SAR alias command.\n', function(args) {
+				src.cmd.executeCommand(`sar_alias_run ${args.cmdStr}`);
+			});
+			sar.aliases.push({
+				name: args[1],
+				cmd: cmd
+			});
+		}
+	});
+
+	CON_COMMAND('sar_alias_run', 'sar_alias_run <name> [args]... - run a SAR alias, passing on any additional arguments\n', function(args) {
+		if (args.length < 2) {
+			return sar.printHelp(args);
+		}
+		let it = sar.aliases.find(e => e.name.toLowerCase() === args[1].toLowerCase());
+		if (!it) return src.con.err(`Alias ${args[1]} does not exist\n`);
+		src.cmd.executeCommand(`${it.cmd} ${args.cmdStr.slice(args.argLengthS[1])}`);
+	});
+
+} // functions / aliases
+
+{ // cond
+
+	sar.cond = {
 		conditions: {
 			ORANGE: 0,
 			COOP: 1,
@@ -435,552 +945,74 @@ const sar = {
 			}
 			return cond;
 		}
-	},
-	
-	expand: function(text, args) {
-		// if (text.encases('"', '"')) text = text.slice(1, -1);
-		let str = '', sub = false, i = -1;
-		while (++i < text.length) {
-			if (text[i] == '$') {
-				let c = text[i + 1];
-				if (c == '$') {
-					str += c;
-					i++;
-					continue;
-				}
-				if (c == "'") {
-					str += '"';
-					i++;
-					continue;
-				}
-				if (c == '-') {
-					i++;
-					continue;
-				}
-				if (c >= 1 && c <= 9) {
-					sub = true;
-					let arg = Number(c);
-					i++;
-					while (parseInt(text[i + 1]) >= 0 && parseInt(text[i++]) <= 9) {
-						arg = arg * 10 + text[i];
-					}
-					if (args[arg + 1]) str += args[arg + 1];
-					continue;
-				}
-				if (c == '#') {
-					sub = true;
-					str += args.length - 2;
-					i++;
-					continue;
-				}
-				let len = 0;
-				while (true) {
-					let ch = text[i + ++len];
-					if (ch >= 'a' && ch <= 'z') continue;
-					if (ch >= 'A' && ch <= 'Z') continue;
-					if (ch >= '0' && ch <= '9') continue;
-					if (ch == '_' || ch == '-') continue;
-					break;
-				}
-				if (--len == 0) {
-					str += '$';
-					continue;
-				}
-				sub = true;
-				let value = this.GetSvar(text.substr(i + 1, len));
-				if (value) str += value;
-				i += len;
-				continue;
-			}
-			str += text[i];
-		}
-		return {out: str, sub: sub};
-	},
-	
-	printHelp: function(args) {
-		let convar = src.cmd.getConvar(args[0]);
-		if (!convar || !convar.helpStr) return;
-		sar.println(convar.helpStr);
-	},
-	
-	GetColor: function(colstr = '') {
-		return `#${colstr}`;
-	},
-	
-	println: function(text, debugLevel = 0, color = '#EECC44') {
-		src.con.log(`${text}`, debugLevel, color);
-	},
-	
-	event_execs: {},
-	
-	atoi: function(val) {
-		let i = parseInt(val);
-		if (isNaN(i) || !isFinite(i)) return 0;
-		return Math.max(-2147483648, Math.min(2147483647, val));
-	},
-	signedint: function(val) {
-		let i = parseInt(val);
-		if (isNaN(i) || !isFinite(i)) return 0;
-		while (i < -2147483648) i += 4294967296;
-		while (i > 2147483647) i -= 4294967296;
-		return i;
-	},
-};
-
-{ // hwait
-	ON_PRETICK(function() {
-		for (let i = 0; i < sar.hwaits.length; i++) {
-			let hwait = sar.hwaits[i];
-			hwait.ticks--;
-			if (hwait.ticks <= 0) {
-				src.cmd.executeCommand(hwait.cmd);
-				sar.hwaits.splice(i--, 1);
-			}
-		}
-	});
-
-	CON_COMMAND_F('hwait', 'hwait <tick> <command> [args...] - run a command after the given number of host ticks\n', FCVAR_DONTRECORD, function(args) {
-		if (args.length < 3) {
-			return sar.printHelp(args);
-		}
-		let ticks = sar.atoi(args[1]);
-		let cmd = args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]);
-		sar.hwaits.push({
-			ticks: ticks,
-			cmd: cmd
-		});
-	});
-	
-	CON_COMMAND('seq', 'seq <commands>... - runs a sequence of commands one tick after one another\n', function(args) {
-		if (args.length < 2) {
-			return sar.printHelp(args);
-		}
-		let cmds = args.slice(1), i = 0;
-		for (let cmd of cmds) {
-			i++;
-			sar.hwaits.push({
-				ticks: i,
-				cmd: cmd
-			});
-		}
-	});
-} // hwait
-
-sar.svars = JSON.parse(localStorage.getItem('sar.persistentSvars') || '{}');
-
-CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does nothing\n', FCVAR_DONTRECORD, () => {});
-
-{ // hud
-	CON_CVAR('sar_hud_precision', 3);
-	CON_CVAR('sar_hud_velocity_precision', 2);
-	CON_CVAR('sar_hud_font_color', '255 255 255 255');
-	
-	sar.ticks = 0;
-	sar.hud.rainbow = false;
-	CON_CVAR('sar_hud_rainbow', -1, 'Enables the rainbow HUD mode. -1 = default, 0 = disable, 1 = enable.\n', FCVAR_NONE, -1, 1);
-	if (new Date().getMonth() === 5) { // June
-		if (Math.floor(Math.random() * 50 + 1)) {
-			sar.hud.rainbow = true;
-		}
-	}
-	
-	ON_TICK(function() {
-		switch (src.cmd.cvar('sar_hud_rainbow')) {
-			case '0':
-				sar.hud.rainbow = false;
-				break;
-			case '1':
-				sar.hud.rainbow = true;
-				break;
-		}
-		sar.hud.draw();
-	});
-	
-	sar.hud.defaultorder = [];
-	for (let ele of ['tastick', 'groundframes', 'text', 'position', 'angles', 'portal_angles', 'portal_angles_2', 'velocity', 'velang', 'groundspeed', 'session', 'last_session', 'sum', 'timer', 'avg', 'cps', 'pause_timer', 'demo', 'jumps', 'portals', 'steps', 'jump', 'jump_peak', 'velocity_peak', 'trace', 'frame', 'last_frame', 'inspection', 'eyeoffset', 'duckstate', 'grounded']) {
-		sar.hud.defaultorder.push(ele);
-		if (ele != 'text') CON_CVAR(`sar_hud_${ele}`, 0);
-	}
-	sar.hud.order = sar.hud.defaultorder;
-	
-	CON_COMMAND('sar_hud_set_text', 'sar_hud_set_text <id> <text>... - sets and shows the nth text value in the HUD\n', function(args) {
-		if (args.length < 3) {
-			return sar.printHelp(args);
-		}
-		let id = sar.atoi(args[1]);
-		if (id === -1) {
-			return sar.printHelp(args);
-		}
-		let txt = sar.hud.formatText(args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]));
-		let existing = sar.hud.texts.find(e => e.id === id)
-		if (existing) {
-			return existing.txt = txt;
-		}
-		let component = {
-			id: id,
-			txt: txt,
-			color: null,
-			shown: true
-		};
-		sar.hud.texts.push(component);
-	});
-	
-	CON_COMMAND('sar_hud_set_text_color', 'sar_hud_set_text_color <id> [color] - sets the color of the nth text value in the HUD. Reset by not giving color.\n', function(args) {
-		if (args.length < 2 || args.length > 3) {
-			return sar.printHelp(args);
-		}
-		let id = sar.atoi(args[1]);
-		let existing = sar.hud.texts.find(e => e.id === id);
-		if (args.length === 2) {
-			existing.color = null;
-		} else {
-			existing.color = args[2];
-		}
-	});
-	
-	CON_COMMAND('sar_hud_show_text', 'sar_hud_show_text <id> - shows the nth text value in the HUD\n', function(args) {
-		if (args.length < 2) {
-			return sar.printHelp(args);
-		}
-		let existing = sar.hud.texts.find(e => e.id === sar.atoi(args[1]));
-		if (existing) existing.shown = true;
-	});
-
-	CON_COMMAND('sar_hud_hide_text', 'sar_hud_hide_text <id> - hides the nth text value in the HUD\n', function(args) {
-		if (args.length < 2) {
-			return sar.printHelp(args);
-		}
-		let existing = sar.hud.texts.find(e => e.id === sar.atoi(args[1]));
-		if (existing) existing.shown = false;
-	});
-	
-	CON_COMMAND('sar_hud_order_bottom', 'sar_hud_order_bottom <name> - orders hud element to bottom\n', function(args) {
-		if (args.length !== 2) {
-			return sar.println(`Set!\n`);
-		}
-		
-		if (!sar.hud.order.includes(args[1].toLowerCase())) {
-			return src.con.err(`Unknown HUD element name!\n`);
-		}
-		
-		sar.hud.order = [...sar.hud.order.filter(e => e.toLowerCase() !== args[1].toLowerCase()), args[1].toLowerCase()];
-		
-		sar.println(`Moved HUD element ${args[1]} to bottom.\n`)
-	}, sar.hud.ordercompletion);
-
-	CON_COMMAND('sar_hud_order_top', 'sar_hud_order_top <name> - orders hud element to top\n', function(args) {
-		if (args.length !== 2) {
-			return sar.println(`Orders hud element to top: sar_hud_order_top <name>\n`);
-		}
-		
-		if (!sar.hud.order.includes(args[1].toLowerCase())) {
-			return src.con.err(`Unknown HUD element name!\n`);
-		}
-		
-		sar.hud.order = [args[1].toLowerCase(), ...sar.hud.order.filter(e => e != args[1].toLowerCase())];
-		
-		sar.println(`Moved HUD element ${args[1]} to top.\n`)
-	}, sar.hud.ordercompletion);
-	
-	CON_COMMAND('sar_hud_order_reset', 'sar_hud_order_reset - resets order of hud element\n', function(args) {
-		sar.hud.order = sar.hud.defaultorder;
-		sar.println(`Reset default HUD element order!\n`);
-	});
-} // hud
-
-{ // svar operations
-	CON_COMMAND_F('svar_set', 'svar_set <variable> <value> - set a svar (SAR variable) to a given value\n', FCVAR_DONTRECORD, function(args) {
-		if (args.length < 3) {
-			return sar.printHelp(args);
-		}
-		
-		sar.SetSvar(args[1], args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]));
-	});
-	
-	CON_COMMAND_F('svar_substr', 'svar_substr <variable> <from> [len] - sets a svar to its substring.\n', FCVAR_DONTRECORD, function(args) {
-		if (args.length < 3 || args.length > 4) {
-			return sar.printHelp(args);
-		}
-		
-		let val = sar.GetSvar(args[1]);
-		let from = sar.atoi(args[2]);
-		let len = args.length === 4 ? sar.atoi(args[3]) : val.length;
-		
-		if (from < 0) from += val.length;
-		if (from < 0 || from > val.length) {
-			return sar.println(`Substring index out of bounds of variable\n`);
-		}
-		if (len < 0) {
-			return sar.println(`Negative length of substring\n`);
-		}
-		val = val.substr(from, len);
-		sar.SetSvar(args[1], val);
-	});
-
-	CON_COMMAND_F('svar_get', 'svar_get <variable> - get the value of a svar\n', FCVAR_DONTRECORD, function(args) {
-		if (args.length !== 2) {
-			return sar.printHelp(args);
-		}
-		sar.println(`${args[1]} = ${sar.GetSvar(args[1])}\n`);
-	});
-
-	CON_COMMAND_F('svar_from_cvar', 'svar_from_cvar <variable> <cvar> - capture a cvar\'s value and place it into an svar, removing newlines\n', FCVAR_DONTRECORD, function(args) {
-		if (args.length !== 3) {
-			return sar.printHelp(args);
-		}
-		
-		let cvar = src.cmd.getConvar(args[2])
-		if (cvar && !cvar.isCommand) {
-			sar.SetSvar(args[1], cvar.value.toString().replace(/\n/g, ''));
-		}
-	});
-	
-	sar.capture = {
-		target: '', len: 0
 	};
-	CON_COMMAND_F('_sar_svar_capture_stop', 'Internal SAR command. Do not use\n', FCVAR_DONTRECORD | FCVAR_HIDDEN, function(args) {
-		let out = src.con.buffer.slice(sar.capture.len); // Get the console buffer since capture
-		out = out.filter(e => e[1] <= src.cmd.cvar('developer')); // Filter to developer level
-		out = out.map(e => e[0]); // Get the text components
-		out = out.join(''); // Squish into one string
-		out = out.replace(/\n/g, ''); // Remove newlines
-		sar.SetSvar(sar.capture.target, out);
-		sar.capture = {
-			target: '', len: 0
-		};
-		src.cmd.getConvar(args[0]).flags |= FCVAR_HIDDEN;
-	});
-	CON_COMMAND_F('svar_capture', 'svar_capture <variable> <command> [args]... - capture a command\'s output and place it into an svar, removing newlines\n', FCVAR_DONTRECORD, function(args) {
+
+	CON_COMMAND_F('cond', 'cond <condition> <command> [args]... - runs a command only if a given condition is met\n', FCVAR_DONTRECORD, function(args) {
 		if (args.length < 3) {
-			return src.__.tooFewArgs(args);
-		}
-		
-		let cmd = args.length == 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]);
-			
-		// Console reading - use the buffer
-		sar.capture.target = args[1];
-		sar.capture.len = src.con.buffer.length;
-		src.cmd.getConvar('_sar_svar_capture_stop').flags &= ~FCVAR_HIDDEN;
-		src.cmd.executeCommand('_sar_svar_capture_stop');
-		src.cmd.executeCommand(cmd);
-	});
-
-	CON_COMMAND_F('svar_persist', 'svar_persist <variable> - mark an svar as persistent\n', FCVAR_DONTRECORD, function(args) {
-		if (args.length !== 2) {
-			return sar.printHelp(args);
-		}
-		if (!~sar.persistentSvars.indexOf(args[1])) {
-			sar.persistentSvars.push(args[1]);
-		}
-		sar.SavePersistentSvars();
-	});
-
-	CON_COMMAND_F('svar_no_persist', 'svar_no_persist <variable> - unmark an svar as persistent\n', FCVAR_DONTRECORD, function(args) {
-		if (args.length !== 2) {
-			return sar.printHelp(args);
-		}
-		sar.persistentSvars = sar.persistentSvars.filter(e => e !== args[1]);
-		sar.SavePersistentSvars();
-	});
-
-	{
-		let SVAR_OP = function(name, op, disallowSecondZero = false) {
-			CON_COMMAND_F(`svar_${name}`, `svar_${name} <variable> <variable|value> - perform the given operation on an svar\n`, FCVAR_DONTRECORD, function(args) {
-				if (args.length !== 3) {
-					return sar.printHelp(args);
-				}
-				let pInt = (x) => sar.atoi(x);
-				let cur = sar.svars.hasOwnProperty(args[1]) ? pInt(sar.svars[args[1]]) : 0;
-				let other = sar.svars.hasOwnProperty(args[2]) ? pInt(sar.svars[args[2]]) : pInt(args[2]);
-				sar.SetSvar(args[1], (disallowSecondZero && other === 0) ? 0 : sar.signedint(eval(`cur ${op} other`)));
-			});
-		};
-		
-		SVAR_OP('add', '+');
-		SVAR_OP('sub', '-');
-		SVAR_OP('mul', '*');
-		SVAR_OP('div', '/', true);
-		SVAR_OP('mod', '%', true);
-	}
-} // svar operations
-
-{ // sar_on_things
-	let MK_SAR_ON = function(name, when, immediately) {
-		sar.event_execs[name] = [];
-		CON_COMMAND_F(`sar_on_${name}`, `sar_on_${name} <command> [args]... - registers a command to be run ${when}\n`, FCVAR_DONTRECORD, function(args) {
-			if (args.length < 2) {
-				return sar.printHelp(args);
-			}
-			let cmd = args.length === 2 ? args[1] : args.cmdStr.slice(args.argLengthS[0]);
-			sar.event_execs[name].push(cmd);
-		});
-		CON_COMMAND_F(`sar_on_${name}_clear`, `sar_on_${name}_clear - clears commands registered on event "${name}"\n`, FCVAR_DONTRECORD, function(args) {
-			sar.println(`Cleared ${sar.event_execs[name].length} commands from event "${name}"\n`);
-			sar.event_execs[name] = [];
-		});
-	}
-	
-	MK_SAR_ON('load',              'on session start',                   true);
-	MK_SAR_ON('session_end',       'on session end',                     true);
-	MK_SAR_ON('exit',              'on game exit',                       true);
-	MK_SAR_ON('demo_start',        'when demo playback starts',          false);
-	MK_SAR_ON('demo_stop',         'when demo playback stops',           false);
-	MK_SAR_ON('flags',             'when CM flags are hit',              false);
-	MK_SAR_ON('coop_reset_done',   'when coop reset is completed',       false);
-	MK_SAR_ON('coop_reset_remote', 'when coop reset run remotely',       false);
-	MK_SAR_ON('coop_spawn',        'on coop spawn',                      true);
-	MK_SAR_ON('config_exec',       'on config.cfg exec',                 true);
-	MK_SAR_ON('tas_start',         'when TAS script playback starts',    true);
-	MK_SAR_ON('tas_end',           'when TAS script playback ends',      true);
-	MK_SAR_ON('pb',                'when auto-submitter detects PB',     true);
-	MK_SAR_ON('not_pb',            'when auto-submitter detects not PB', true);
-	
-	// Since I can't simulate the entire game, here's these commands to test map loads or whatevs
-	CON_COMMAND('__do_event', '__do_event <event> - Executes a faux event (e.g. "__do_event load" runs sar_on_load commands)\n', function(args) {
-		if (args.length !== 2) {
-			return sar.printHelp(args);
-		}
-		if (!sar.event_execs[args[1]]) {
-			return src.con.err(`Event "${args[1]}" does not exist.\n`);
-		}
-		
-		for (let exec of sar.event_execs[args[1]]) {
-			src.cmd.executeCommand(exec);
-		}
-	}, function(args) {
-		if (args.length === 1) return Object.keys(sar.event_execs);
-		if (args.length === 2) return Object.keys(sar.event_execs).filter(e => ~e.indexOf(args[1]));
-	});
-	
-	sar.hasConfigExeced = false;
-	src.cmd.getConvar('exec').callback = function(args) {
-		src.cfg.exec(args, false);
-		if (args[1] === 'config.cfg' && !sar.hasConfigExeced) {
-			sar.hasConfigExeced = true;
-			for (let exec of sar.event_execs['config_exec']) {
-				src.cmd.executeCommand(exec);
-			}
-		}
-	}
-}
-
-{ // functions / aliases
-	CON_COMMAND_F('sar_function', 'sar_function <name> [command] [args]... - create a function, replacing $1, $2 etc up to $9 in the command string with the respective argument. If no command is specified, prints the given function\n', FCVAR_DONTRECORD, function(args) {
-		if (args.length < 2) {
 			return sar.printHelp(args);
 		}
 		
-		let func = sar.functions.find(e => e.name.toLowerCase() === args[1].toLowerCase());
-		
-		if (args.length === 2) {
-			if (func) {
-				sar.println(`${func.cmd}\n`);
-			} else {
-				sar.println(`Function ${args[1]} does not exist\n`);
-			}
-			return;
+		let cond_str = args[1];
+		let cond = sar.cond.parse(cond_str);
+		if (!cond) {
+			return sar.println(`Condition parsing of "${cond_str}" failed\n`);
 		}
-		
-		let cmd = args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]);
-		
-		if (func) {
-			func.cmd = cmd;
-		} else {
-			if (src.cmd.getConvar(args[1])) {
-				return sar.println(`Command ${args[1]} already exists! Cannot shadow.\n`);
-			}
-			CON_COMMAND(args[1], 'SAR function command.\n', function(args) {
-				src.cmd.executeCommand(`sar_function_run ${args.cmdStr}`);
-			});
-			sar.functions.push({
-				name: args[1],
-				cmd: cmd
-			});
-		}
+		let should_run = sar.cond.eval(cond);
+		if (!should_run) return;
+		src.cmd.executeCommand(args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]));
 	});
+} // cond
 
-	CON_COMMAND_F('sar_function_run', 'sar_function_run <name> [args]... - run a function with the given arguments\n', FCVAR_DONTRECORD, function(args) {
-		if (args.length < 2) {
-			return sar.printHelp(args);
-		}
-		let it = sar.functions.find(e => e.name.toLowerCase() === args[1].toLowerCase());
-		if (!it) return src.con.err(`Function ${args[1]} does not exist\n`);
-		src.cmd.executeCommand(sar.expand(it.cmd, args).out);
-	});
-
-	CON_COMMAND_F('sar_expand', 'sar_expand [cmd]... - run a command after expanding svar substitutions\n', FCVAR_DONTRECORD, function(args) {
-		if (args.length < 2) {
-			return sar.printHelp(args);
-		}
-		let cmd = args.length === 2 ? args[1] : args.cmdStr.slice(args.argLengthS[0]);
-		src.cmd.executeCommand(sar.expand(cmd, []).out);
-	})
-
-	CON_COMMAND_F('sar_alias', 'sar_alias <name> [command] [args]... - create an alias, similar to the \'alias\' command but not requiring quoting. If no command is specified, prints the given alias\n', FCVAR_DONTRECORD, function(args) {
-		if (args.length < 2) {
-			return sar.printHelp(args);
-		}
-		
-		let alias = sar.aliases.find(e => e.name.toLowerCase() === args[1].toLowerCase());
-		
-		if (args.length === 2) {
-			if (alias) {
-				sar.println(`${alias.cmd}\n`);
-			} else {
-				sar.println(`Alias ${args[1]} does not exist\n`);
-			}
-			return;
-		}
-		
-		let cmd = args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]);
-		
-		// TODO: Work with __delete
-		if (alias) {
-			alias.cmd = cmd;
-		} else {
-			if (src.cmd.getConvar(args[1])) {
-				return sar.println(`Command ${args[1]} already exists! Cannot shadow.\n`);
-			}
-			CON_COMMAND(args[1], 'SAR alias command.\n', function(args) {
-				src.cmd.executeCommand(`sar_alias_run ${args.cmdStr}`);
-			});
-			sar.aliases.push({
-				name: args[1],
-				cmd: cmd
-			});
-		}
-	});
-
-	CON_COMMAND('sar_alias_run', 'sar_alias_run <name> [args]... - run a SAR alias, passing on any additional arguments\n', function(args) {
-		if (args.length < 2) {
-			return sar.printHelp(args);
-		}
-		let it = sar.aliases.find(e => e.name.toLowerCase() === args[1].toLowerCase());
-		if (!it) return src.con.err(`Alias ${args[1]} does not exist\n`);
-		src.cmd.executeCommand(`${it.cmd} ${args.cmdStr.slice(args.argLengthS[1])}`);
-	});
-
-}
-
-CON_COMMAND_F('cond', 'cond <condition> <command> [args]... - runs a command only if a given condition is met\n', FCVAR_DONTRECORD, function(args) {
-	if (args.length < 3) {
-		return sar.printHelp(args);
-	}
-	
-	let cond_str = args[1];
-	let cond = sar.cond.parse(cond_str);
-	if (!cond) {
-		return sar.println(`Condition parsing of "${cond_str}" failed\n`);
-	}
-	let should_run = sar.cond.eval(cond);
-	if (!should_run) return;
-	src.cmd.executeCommand(args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]));
-});
 
 { // con filter
-	CON_CVAR('sar_con_filter', 0, 'Enable the console filter\n');
-	CON_CVAR('sar_con_filter_default', 0, 'Whether to allow text through the console filter by default');
-	CON_CVAR('sar_con_filter_suppress_blank_lines', 0, 'Whether to suppress blank lines in console\n');
+
+	sar.con = {
+		filters: [],
+		filtering: null,
+		
+		matches_filters: function(text) {
+			if (Number(src.cmd.cvar('sar_con_filter')) === 0) return true;
+			
+			if (this.filtering) {
+				let match = this.filtering.allow;
+				if (this.matches_filter(text, this.filtering.to)) {
+					let was_filtering = JSON.parse(JSON.stringify(this.filtering));
+					this.filtering = undefined;
+					src.con.log(`Finishing persistent filter rule from "${was_filtering.from}" to "${was_filtering.to}"\n`, 3, '#88FF88');
+				}
+				return match;
+			}
+			
+			for (let rule of this.filters) {
+				if (this.matches_filter(text, rule.from)) {
+					if (!this.matches_filter(text, rule.to)) {
+						src.con.log(`Starting persistent filter rule from "${rule.from}" to "${rule.to}"\n`, 3, '#88FF88');
+						this.filtering = rule;
+					}
+					return rule.allow;
+				}
+			}
+			return Number(src.cmd.cvar('sar_con_filter_default')) === 1;
+		},
+		
+		matches_filter: function(text, rule) {
+			return !rule
+				? true
+				: typeof text !== 'string'
+					? false
+					: rule[0] === '^' && rule[rule.length - 1] === '$'
+						? rule.slice(1, -1) === text
+						: rule[0] === '^'
+							? text.startsWith(rule.slice(1))
+							: rule[rule.length - 1] === '$'
+								? text.endsWith(rule.slice(0, -1))
+								: ~text.indexOf(rule);
+		}
+	};
+
+	CON_CVAR('sar_con_filter', 0, 'Enable the console filter\n', FCVAR_NONE, 0, 1);
+	CON_CVAR('sar_con_filter_default', 0, 'Whether to allow text through the console filter by default', FCVAR_NONE, 0, 1);
+	CON_CVAR('sar_con_filter_suppress_blank_lines', 0, 'Whether to suppress blank lines in console\n', FCVAR_NONE, 0, 1);
 	CON_COMMAND('sar_con_filter_allow', 'sar_con_filter_allow <string> [end] - add an allow rule to the console filter, allowing until \'end\' is matched\n', function(args) {
 		if (args.length < 2 || args.length > 3) {
 			return sar.printHelp(args);
@@ -1206,17 +1238,17 @@ CON_COMMAND('sar_update', 'sar_update [release|pre] [exit] [force] - update SAR 
 					},
 					rule('02', '003',  336,   432,  100),
 					rule('03', '003', -2400, -2080, 100),
-					rule('04', '003', -2400,  416, 200),
-					rule('06', '004',  1952,  208, 100),
+					rule('04', '003', -2400,  416,  200),
+					rule('06', '004',  1952,  208,  100),
 					rule('07', '004',  4864,  6784, 100),
 					rule('09', '005',  160,  -1472, 100),
-					rule('11', '006', -2816, -288, 100),
-					rule('13', '007',  544,  -320, 100),
+					rule('11', '006', -2816, -288,  100),
+					rule('13', '007',  544,  -320,  100),
 					rule('14', '007', -1472, -1312, 100),
 					rule('16', '008', -608,   1024, 676),
 					rule('17', '008',  4096,  6528, 676),
 					rule('19', '009', -2048, -3488, 548),
-					rule('21', '010',  1344,  288, 260),
+					rule('21', '010',  1344,  288,  260),
 					rule('23', '011', -2336, -2944, 484)
 				];
 			}
@@ -1392,6 +1424,7 @@ sar_speedrun_smartsplit
 sar_autorecord
 sar_record_prefix
 sar_speedrun_autostop
+sar_speedrun_reset
 sar_challenge_autostop
 sar_fast_load_preset
 sar_cm_rightwarp
@@ -1443,7 +1476,7 @@ CON_COMMAND('sar_about', 'sar_about - prints info about SAR plugin\n', function(
 
 sar.println(`Loaded SourceAutoRecord, Version ${sar.version}\n`, undefined, '#55CC55');
 
-// CON_COMMAND_HOOK('map', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents.load()});
-// CON_COMMAND_HOOK('changelevel', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents.load()});
-// CON_COMMAND_HOOK('restart', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents.load()});
-// CON_COMMAND_HOOK('restart_level', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents.load()});
+CON_COMMAND_HOOK('map', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents('load')});
+CON_COMMAND_HOOK('changelevel', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents('load')});
+CON_COMMAND_HOOK('restart', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents('load')});
+CON_COMMAND_HOOK('restart_level', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents('load')});
