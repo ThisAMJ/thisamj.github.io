@@ -528,7 +528,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 	};
 	CON_COMMAND_F('_sar_svar_capture_stop', 'Internal SAR command. Do not use\n', FCVAR_DONTRECORD | FCVAR_HIDDEN, function(args) {
 		let out = src.con.buffer.slice(sar.capture.len); // Get the console buffer since capture
-		out = out.filter(e => e[1] <= src.cmd.cvar('developer')); // Filter to developer level
+		out = out.filter(e => e[1] <= Math.min(2, Number(src.cmd.cvar('developer')))); // Filter to developer level
 		out = out.map(e => e[0]); // Get the text components
 		out = out.join(''); // Squish into one string
 		out = out.replace(/\n/g, ''); // Remove newlines
@@ -1043,9 +1043,8 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 				display = true;
 			} else if (line.trim() != '' && line.trim() != '\n') {
 				line += '\n';
-				debugLevel = 3;
 				color = '#888888';
-				display = true;
+				display = Number(src.cmd.cvar('developer')) >= 3;
 			}
 			// if (line == '\n') continue;
 			// console.log([line, debugLevel, color, false, display]);
