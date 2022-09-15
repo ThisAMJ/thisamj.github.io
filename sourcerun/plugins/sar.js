@@ -1447,6 +1447,11 @@ CON_COMMAND('sar_disable_coop_score_hud');
 CON_COMMAND('sar_demo_blacklist_all');
 CON_COMMAND('sar_disable_no_focus_sleep');
 
+CON_COMMAND('sar_session', 'sar_session - prints the current tick of the server since it has loaded\n', function(args) {
+	sar.println(`Session Tick: ${sar.ticks} (${(sar.ticks / 60).toFixed(3)})\n`);
+	// TODO: Demo Recorder / Player
+});
+
 CON_COMMAND('sar_about', 'sar_about - prints info about SAR plugin\n', function(args) {
 	let gamestr = 'Unknown';
 	switch (src.game.str) {
