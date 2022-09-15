@@ -149,7 +149,7 @@ const sar = {
 			return out;
 		},
 		draw: function() {
-			sar.ticks = (sar.ticks + 1) % 600;
+			sar.ticks += 1;
 			if (!this.output) return false;
 			let hud_elements = {}, out = [], tmp, tmp2 = (0).toFixed(this.getPrecision()), tmp3 = (0).toFixed(this.getPrecision(true));
 			
@@ -174,7 +174,7 @@ const sar = {
 				if (hud_elements[ele]) out.push(...typeof hud_elements[ele] === 'string' ? hud_elements[ele].split('\n') : hud_elements[ele]);
 			}
 			
-			let color = sar.hud.rainbow ? `${hsvToRgb(sar.ticks / 600).join(' ')} 255` : src.cmd.cvar('sar_hud_font_color');
+			let color = sar.hud.rainbow ? `${hsvToRgb((sar.ticks % 600) / 600).join(' ')} 255` : src.cmd.cvar('sar_hud_font_color');
 			color = color.replace(/  */g, ' ').split(' ');
 			if (color.length !== 4) color = ['255', '255', '255', '255'];
 			color[3] /= 255;
