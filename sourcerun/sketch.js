@@ -70,8 +70,12 @@ function newCFG() {
 	viewCFG(name);
 }
 
-function addCFG(name, content) {
-	src.cfg.set(name, content);
+src.cfg.set = function(name, value = '') {
+	addCFG(name, value)
+}
+
+function addCFG(name, value) {
+	src.cfg.cfgs[name] = value;
 	for (let child of q('cfg-tabs').childNodes) {
 		if (child.innerText === name) return;
 	}
