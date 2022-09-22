@@ -1409,6 +1409,7 @@ sar_hud_x
 sar_hud_y
 sar_hud_spacing
 sar_hud_bg
+sar_hud_orange_only
 sar_toast_tag_set_color
 sar_record_at_demo_name
 sar_record_at
