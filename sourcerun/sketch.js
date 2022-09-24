@@ -88,41 +88,45 @@ function addCFG(name, value) {
 	q('cfg-tabs').appendChild(btn);
 	q('remove-cfg').hidden = false;
 	saveCFG();
+
+	if (q('cfg-tabs').childElementCount == 1) {
+		viewCFG(name)
+	}
 }
 
 function editCFG() {
 	if (viewedCFG === null) {
-		addCFG('autoexec', q('cfg-content').innerText);
-		viewCFG('autoexec');
+		addCFG('autoexec', '');
 	}
 	src.cfg.set(viewedCFG, q('cfg-content').innerText);
 	saveCFG();
 }
 
-function removeCFG() {
-	if (src.cfg.cfgs.hasOwnProperty(viewedCFG)) {
-		let tabs = q('cfg-tabs');
-		
-		let i = 0;
+src.cfg.remove = function(name) {
+	let tabs = q('cfg-tabs');
+	if (src.cfg.cfgs.hasOwnProperty(name)) {
 		for (let child of tabs.childNodes) {
-			if (child.innerText === viewedCFG) {
+			if (child.innerText === name) {
 				tabs.removeChild(child);
 				break;
 			}
-			i++;
-		}
-
-		delete src.cfg.cfgs[viewedCFG];
-		saveCFG();
-		
-		if (tabs.firstChild) {
-			viewCFG(tabs.firstChild.innerText);
-		} else {
-			viewedCFG = null;
-			q('cfg-content').innerText = '';
-			q('remove-cfg').hidden = true;
 		}
 	}
+	delete src.cfg.cfgs[name];
+	saveCFG();
+
+	if (name == viewedCFG && tabs.firstChild) {
+		viewCFG(tabs.firstChild.innerText);
+	}
+	if (!tabs.firstChild) {
+		viewedCFG = null;
+		q('cfg-content').innerText = '';
+		q('remove-cfg').hidden = true;
+	}
+}
+
+function removeCFG() {
+	src.cfg.remove(viewedCFG);
 }
 
 function viewCFG(name) {

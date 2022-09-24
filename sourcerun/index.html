@@ -8,6 +8,7 @@
 		<link rel="stylesheet" href="stylesheet.css">
 		<script src="../lib/prototypes.js"></script>
 		<script src="../lib/source.js"></script>
+		<script src="examples.js"></script>
 		<script src="sketch.js"></script>
 	</head>
 	<body>
@@ -31,6 +32,12 @@
 				<div class="width-full content-tab-left" id="content-tab-left-cfg">
 				
 					<button onclick="runSelected()">Run Selected CFG</button>
+					<select name="cfg-example" id="cfg-example">
+						<option selected>Use Example</option>
+						<option>(Warning: Will erase current cfg)</option>
+						<option onclick="examples[0].run()">srconfigs</option>
+						<option onclick="examples[1].run()">SARtris Classic</option>
+					</select>
 					
 					<!-- TODO: Tree view of cfg -->
 					<div class="width-full nav">
