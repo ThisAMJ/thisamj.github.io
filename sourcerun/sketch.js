@@ -23,13 +23,12 @@ function changeGame(live = true) {
 	localStorage.setItem('game', q('game-select').value);
 }
 
-function bindKeyPress(ev, down) {
-	src.key[down ? 'down' : 'up'](ev);
+function bindKeyPress(event, down) {
+	src.key.keyPress(event, down);
 	q('bindarea').value = src.key.list.pressed.join(' ');
 }
 
 // TODO: Tab/arrow keys autocomplete
-window.addEventListener('load', () => q('liveconsole').allowTab());
 function consoleKeyPress(ev, down) {
 	if (down) {
 		switch (ev.key) {
@@ -156,6 +155,7 @@ window.addEventListener('load', async function() {
 	});
 	src.con.output = q('console');
 	
+	q('liveconsole').allowTab()
 	q('cfg-content').allowTab();
 	
 	let cfgs = JSON.parse(localStorage.getItem('cfgs') || '{}');
@@ -168,3 +168,13 @@ window.addEventListener('load', async function() {
 	changeTab('left',  localStorage.getItem('leftTab')  || 'cfg');
 	changeTab('right', localStorage.getItem('rightTab') || 'con');
 });
+
+
+src.tick.call = function() {
+	if (src.tick.last !== null) {
+		document.getElementById('stats-ticktime').innerText = (Date.now() - src.tick.last).toString() + "ms per tick";
+	}
+	src.tick.last = Date.now();
+	src.tick.__call();
+	requestAnimationFrame(src.tick.call);
+}
