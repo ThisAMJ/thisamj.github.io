@@ -28,6 +28,13 @@ function bindKeyPress(event, down) {
 	q('bindarea').value = src.key.list.pressed.join(' ');
 }
 
+function selectExample() {
+	let example = q('cfg-example').value;
+	if (example >= 0) {
+		examples[example].run();
+	}
+}
+
 // TODO: Tab/arrow keys autocomplete
 function consoleKeyPress(ev, down) {
 	if (down) {

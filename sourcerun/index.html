@@ -32,11 +32,11 @@
 				<div class="width-full content-tab-left" id="content-tab-left-cfg">
 				
 					<button onclick="runSelected()">Run Selected CFG</button>
-					<select name="cfg-example" id="cfg-example">
-						<option selected>Use Example</option>
+					<select name="cfg-example" id="cfg-example" onchange="selectExample()">
+						<option>Use Example</option>
 						<option>(Warning: Will erase current cfg)</option>
-						<option onclick="examples[0].run()">srconfigs</option>
-						<option onclick="examples[1].run()">SARtris Classic</option>
+						<option value="0">srconfigs</option>
+						<option value="1">SARtris Classic</option>
 					</select>
 					
 					<!-- TODO: Tree view of cfg -->
