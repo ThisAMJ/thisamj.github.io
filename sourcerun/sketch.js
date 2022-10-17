@@ -174,6 +174,11 @@ window.addEventListener('load', async function() {
 	changeGame(false);
 	changeTab('left',  localStorage.getItem('leftTab')  || 'cfg');
 	changeTab('right', localStorage.getItem('rightTab') || 'con');
+	
+	let params = new URLSearchParams(window.location.search);
+	if (params.has('example')) {
+		if (examples[params.get('example')]) examples[params.get('example')].run();
+	}
 });
 
 
