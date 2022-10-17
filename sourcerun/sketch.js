@@ -177,7 +177,8 @@ window.addEventListener('load', async function() {
 	
 	let params = new URLSearchParams(window.location.search);
 	if (params.has('example')) {
-		if (examples[params.get('example')]) examples[params.get('example')].run();
+		let example = examples.find(e => e.name === params.get('example'));
+		if (example) example.run();
 	}
 });
 
