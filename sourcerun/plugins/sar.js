@@ -208,12 +208,16 @@ const sar = {
 				if (c == '+') {
 					sub = true;
 					i++;
-					let arg = Number(text[i + 1]);
-					i++;
-					while (parseInt(text[i + 1]) >= 0 && parseInt(text[i++]) <= 9) {
-						arg = arg * 10 + text[i];
+					if (parseInt(text[i + 1]) >= 1 && parseInt(text[i + 1]) <= 9) {
+						let arg = Number(text[i + 1]);
+						i++;
+						while (parseInt(text[i + 1]) >= 0 && parseInt(text[i++]) <= 9) {
+							arg = arg * 10 + text[i];
+						}
+						str += args.cmdStr.slice(args.argLengthS[arg - 1]);
+					} else {
+						str += '$+';
 					}
-					str += args.cmdStr.slice(args.argLengthS[arg]);
 					continue;
 				}
 				if (c >= 1 && c <= 9) {
@@ -223,12 +227,12 @@ const sar = {
 					while (parseInt(text[i + 1]) >= 0 && parseInt(text[i++]) <= 9) {
 						arg = arg * 10 + text[i];
 					}
-					if (args[arg + 1]) str += args[arg + 1];
+					if (args[arg]) str += args[arg];
 					continue;
 				}
 				if (c == '#') {
 					sub = true;
-					str += args.length - 2;
+					str += args.length - 1;
 					i++;
 					continue;
 				}
@@ -601,7 +605,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 			return src.con.err(`Event "${event}" does not exist.\n`);
 		}
 		for (let exec of sar.event_execs[event]) {
-			src.cmd.executeCommand(exec);
+			src.cmd.executeCommand(exec, true, true);
 		}
 	}
 
@@ -687,7 +691,9 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 				return sar.println(`Command ${args[1]} already exists! Cannot shadow.\n`);
 			}
 			CON_COMMAND(args[1], 'SAR function command.\n', function(args) {
-				src.cmd.executeCommand(`sar_function_run ${args.cmdStr}`);
+				let it = sar.functions.find(e => e.name.toLowerCase() === args[0].toLowerCase());
+				if (it) src.cmd.executeCommand(sar.expand(it.cmd, args).out);
+				// src.cmd.executeCommand(`sar_function_run ${args.cmdStr}`);
 			});
 			sar.functions.push({
 				name: args[1],
@@ -702,7 +708,14 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		}
 		let it = sar.functions.find(e => e.name.toLowerCase() === args[1].toLowerCase());
 		if (!it) return src.con.err(`Function ${args[1]} does not exist\n`);
-		src.cmd.executeCommand(sar.expand(it.cmd, args).out);
+		
+		let newargs = args.slice(1);
+		newargs.argc = args.argc - 1;
+		newargs.cmdStr = args.cmdStr.slice(args.argLength[0]);
+		newargs.argLength = args.argLength.slice(1);
+		newargs.argLengthS = args.argLengthS.slice(1);
+		
+		src.cmd.executeCommand(sar.expand(it.cmd, newargs).out);
 	});
 
 	CON_COMMAND_F('sar_expand', 'sar_expand [cmd]... - run a command after expanding svar substitutions\n', FCVAR_DONTRECORD, function(args) {
@@ -739,7 +752,9 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 				return sar.println(`Command ${args[1]} already exists! Cannot shadow.\n`);
 			}
 			CON_COMMAND(args[1], 'SAR alias command.\n', function(args) {
-				src.cmd.executeCommand(`sar_alias_run ${args.cmdStr}`);
+				let it = sar.aliases.find(e => e.name.toLowerCase() === args[0].toLowerCase());
+				if (it) src.cmd.executeCommand(`${it.cmd} ${args.cmdStr.slice(args.argLength[0])}`);
+				// src.cmd.executeCommand(`sar_alias_run ${args.cmdStr}`);
 			});
 			sar.aliases.push({
 				name: args[1],
@@ -782,7 +797,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 			switch (c.type) {
 				case this.conditions.ORANGE: return false;
 				case this.conditions.COOP: return src.maps.cur.startsWith('mp_coop_');
-				case this.conditions.CM: return src.cvar('sv_bonus_challenge') == 1;
+				case this.conditions.CM: return src.cmd.cvar('sv_bonus_challenge') == 1;
 				case this.conditions.SAME_MAP: return src.maps.cur == src.maps.history[0];
 				case this.conditions.WORKSHOP: return false;
 				case this.conditions.MENU: return src.maps.cur == '';
@@ -1440,7 +1455,24 @@ sar_toast_disable
 sar_toast_background
 sar_toast_compact
 sar_toast_font
-sar_toast_create`.replace(/\t/g, '').split('\n')) {
+sar_toast_create
+sar_timer_time_pauses
+sar_disable_steam_pause
+sar_dpi_scale
+sar_demo_remove_broken
+sar_ihud
+sar_ihud_button_color
+sar_ihud_y
+ghost_type
+ghost_sync
+ghost_name
+sar_trace_record
+sar_tas_stop
+sar_tas_play
+sar_tas_playback_rate
+sar_ihud_preset
+sar_trace_draw
+sar_trace_font_size`.replace(/\t/g, '').split('\n')) {
 	CON_COMMAND(cmd);
 }
 CON_COMMAND('sar_disable_coop_score_hud');
