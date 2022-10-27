@@ -72,8 +72,10 @@ function dispAutocompletions() {
 let viewedCFG = null;
 function newCFG() {
 	let name = prompt('CFG Name', 'autoexec').toLowerCase();
-	addCFG(name, src.cfg.cfgs[name] || '');
-	viewCFG(name);
+	if (name !== '') {
+		addCFG(name, src.cfg.cfgs[name] || '');
+		viewCFG(name);
+	}
 }
 
 src.cfg.set = function(name, value = '') {
