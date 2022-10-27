@@ -182,6 +182,8 @@ window.addEventListener('load', async function() {
 		let example = examples.find(e => e.name === params.get('example'));
 		if (example) example.run();
 	}
+	params.delete('example');
+	window.history.replaceState('', '', `${location.protocol}//${location.host}${location.pathname}${params.toString() === '' ? '' : ('?' + params.toString())}`);
 });
 
 
