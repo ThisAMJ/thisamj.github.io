@@ -80,7 +80,7 @@ src.cfg.set = function(name, value = '') {
 	addCFG(name, value)
 }
 
-function addCFG(name, value) {
+function addCFG(name, value, init = false) {
 	src.cfg.cfgs[name] = value;
 	for (let child of q('cfg-tabs').childNodes) {
 		if (child.innerText === name) return;
@@ -95,7 +95,7 @@ function addCFG(name, value) {
 	q('remove-cfg').hidden = false;
 	saveCFG();
 
-	if (q('cfg-tabs').childElementCount == 1) {
+	if (q('cfg-tabs').childElementCount == 1 && !init) {
 		viewCFG(name)
 	}
 }
@@ -167,7 +167,7 @@ window.addEventListener('load', async function() {
 	
 	let cfgs = JSON.parse(localStorage.getItem('cfgs') || '{}');
 	for (let cfg of Object.keys(cfgs)) {
-		addCFG(cfg, cfgs[cfg]);
+		addCFG(cfg, cfgs[cfg], true);
 	}
 	viewCFG(localStorage.getItem('cfgView') || 'autoexec');
 	
