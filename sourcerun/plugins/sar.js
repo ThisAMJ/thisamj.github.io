@@ -3,8 +3,8 @@
  */
  
 const sar = {
-	version: '1.12.8-pre1',
-	built: '22:52:20 Aug 26 2022',
+	version: '1.12.8-pre3',
+	built: '03:52:12 Oct 30 2022',
 	
 	category: {
 		current: '',
@@ -208,8 +208,8 @@ const sar = {
 				if (c == '+') {
 					sub = true;
 					i++;
-					if (parseInt(text[i + 1]) >= 1 && parseInt(text[i + 1]) <= 9) {
-						let arg = Number(text[i + 1]);
+					if (parseInt(text[i + 1]) >= 0 && parseInt(text[i + 1]) <= 9) {
+						let arg = parseInt(text[i + 1]);
 						i++;
 						while (parseInt(text[i + 1]) >= 0 && parseInt(text[i++]) <= 9) {
 							arg = arg * 10 + text[i];
@@ -220,9 +220,9 @@ const sar = {
 					}
 					continue;
 				}
-				if (c >= 1 && c <= 9) {
+				if (c >= 0 && c <= 9) {
 					sub = true;
-					let arg = Number(c);
+					let arg = parseInt(c);
 					i++;
 					while (parseInt(text[i + 1]) >= 0 && parseInt(text[i++]) <= 9) {
 						arg = arg * 10 + text[i];
@@ -338,13 +338,22 @@ const sar = {
 CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does nothing\n', FCVAR_DONTRECORD, () => {});
 
 { // hud
-	CON_CVAR('sar_hud_precision', 3);
-	CON_CVAR('sar_hud_velocity_precision', 2);
-	CON_CVAR('sar_hud_font_color', '255 255 255 255');
-	
 	sar.ticks = 0;
+
+	CON_CVAR('sar_hud_spacing', '1', 'Spacing between elements of HUD.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0);
+	CON_CVAR('sar_hud_x', '2', 'X padding of HUD.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0);
+	CON_CVAR('sar_hud_y', '2', 'Y padding of HUD.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0);
+	CON_CVAR('sar_hud_font_index', '0', 'Font index of HUD.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0);
+	CON_CVAR('sar_hud_font_color', '255 255 255 255', 'RGBA font color of HUD.\n', FCVAR_DONTRECORD);
+	
+	CON_CVAR('sar_hud_bg', '0', 'Enable the SAR HUD background.\n', FCVAR_NEVER_AS_STRING);
+	CON_CVAR('sar_hud_orange_only', '0', 'Only display the SAR HUD for orange, for solo coop (fullscreen PIP).\n', FCVAR_NEVER_AS_STRING);
+	
+	CON_CVAR('sar_hud_precision', '3', 'Precision of HUD numbers.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0);
+	CON_CVAR('sar_hud_velocity_precision', '2', 'Precision of velocity HUD numbers.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0);
+	
+	CON_CVAR('sar_hud_rainbow', -1, 'Enables the rainbow HUD mode. -1 = default, 0 = disable, 1 = enable.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, -1, 1);
 	sar.hud.rainbow = false;
-	CON_CVAR('sar_hud_rainbow', -1, 'Enables the rainbow HUD mode. -1 = default, 0 = disable, 1 = enable.\n', FCVAR_NONE, -1, 1);
 	if (new Date().getMonth() === 5) { // June
 		if (Math.floor(Math.random() * 50 + 1)) {
 			sar.hud.rainbow = true;
@@ -370,7 +379,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 	}
 	sar.hud.order = sar.hud.defaultorder;
 	
-	CON_COMMAND('sar_hud_set_text', 'sar_hud_set_text <id> <text>... - sets and shows the nth text value in the HUD\n', function(args) {
+	CON_COMMAND_F('sar_hud_set_text', 'sar_hud_set_text <id> <text>... - sets and shows the nth text value in the HUD\n', FCVAR_DONTRECORD, function(args) {
 		if (args.length < 3) {
 			return sar.printHelp(args);
 		}
@@ -392,7 +401,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		sar.hud.texts.push(component);
 	});
 	
-	CON_COMMAND('sar_hud_set_text_color', 'sar_hud_set_text_color <id> [color] - sets the color of the nth text value in the HUD. Reset by not giving color.\n', function(args) {
+	CON_COMMAND_F('sar_hud_set_text_color', 'sar_hud_set_text_color <id> [color] - sets the color of the nth text value in the HUD. Reset by not giving color.\n', FCVAR_DONTRECORD, function(args) {
 		if (args.length < 2 || args.length > 3) {
 			return sar.printHelp(args);
 		}
@@ -405,7 +414,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		}
 	});
 	
-	CON_COMMAND('sar_hud_show_text', 'sar_hud_show_text <id> - shows the nth text value in the HUD\n', function(args) {
+	CON_COMMAND_F('sar_hud_show_text', 'sar_hud_show_text <id> - shows the nth text value in the HUD\n', FCVAR_DONTRECORD, function(args) {
 		if (args.length < 2) {
 			return sar.printHelp(args);
 		}
@@ -416,7 +425,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		if (existing) existing.shown = true;
 	});
 
-	CON_COMMAND('sar_hud_hide_text', 'sar_hud_hide_text <id> - hides the nth text value in the HUD\n', function(args) {
+	CON_COMMAND_F('sar_hud_hide_text', 'sar_hud_hide_text <id> - hides the nth text value in the HUD\n', FCVAR_DONTRECORD, function(args) {
 		if (args.length < 2) {
 			return sar.printHelp(args);
 		}
@@ -427,7 +436,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		if (existing) existing.shown = false;
 	});
 	
-	CON_COMMAND('sar_hud_order_bottom', 'sar_hud_order_bottom <name> - orders hud element to bottom\n', function(args) {
+	CON_COMMAND_F('sar_hud_order_bottom', 'sar_hud_order_bottom <name> - orders hud element to bottom\n', FCVAR_DONTRECORD, function(args) {
 		if (args.length !== 2) {
 			return sar.println(`Set!\n`);
 		}
@@ -441,7 +450,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		sar.println(`Moved HUD element ${args[1]} to bottom.\n`)
 	}, sar.hud.ordercompletion);
 
-	CON_COMMAND('sar_hud_order_top', 'sar_hud_order_top <name> - orders hud element to top\n', function(args) {
+	CON_COMMAND_F('sar_hud_order_top', 'sar_hud_order_top <name> - orders hud element to top\n', FCVAR_DONTRECORD, function(args) {
 		if (args.length !== 2) {
 			return sar.println(`Orders hud element to top: sar_hud_order_top <name>\n`);
 		}
@@ -455,11 +464,136 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		sar.println(`Moved HUD element ${args[1]} to top.\n`)
 	}, sar.hud.ordercompletion);
 	
-	CON_COMMAND('sar_hud_order_reset', 'sar_hud_order_reset - resets order of hud element\n', function(args) {
+	CON_COMMAND_F('sar_hud_order_reset', 'sar_hud_order_reset - resets order of hud element\n', FCVAR_DONTRECORD, function(args) {
 		sar.hud.order = sar.hud.defaultorder;
 		sar.println(`Reset default HUD element order!\n`);
 	});
+	
+	CON_COMMAND_F('sar_pip_align', 'sar_pip_align <top|center|bottom> <left|center|right> - aligns the remote view.\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 3) {
+			return sar.printHelp(args);
+		}
+		let sw = window.outerWidth, sh = window.outerHeight;
+		let scale = Number(src.cmd.getConvar('ss_pipscale').value);
+		let w = sw * scale, h = sh * scale, x, y;
+		
+		if (args[1].toLowerCase() === 'top') {
+			y = sh - h - 25;
+		} else if (args[1].toLowerCase() === 'center') {
+			y = (sh - h) / 2;
+		} else if (args[1].toLowerCase() === 'bottom') {
+			y = 25;
+		} else {
+			return sar.printHelp(args);
+		}
+		
+		if (args[1].toLowerCase() === 'left') {
+			x = sw - w - 25;
+		} else if (args[1].toLowerCase() === 'center') {
+			x = (sw - w) / 2;
+		} else if (args[1].toLowerCase() === 'right') {
+			x = 25;
+		} else {
+			return sar.printHelp(args);
+		}
+		
+		src.cmd.getConvar('ss_pip_right_offset').value = x;
+		src.cmd.getConvar('ss_pip_bottom_offset').value = y;
+	});
 } // hud
+
+{ // toasts
+	let TOAST_GAP = 10, LINE_PAD = 6, COMPACT_TOAST_PAD = 2, SIDE_PAD = 6, COMPACT_SIDE_PAD = 3, SLIDE_RATE = 200, FADE_TIME = 300;
+	CON_CVAR('sar_toast_disable', '0', 'Disable all toasts from showing.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD);
+	CON_CVAR('sar_toast_font', '6', 'The font index to use for toasts.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0);
+	CON_CVAR('sar_toast_width', '250', 'The maximum width for toasts.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 2 * SIDE_PAD + 10);
+	CON_CVAR('sar_toast_x', TOAST_GAP, 'The horizontal position of the toasts HUD.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0);
+	CON_CVAR('sar_toast_y', TOAST_GAP, 'The vertical position of the toasts HUD.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0);
+	CON_CVAR('sar_toast_align', '0', 'The side to align toasts to horizontally. 0 = left, 1 = center, 2 = right.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0, 2);
+	CON_CVAR('sar_toast_anchor', '1', 'Where to put new toasts. 0 = bottom, 1 = top.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0, 1);
+	CON_CVAR('sar_toast_compact', '0', 'Enables a compact form of the toasts HUD.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD);
+	CON_CVAR('sar_toast_background', '1', 'Sets the background highlight for toasts. 0 = no background, 1 = text width only, 2 = full width.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0, 2);
+	CON_CVAR('sar_toast_net_disable', '0', 'Disable network toasts.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD);
+	CON_COMMAND_F('sar_toast_tag_set_color', 'sar_toast_tag_set_color <tag> <color> - set the color of the specified toast tag to an sRGB color\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 3 && args.length !== 5) {
+			return sar.printHelp(args);
+		}
+		
+		let tag = args[1];
+		// ...
+	});
+	CON_COMMAND_F('sar_toast_tag_set_duration', 'sar_toast_tag_set_duration <tag> <duration> - set the duration of the specified toast tag in seconds. The duration may be given as \'forever\'\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 3) {
+			return sar.printHelp(args);
+		}
+		
+		let tag = args[1];
+		// ...
+	});
+	CON_COMMAND_F('sar_toast_tag_dismiss_all', 'sar_toast_tag_dismiss_all <tag> - dismiss all active toasts with the given tag\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 2) {
+			return sar.printHelp(args);
+		}
+		
+		let tag = args[1];
+		// ...
+	});
+	CON_COMMAND_F('sar_toast_setpos', 'sar_toast_setpos <bottom|top> <left|center|right> - set the position of the toasts HUD\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 3) {
+			return sar.printHelp(args);
+		}
+		
+		let screenWidth = window.outerWidth, screenHeight = window.outerHeight;
+		
+		if (args[1] === 'bottom') {
+			src.cmd.getConvar('sar_toast_anchor').value = 0;
+			src.cmd.getConvar('sar_toast_y').value = screenHeight - TOAST_GAP;
+		} else {
+			src.cmd.getConvar('sar_toast_anchor').value = 1;
+			src.cmd.getConvar('sar_toast_y').value = TOAST_GAP;
+		}
+		
+		if (args[2] === 'left') {
+			src.cmd.getConvar('sar_toast_align').value = 0;
+			src.cmd.getConvar('sar_toast_x').value = TOAST_GAP;
+		} else if (args[2] === 'center') {
+			src.cmd.getConvar('sar_toast_align').value = 1;
+			src.cmd.getConvar('sar_toast_x').value = (screenWidth - parseInt(src.cmd.getConvar('sar_toast_width').value)) / 2;
+		} else {
+			src.cmd.getConvar('sar_toast_align').value = 2;
+			src.cmd.getConvar('sar_toast_x').value = screenWidth - parseInt(src.cmd.getConvar('sar_toast_width').value) - TOAST_GAP;
+			
+		}
+	});
+	CON_COMMAND_F('sar_toast_create', 'sar_toast_create <tag> <text> - create a toast\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 3) {
+			return sar.printHelp(args);
+		}
+	});
+	CON_COMMAND_F('sar_toast_net_create', 'sar_toast_net_create <tag> <text> - create a toast, also sending it to your coop partner\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 3) {
+			return sar.printHelp(args);
+		}
+	});
+	CON_COMMAND_F('sar_toast_dismiss_all', 'sar_toast_dismiss_all - dismiss all active toasts\n', FCVAR_DONTRECORD, function(args) {
+		
+	});
+} // toasts
+
+{
+		CON_CVAR('sar_record_at', '-1', 'Start recording a demo at the tick specified. Will use sar_record_at_demo_name.\n', FCVAR_NONE, -1);
+		CON_CVAR('sar_record_at_demo_name', 'chamber', 'Name of the demo automatically recorded.\n');
+		CON_CVAR('sar_record_at_increment', '0', 'Increment automatically the demo name.\n', FCVAR_NEVER_AS_STRING);
+		
+		CON_CVAR('sar_pause_at', '-1', 'Pause at the specified tick. -1 to deactivate it.\n', FCVAR_NEVER_AS_STRING, -1);
+		CON_CVAR('sar_pause_for', '0', 'Pause for this amount of ticks.\n', FCVAR_NEVER_AS_STRING, 0);
+		
+		CON_CVAR('sar_tick_debug', '0', 'Output debugging information to the console related to ticks and frames.\n', FCVAR_NEVER_AS_STRING, 0, 3);
+		
+		CON_CVAR('sar_cm_rightwarp', '0', 'Fix CM wrongwarp.\n', FCVAR_NEVER_AS_STRING);
+		
+		CON_CVAR('sar_bink_respect_host_time', '1', 'Make BINK video playback respect host time.\n', FCVAR_NEVER_AS_STRING);
+}
 
 { // svar operations
 
@@ -586,6 +720,16 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 				let other = sar.svars.hasOwnProperty(args[2]) ? pInt(sar.svars[args[2]]) : pInt(args[2]);
 				sar.SetSvar(args[1], (disallowSecondZero && other === 0) ? 0 : sar.signedint(eval(`cur ${op} other`)));
 			});
+			CON_COMMAND_F(`svar_f${name}`, `svar_f${name} <variable> <variable|value> - perform the given operation on an svar\n`, FCVAR_DONTRECORD, function(args) {
+				if (args.length !== 3) {
+					return sar.printHelp(args);
+				}
+				let cur = sar.svars.hasOwnProperty(args[1]) ? Number(sar.svars[args[1]]) : 0;
+				let other = sar.svars.hasOwnProperty(args[2]) ? Number(sar.svars[args[2]]) : Number(args[2]);
+				if (isNaN(cur)) cur = 0;
+				if (isNaN(other)) other = 0;
+				sar.SetSvar(args[1], (disallowSecondZero && other === 0) ? 0 : eval(`cur ${op} other`));
+			});
 		};
 		
 		SVAR_OP('add', '+');
@@ -593,6 +737,23 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		SVAR_OP('mul', '*');
 		SVAR_OP('div', '/', true);
 		SVAR_OP('mod', '%', true);
+		
+		let SVAR_SINGLE_OP = function(name, op) {
+			CON_COMMAND_F(`svar_${name}`, `svar_${name} <variable> - perform the given operation on an svar`, FCVAR_DONTRECORD, function(args) {
+				if (args.length !== 2) {
+					return sar.printHelp(args);
+				}
+				let cur = sar.svars.hasOwnProperty(args[1]) ? Number(sar.svars[args[1]]) : 0;
+				if (isNaN(cur)) cur = 0;
+				sar.SetSvar(args[1], eval(op));
+			});
+		};
+		
+		SVAR_SINGLE_OP('round', 'Math.round(cur)');
+		SVAR_SINGLE_OP('floor', 'Math.floor(cur)');
+		SVAR_SINGLE_OP('ceil', 'Math.ceil(cur)');
+		SVAR_SINGLE_OP('abs', 'Math.abs(cur)');
+		
 	}
 } // svar operations
 
@@ -621,6 +782,12 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		CON_COMMAND_F(`sar_on_${name}_clear`, `sar_on_${name}_clear - clears commands registered on event "${name}"\n`, FCVAR_DONTRECORD, function(args) {
 			sar.println(`Cleared ${sar.event_execs[name].length} commands from event "${name}"\n`);
 			sar.event_execs[name] = [];
+		});
+		CON_COMMAND_F(`sar_on_${name}_list`, `sar_on_${name}_list - lists commands registered on event "${name}"\n`, FCVAR_DONTRECORD, function(args) {
+			sar.println(`${sar.event_execs[name].length} commands on event "${name}"\n`);
+			for (let cmd of sar.event_execs[name]) {
+				sar.println(`${cmd}\n`);
+			}
 		});
 	}
 	
@@ -976,8 +1143,32 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		if (!should_run) return;
 		src.cmd.executeCommand(args.length === 3 ? args[2] : args.cmdStr.slice(args.argLengthS[1]));
 	});
+	
+	CON_COMMAND_F('conds', 'conds [<condition> <command>]... [else] - runs the first command which has a satisfied condition\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length < 2) {
+			return sar.printHelp(args);
+		}
+		
+		let i = 1;
+		while (i < args.length) {
+			if (i === args.length - 1) {
+				// else
+				return src.cmd.executeCommand(args[i], true);
+			}
+			
+			let cond_str = args[i];
+			let cond = sar.cond.parse(cond_str);
+			if (!cond) {
+				return sar.println(`Condition parsing of "${cond_str}" failed\n`);
+			}
+			let should_run = sar.cond.eval(cond);
+			if (should_run) {
+				return src.cmd.executeCommand(args[i + 1], true);
+			}
+			i += 2;
+		}
+	});
 } // cond
-
 
 { // con filter
 
@@ -1107,6 +1298,47 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		src.con.log(str, 0, col);
 	});
 }
+
+{ // ihud
+	CON_CVAR('sar_ihud', '0', 'Enables or disables movement inputs HUD of client.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0, 1);
+	CON_CVAR('sar_ihud_x', '2', 'X position of input HUD.\n', FCVAR_DONTRECORD);
+	CON_CVAR('sar_ihud_y', '2', 'Y position of input HUD.\n', FCVAR_DONTRECORD);
+	CON_CVAR('sar_ihud_grid_padding', '2', 'Padding between grid squares of input HUD.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0);
+	CON_CVAR('sar_ihud_grid_size', '60', 'Grid square size of input HUD.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0);
+	CON_CVAR('sar_ihud_analog_image_scale', '0.6', 'Scale of analog input images against max extent.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, 0, 1);
+	CON_CVAR('sar_ihud_analog_view_deshake', '0', 'Try to eliminate small fluctuations in the movement analog.\n', FCVAR_NEVER_AS_STRING);
+	CON_COMMAND_F('sar_ihud_preset', 'sar_ihud_preset <preset> - modifies input hud based on given preset\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 2) {
+			return sar.printHelp(args);
+		}
+	});
+	CON_COMMAND_F('sar_ihud_modify', 'sar_ihud_modify <element|all> [param=value]... - modifies parameters in given element.\nParams: enabled, text, pos, x, y, width, height, font, background, highlight, textcolor, texthighlight, image, highlightimage, minhold.\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length < 3) {
+			return sar.printHelp(args);
+		}
+	});
+	CON_COMMAND_F('sar_ihud_add_key', 'sar_ihud_add_key <key>\n', function(args) {
+		if (args.length !== 2) {
+			return sar.printHelp(args);
+		}
+		
+		let keyCode = src.key.list.src.findIndex(e => e.toLowerCase() === args[1].toLowerCase());
+		if (keyCode === -1) {
+			return sar.println(`Key ${args[1]} does not exist.\n`);
+		}
+	});
+	CON_COMMAND_F('sar_ihud_setpos', 'Automatically sets the position of input HUD.\nUsage: sar_ihud_setpos <top|center|bottom|y|y%> <left|center|right|x|x%>\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 3) return sar.printHelp(args);
+		src.cmd.getConvar('sar_ihud_x').value = args[2];
+		src.cmd.getConvar('sar_ihud_y').value = args[1];
+	});
+	CON_COMMAND_F('sar_ihud_set_background', 'sar_ihud_set_background <path> <grid x> <grid y> <grid w> <grid h>\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 6) {
+			return sar.printHelp(args);
+		}
+	});
+	CON_COMMAND_F('sar_ihud_clear_background', 'sar_ihud_clear_background\n', FCVAR_DONTRECORD);
+} // ihud
 
 CON_COMMAND('sar_update', 'sar_update [release|pre] [exit] [force] - update SAR to the latest version. If exit is given, exit the game upon successful update; if force is given, always re-install, even if it may be a downgrade\n');
 
@@ -1329,6 +1561,88 @@ CON_COMMAND('sar_update', 'sar_update [release|pre] [exit] [force] - update SAR 
 			];
 			break;
 	}
+	
+	CON_CVAR('sar_speedrun_smartsplit', '1', 'Only split the speedrun timer a maximum of once per map.\n', FCVAR_NEVER_AS_STRING);
+	CON_CVAR('sar_speedrun_time_pauses', '0', 'Include time spent paused in the speedrun timer.\n', FCVAR_NEVER_AS_STRING);
+	CON_CVAR('sar_speedrun_stop_in_menu', '0', 'Automatically stop the speedrun timer when the menu is loaded.\n', FCVAR_NEVER_AS_STRING);
+	CON_CVAR('sar_speedrun_start_on_load', '0', 'Automatically start the speedrun timer when a map is loaded. 2 = restart if active.\n', FCVAR_NEVER_AS_STRING, 0, 2);
+	CON_CVAR('sar_speedrun_offset', '0', 'Start speedruns with this time on the timer.\n', FCVAR_NONE, 0);
+	CON_CVAR('sar_speedrun_autostop', '0', 'Automatically stop recording demos when a speedrun finishes. If 2, automatically append the run time to the demo name.\n', FCVAR_NEVER_AS_STRING, 0, 2);
+	
+	CON_CVAR('sar_mtrigger_legacy', '0', '\n', FCVAR_NEVER_AS_STRING, 0, 1);
+	
+	CON_COMMAND('sar_speedrun_start', 'sar_speedrun_start - start the speedrun timer\n', function(args) {
+		
+	});
+	
+	CON_COMMAND('sar_speedrun_stop', 'sar_speedrun_stop - stop the speedrun timer\n', function(args) {
+		
+	});
+	
+	CON_COMMAND('sar_speedrun_split', 'sar_speedrun_split - perform a split on the speedrun timer\n', function(args) {
+		
+	});
+	
+	CON_COMMAND('sar_speedrun_pause', 'sar_speedrun_pause - pause the speedrun timer\n', function(args) {
+		
+	});
+	
+	CON_COMMAND('sar_speedrun_resume', 'sar_speedrun_resume - resume the speedrun timer\n', function(args) {
+		
+	});
+	
+	CON_COMMAND('sar_speedrun_reset', 'sar_speedrun_reset - reset the speedrun timer\n', function(args) {
+		
+	});
+	
+	CON_COMMAND('sar_speedrun_result', 'sar_speedrun_result - print the speedrun result\n', function(args) {
+		
+	});
+	
+	CON_COMMAND('sar_speedrun_export', 'sar_speedrun_export <filename> - export the speedrun result to the specified CSV file\n', function(args) {
+		if (args.length !== 2) {
+			return sar.printHelp(args);
+		}
+	});
+	
+	CON_COMMAND('sar_speedrun_recover', 'sar_speedrun_recover <ticks|time> - recover a crashed run by resuming the timer at the given time on next load\n', function(args) {
+		if (args.length < 2) {
+			return sar.printHelp(args);
+		}
+	});
+	
+	CON_COMMAND('sar_speedrun_export_all', 'sar_speedrun_export_all <filename> - export the results of many speedruns to the specified CSV file\n', function(args) {
+		if (args.length !== 2) {
+			return sar.printHelp(args);
+		}
+	});
+	
+	CON_COMMAND('sar_speedrun_reset_export', 'sar_speedrun_reset_export - reset the log of complete and incomplete runs to be exported\n', function(args) {
+		
+	});
+	
+	CON_COMMAND('sar_speedrun_autoreset_load', 'sar_speedrun_autoreset_load <file> - load the given file of autoreset timestamps and use it while the speedrun timer is active\n', function(args) {
+		if (args.length !== 2) {
+			return sar.printHelp(args);
+		}
+	});
+	
+	CON_COMMAND('sar_speedrun_autoreset_clear', 'sar_speedrun_autoreset_clear - stop using the autoreset file\n', function(args) {
+		
+	});
+	
+	CON_COMMAND('sar_mtrigger_legacy_format', 'sar_mtrigger_legacy_format <string format> - formatting of the text that is displayed in the chat (!map - for map name, !seg - for segment name, !tt - for total time, !st - for split time). ( def. "!seg -> !tt (!st)" )\n', function(args) {
+		if (args.length !== 2) {
+			return sar.printHelp(args);
+		}
+	});
+	
+	CON_COMMAND('sar_mtrigger_legacy_textcolor', 'sar_mtrigger_legacy_textcolor <hex code> - the color of the text that is displayed in the chat.\n', function(args) {
+		if (args.length !== 2) {
+			return sar.printHelp(args);
+		}
+	});
+	
 	CON_COMMAND('sar_speedrun_category', 'sar_speedrun_category [category] - get or set the speedrun category\n', function(args) {
 		if (args.length > 1) {
 			if (!sar.category.categories.find(e => e.name.toLowerCase() === args[1].toLowerCase())) {
@@ -1418,66 +1732,193 @@ CON_COMMAND('sar_update', 'sar_update [release|pre] [exit] [force] - update SAR 
 
 CON_COMMAND('sar_import_stats', 'sar_import_stats <filePath> - import the stats from the specified .csv file\n');
 CON_COMMAND('sar_export_stats', 'sar_export_stats <filepath> -  export the stats to the specifed path in a .csv file\n');
-for (let cmd of `sar_demo_overwrite_bak
-sar_prevent_ehm
-sar_hud_x
-sar_hud_y
-sar_hud_spacing
-sar_hud_bg
-sar_hud_orange_only
-sar_toast_tag_set_color
-sar_record_at_demo_name
-sar_record_at
-sar_record_at_increment
-sar_toast_width
-sar_toast_setpos
-sar_toast_tag_set_duration
-sar_always_transmit_heavy_ents
-sar_toast_tag_dismiss_all
-sar_speedrun_time_pauses
-sar_speedrun_smartsplit
-sar_autorecord
-sar_record_prefix
-sar_speedrun_autostop
-sar_speedrun_reset
-sar_challenge_autostop
-sar_fast_load_preset
-sar_cm_rightwarp
-sar_speedrun_offset
-sar_hud_font_index
-sar_chat
-ghost_chat
-sar_toast_x
-sar_toast_y
-sar_toast_align
-sar_toast_anchor
-sar_toast_disable
-sar_toast_background
-sar_toast_compact
-sar_toast_font
-sar_toast_create
-sar_timer_time_pauses
-sar_disable_steam_pause
-sar_dpi_scale
-sar_demo_remove_broken
-sar_ihud
-sar_ihud_button_color
-sar_ihud_y
-ghost_type
+
+CON_CVAR('sar_autorecord', '0', 'Enables or disables automatic demo recording.\n', FCVAR_NEVER_AS_STRING, -1, 1);
+CON_CVAR('sar_autojump', '0', 'Enables automatic jumping on the server.\n', FCVAR_NEVER_AS_STRING);
+CON_CVAR('sar_jumpboost', '0', 'Enables special game movement on the server.\n0 = Default,\n1 = Orange Box Engine,\n2 = Pre-OBE.\n', FCVAR_NEVER_AS_STRING, 0);
+CON_CVAR('sar_aircontrol', '0', 'Enables more air-control on the server.\n', FCVAR_NEVER_AS_STRING, 0, 2);
+CON_CVAR('sar_duckjump', '0', 'Allows duck-jumping even when fully crouched, similar to prevent_crouch_jump.\n', FCVAR_NEVER_AS_STRING);
+CON_CVAR('sar_disable_challenge_stats_hud', '0', 'Disables opening the challenge mode stats HUD.\n', FCVAR_NEVER_AS_STRING)
+CON_CVAR('sar_disable_steam_pause', '0', 'Prevents pauses from steam overlay.\n', FCVAR_NEVER_AS_STRING);
+CON_CVAR('sar_disable_no_focus_sleep', '0', 'Does not yield the CPU when game is not focused.\n', FCVAR_NEVER_AS_STRING);
+CON_CVAR('sar_disable_progress_bar_update', '0', 'Disables excessive usage of progress bar.\n', FCVAR_NEVER_AS_STRING, 0, 2);
+CON_CVAR('sar_prevent_mat_snapshot_recompute', '0', 'Shortens loading times by preventing state snapshot recomputation.\n', FCVAR_NEVER_AS_STRING);
+CON_CVAR('sar_challenge_autostop', '0', 'Automatically stops recording demos when the leaderboard opens after a CM run. If 2, automatically appends the run time to the demo name.\n', FCVAR_NEVER_AS_STRING, 0, 3);
+CON_CVAR('sar_show_entinp', '0', 'Print all entity inputs to console.\n', FCVAR_NEVER_AS_STRING);
+CON_CVAR('sar_force_qc', '0', 'When ducking, forces view offset to always be at standing height. Requires sv_cheats to work.\n', FCVAR_NEVER_AS_STRING, 0, 1);
+CON_CVAR('sar_patch_bhop', '0', 'Patches bhop by limiting wish direction if your velocity is too high.\n', FCVAR_NEVER_AS_STRING, 0, 1);
+CON_CVAR('sar_patch_cfg', '0', 'Patches Crouch Flying Glitch.\n', FCVAR_NEVER_AS_STRING, 0, 1);
+CON_CVAR('sar_prevent_ehm', '0', 'Prevents Entity Handle Misinterpretation (EHM) from happening.\n', FCVAR_NEVER_AS_STRING, 0, 1);
+CON_CVAR('sar_disable_weapon_sway', '0', 'Disables the viewmodel lagging behind.\n', FCVAR_NEVER_AS_STRING, 0, 1);
+
+CON_CVAR('sar_demo_overwrite_bak', '0', 'Rename demos to (name)_bak if they would be overwritten by recording\n', FCVAR_NEVER_AS_STRING, 0);
+CON_CVAR('sar_record_prefix', '', 'A string to prepend to recorded demo names. Can include strftime format codes.\n');
+CON_CVAR('sar_record_mkdir', '1', 'Automatically create directories for demos if necessary.\n', FCVAR_NEVER_AS_STRING);
+CON_COMMAND('sar_stop', 'sar_stop <name> - stop recording the current demo and rename it to \'name\' (not considering sar_record_prefix)\n', function(args) {
+	if (args.length !== 2) {
+		return sar.printHelp(args);
+	}
+
+	let name = args[1]
+	if (name === '') {
+		return sar.println("Demo name cannot be blank\n");
+	}
+	name += '.dem';
+});
+
+CON_CVAR('sar_loads_uncap', '0', 'Temporarily set fps_max to 0 during loads\n', FCVAR_NEVER_AS_STRING, 0, 1);
+CON_CVAR('sar_loads_norender', '0', 'Temporarily set mat_norendering to 1 during loads\n', FCVAR_NEVER_AS_STRING, 0, 1);
+CON_CVAR('sar_load_delay', '0', 'Delay for this number of milliseconds at the end of a load.\n', FCVAR_NEVER_AS_STRING, 0);
+
+CON_COMMAND('sar_togglewait', 'sar_togglewait - enables or disables "wait" for the comman buffer\n', function(args) {
+	let state = !src.cmd.waitEnabled;
+	src.cmd.waitEnabled = state;
+	sar.println(`${state ? 'Enabled' : 'Disabled'} wait!\n`);
+});
+
+CON_COMMAND('sar_delete_alias_cmds', 'sar_delete_alias_cmds - deletes all alias commands\n', function(args) {
+	src.aliases = [];
+});
+
+CON_COMMAND_F('sar_fast_load_preset', 'sar_fast_load_preset <preset> - sets all loading fixes to preset values\n', FCVAR_DONTRECORD, function(args) {
+	if (args.length !== 2) {
+		return sar.printHelp(args);
+	}
+	
+	let preset = args[1];
+	let CMD = (x) => src.cmd.executeCommand(x);
+	if (preset === "none") {
+		if (src.game.cur !== "srm") {
+			CMD('ui_loadingscreen_transition_time 1.0');
+			CMD('ui_loadingscreen_fadein_time 1.0');
+			CMD('ui_loadingscreen_mintransition_time 0.5');
+		}
+		CMD('sar_disable_progress_bar_update 0');
+		CMD('sar_prevent_mat_snapshot_recompute 0');
+		CMD('sar_loads_uncap 0');
+		CMD('sar_loads_norender 0');
+	} else if (preset === "sla") {
+		if (src.game.cur !== "srm") {
+			CMD('ui_loadingscreen_transition_time 0.0');
+			CMD('ui_loadingscreen_fadein_time 0.0');
+			CMD('ui_loadingscreen_mintransition_time 0.0');
+		}
+		CMD('sar_disable_progress_bar_update 1');
+		CMD('sar_prevent_mat_snapshot_recompute 1');
+		CMD('sar_loads_uncap 0');
+		CMD('sar_loads_norender 0');
+	} else if (preset === "normal") {
+		if (src.game.cur !== "srm") {
+			CMD('ui_loadingscreen_transition_time 0.0');
+			CMD('ui_loadingscreen_fadein_time 0.0');
+			CMD('ui_loadingscreen_mintransition_time 0.0');
+		}
+		CMD('sar_disable_progress_bar_update 1');
+		CMD('sar_prevent_mat_snapshot_recompute 1');
+		CMD('sar_loads_uncap 1');
+		CMD('sar_loads_norender 0');
+	} else if (preset === "full") {
+		if (src.game.cur !== "srm") {
+			CMD('ui_loadingscreen_transition_time 0.0');
+			CMD('ui_loadingscreen_fadein_time 0.0');
+			CMD('ui_loadingscreen_mintransition_time 0.0');
+		}
+		CMD('sar_disable_progress_bar_update 2');
+		CMD('sar_prevent_mat_snapshot_recompute 1');
+		CMD('sar_loads_uncap 1');
+		CMD('sar_loads_norender 1');
+	} else {
+		sar.println(`Unknown preset ${preset}!\n`);
+		sar.printHelp(args);
+	}
+}, function(args) {
+		if (args.length === 1) return ['none', 'sla', 'normal', 'full'];
+		if (args.length === 2) return ['none', 'sla', 'normal', 'full'].filter(e => ~e.indexOf(args[1]));
+});
+
+CON_COMMAND('sar_clear_lines', 'sar_clear_lines - clears all active drawline overlays\n', function(args) {
+	for (let i = 0; i < 20; i++) {
+		src.cmd.executeCommand('drawline 0 0 0 0 0 0', true);
+	}
+});
+
+CON_COMMAND('sar_drawline', 'sar_drawline <x> <y> <z> <x> <y> <z> [r] [g] [b] - overlay a line in the world\n', function(args) {
+	if (args.length !== 7 && args.length !== 10) {
+		return sar.printHelp(args);
+	}
+});
+
+CON_COMMAND('sar_drawline_clear', 'sar_drawline_clear - clear all active sar_drawlines\n', function(args) {
+	
+});
+
+CON_COMMAND('sar_getpos', 'sar_getpos [slot] [server|client] - get the absolute origin and angles of a particular player from either the server or client . Defaults to slot 0 and server.\n', function(args) {
+	if (args.length > 3) {
+		return sar.printHelp(args);
+	}
+	
+	let use_serv = true;
+	if (args.length === 3) {
+		if (args[2] === 'client') {
+			use_serv = false;
+		} else if (args[2] !== 'server') {
+			return sar.printHelp(args);
+		}
+	}
+		
+	let slot = args.length >= 2 ? parseInt(args[1]) : 0;
+	
+	let origin = {x: 0, y: 0, z: 0};
+	let angles = {x: 0, y: 0, z: 0};
+	
+	sar.println(`origin: ${origin.x} ${origin.y} ${origin.z}\n`);
+	sar.println(`angles: ${angles.x} ${angles.y} ${angles.z}\n`);
+});
+
+CON_COMMAND('sar_geteyepos', 'sar_getpos [slot] [server|client] - get the absolute origin and angles of a particular player from either the server or client . Defaults to slot 0 and server.\n', function(args) {
+	if (args.length > 2) {
+		return sar.printHelp(args);
+	}
+	
+	let slot = args.length >= 2 ? parseInt(args[1]) : 0;
+	
+	let eye = {x: 0, y: 0, z: 0};
+	let angles = {x: 0, y: 0, z: 0};
+	
+	sar.println(`eye: ${eye.x} ${eye.y} ${eye.z}\n`);
+	sar.println(`angles: ${angles.x} ${angles.y} ${angles.z}\n`);
+});
+
+CON_COMMAND('sar_chat', 'sar_chat - open the chat HUD\n', function(args) {
+
+});
+
+CON_COMMAND('ghost_chat', 'ghost_chat - open the chat HUD for messaging other players\n\n', function(args) {
+
+});
+
+CON_CVAR('sar_always_transmit_heavy_ents', '0', 'Always transmit large but seldom changing edicts to clients to prevent lag spikes.\n', FCVAR_NEVER_AS_STRING, 0, 1);
+
+CON_CVAR('sar_timer_always_running', '1', 'Timer will save current value when disconnecting.\n', FCVAR_NEVER_AS_STRING, 0, 1);
+CON_CVAR('sar_timer_time_pauses', '1', 'Timer adds non-simulated ticks when server pauses.\n', FCVAR_NEVER_AS_STRING, 0, 1);
+
+CON_CVAR('sar_dpi_scale', '1', 'Fraction to scale mouse DPI down by.\n', FCVAR_NEVER_AS_STRING, 1);
+
+CON_CVAR('sar_demo_remove_broken', '1', 'Whether to remove broken frames from demo playback\n', FCVAR_NEVER_AS_STRING, 0, 1);
+
+for (let cmd of `ghost_type
 ghost_sync
 ghost_name
 sar_trace_record
 sar_tas_stop
 sar_tas_play
 sar_tas_playback_rate
-sar_ihud_preset
 sar_trace_draw
 sar_trace_font_size`.replace(/\t/g, '').split('\n')) {
 	CON_COMMAND(cmd);
 }
 CON_COMMAND('sar_disable_coop_score_hud');
 CON_COMMAND('sar_demo_blacklist_all');
-CON_COMMAND('sar_disable_no_focus_sleep');
 
 CON_COMMAND('sar_session', 'sar_session - prints the current tick of the server since it has loaded\n', function(args) {
 	sar.println(`Session Tick: ${sar.ticks} (${(sar.ticks / 60).toFixed(3)})\n`);
@@ -1517,3 +1958,24 @@ CON_COMMAND_HOOK('map', true, function(args) {if (!src.cmd.lastCommandErrored) s
 CON_COMMAND_HOOK('changelevel', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents('load')});
 CON_COMMAND_HOOK('restart', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents('load')});
 CON_COMMAND_HOOK('restart_level', true, function(args) {if (!src.cmd.lastCommandErrored) sar.runevents('load')});
+
+src.cmd.getConvar('help').callback = function(args) {
+	if (args.length !== 2) {
+		return sar.println('Prints help string of cvar. Usage: help <cvar>\n');
+	}
+	let cvar = src.cmd.getConvar(args[1]);
+	if (cvar) {
+		if (cvar.isCommand) {
+			sar.println(`${cvar.name}\n`);
+			sar.println(`Flags: ${cvar.flags}\n`);
+			sar.println(`Description: ${cvar.helpStr}\n`);
+		} else {
+			sar.println(`${cvar.name}\n`);
+			sar.println(`Default: ${cvar.default}\n`);
+			sar.println(`Flags: ${cvar.flags}\n`);
+			sar.println(`Description: ${cvar.helpStr}\n`);
+		}
+	} else {
+		sar.println('Unknown cvar name!\n');
+	}
+}
