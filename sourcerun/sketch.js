@@ -25,7 +25,7 @@ function changeGame(live = true) {
 
 function bindKeyPress(event, down) {
 	src.key.keyPress(event, down);
-	q('bindarea').value = src.key.list.pressed.join(' ');
+	q('bindarea').value = src.key.list.pressed.filter(pressed => src.key.binds.find(e => e.cmd === 'toggleconsole').key !== pressed).join(' ');
 }
 
 function selectExample() {
@@ -38,6 +38,7 @@ function selectExample() {
 // TODO: Tab/arrow keys autocomplete
 function consoleKeyPress(ev, down) {
 	if (down) {
+		let toggleconsolekey = src.key.binds.find(e => e.cmd === 'toggleconsole')
 		switch (ev.key) {
 			case 'Enter':
 				ev.preventDefault();
@@ -48,6 +49,14 @@ function consoleKeyPress(ev, down) {
 			case 'Tab':
 				ev.preventDefault();
 				q('liveconsole').value = q('liveconsole').value.replace(/\t/g, '');
+				break;
+		}
+		if (toggleconsolekey && ev.key === toggleconsolekey.key) {
+			ev.preventDefault();
+			q('liveconsole').value = q('liveconsole').value.replaceAll(toggleconsolekey, '');
+			q('bindarea').focus();
+			dispAutocompletions();
+			return;
 		}
 	} else {
 		q('liveconsole').value = q('liveconsole').value.replace(/\t/g, '');
@@ -62,6 +71,7 @@ function dispAutocompletions() {
 	let completions = src.con.autocomplete(q('liveconsole').value);
 	completions = completions.slice(0, 5);
 	document.getElementById('console-autocomplete').removeAllChildNodes();
+	if (document.activeElement !== q('liveconsole')) return;
 	for (let completion of completions) {
 		let div = document.createElement('div');
 		div.innerText = completion;
@@ -163,6 +173,16 @@ window.addEventListener('load', async function() {
 		sar.hud.output = q('sar-hud');
 	});
 	src.con.output = q('console');
+	
+	src.cmd.getConvar('toggleconsole').callback = function(args) {
+		if (document.activeElement === q('bindarea')) {
+			q('liveconsole').focus();
+		} else {
+			q('bindarea').focus();
+			dispAutocompletions();
+			return;
+		}
+	}
 	
 	q('liveconsole').allowTab()
 	q('cfg-content').allowTab();

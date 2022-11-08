@@ -1317,7 +1317,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 			return sar.printHelp(args);
 		}
 	});
-	CON_COMMAND_F('sar_ihud_add_key', 'sar_ihud_add_key <key>\n', function(args) {
+	CON_COMMAND_F('sar_ihud_add_key', 'sar_ihud_add_key <key>\n', FCVAR_DONTRECORD, function(args) {
 		if (args.length !== 2) {
 			return sar.printHelp(args);
 		}
