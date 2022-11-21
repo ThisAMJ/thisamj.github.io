@@ -89,10 +89,11 @@ function newCFG() {
 }
 
 src.cfg.set = function(name, value = '') {
-	addCFG(name, value)
+	addCFG(name, value);
 }
 
 function addCFG(name, value, init = false) {
+	name = name.replaceAll('.cfg', '').toLowerCase();
 	src.cfg.cfgs[name] = value;
 	for (let child of q('cfg-tabs').childNodes) {
 		if (child.innerText === name) return;
@@ -110,6 +111,40 @@ function addCFG(name, value, init = false) {
 	if (q('cfg-tabs').childElementCount == 1 && !init) {
 		viewCFG(name)
 	}
+}
+
+async function cfgDrop(event) {
+	let decoder = new TextDecoder();
+	event.preventDefault();
+	if (event.dataTransfer.items) {
+		[...event.dataTransfer.items].forEach((item) => {
+			if (item.kind === 'file') {
+				let file = item.getAsFile();
+				if (file.size != 0) {
+					file.arrayBuffer().then(e => {
+						if (file.type == 'application/zip' || file.name.endsWith('.zip')) {
+							JSZip.loadAsync(e).then(e => {
+								console.log(e);
+							})
+						} else if (file.name.endsWith('.cfg')) {
+							addCFG(file.name, decoder.decode(e));
+						}
+					});
+				}
+			}
+		})
+	}
+	q('cfg-drop').classList.remove('dragging')
+}
+
+function cfgDragOver(event) {
+	event.preventDefault();
+	q('cfg-drop').classList.add('dragging')
+}
+
+function cfgDragLeave(event) {
+	event.preventDefault();
+	q('cfg-drop').classList.remove('dragging')
 }
 
 function editCFG() {
@@ -148,6 +183,7 @@ function removeCFG() {
 }
 
 function viewCFG(name) {
+	name = name.replaceAll('.cfg', '').toLowerCase()
 	if (src.cfg.cfgs.hasOwnProperty(name)) {
 		viewedCFG = name;
 		q('cfg-content').innerText = src.cfg.get(name);
