@@ -3,8 +3,8 @@
  */
  
 const sar = {
-	version: '1.12.8-pre3',
-	built: '03:52:12 Oct 30 2022',
+	version: '1.12.8-pre5',
+	built: '12:22:37 Nov 12 2022',
 	
 	category: {
 		current: '',
@@ -1562,6 +1562,7 @@ CON_COMMAND('sar_update', 'sar_update [release|pre] [exit] [force] - update SAR 
 			break;
 	}
 	
+	CON_CVAR('sar_speedrun_skip_cutscenes', '0', 'Skip Tube Ride and Long Fall in Portal 2.\n', FCVAR_NEVER_AS_STRING)
 	CON_CVAR('sar_speedrun_smartsplit', '1', 'Only split the speedrun timer a maximum of once per map.\n', FCVAR_NEVER_AS_STRING);
 	CON_CVAR('sar_speedrun_time_pauses', '0', 'Include time spent paused in the speedrun timer.\n', FCVAR_NEVER_AS_STRING);
 	CON_CVAR('sar_speedrun_stop_in_menu', '0', 'Automatically stop the speedrun timer when the menu is loaded.\n', FCVAR_NEVER_AS_STRING);
@@ -1570,6 +1571,8 @@ CON_COMMAND('sar_update', 'sar_update [release|pre] [exit] [force] - update SAR 
 	CON_CVAR('sar_speedrun_autostop', '0', 'Automatically stop recording demos when a speedrun finishes. If 2, automatically append the run time to the demo name.\n', FCVAR_NEVER_AS_STRING, 0, 2);
 	
 	CON_CVAR('sar_mtrigger_legacy', '0', '\n', FCVAR_NEVER_AS_STRING, 0, 1);
+	CON_CVAR('sar_mtrigger_legacy_format', '!seg -> !tt (!st)', 'Formatting of the text that is displayed in the chat (!map - for map name, !seg - for segment name, !tt - for total time, !st - for split time).\n');
+	CON_CVAR('sar_mtrigger_legacy_textcolor', '255 176 0', 'The color of the text that is displayed in the chat.\n');
 	
 	CON_COMMAND('sar_speedrun_start', 'sar_speedrun_start - start the speedrun timer\n', function(args) {
 		
@@ -1629,18 +1632,6 @@ CON_COMMAND('sar_update', 'sar_update [release|pre] [exit] [force] - update SAR 
 	
 	CON_COMMAND('sar_speedrun_autoreset_clear', 'sar_speedrun_autoreset_clear - stop using the autoreset file\n', function(args) {
 		
-	});
-	
-	CON_COMMAND('sar_mtrigger_legacy_format', 'sar_mtrigger_legacy_format <string format> - formatting of the text that is displayed in the chat (!map - for map name, !seg - for segment name, !tt - for total time, !st - for split time). ( def. "!seg -> !tt (!st)" )\n', function(args) {
-		if (args.length !== 2) {
-			return sar.printHelp(args);
-		}
-	});
-	
-	CON_COMMAND('sar_mtrigger_legacy_textcolor', 'sar_mtrigger_legacy_textcolor <hex code> - the color of the text that is displayed in the chat.\n', function(args) {
-		if (args.length !== 2) {
-			return sar.printHelp(args);
-		}
 	});
 	
 	CON_COMMAND('sar_speedrun_category', 'sar_speedrun_category [category] - get or set the speedrun category\n', function(args) {
@@ -1961,7 +1952,7 @@ CON_COMMAND_HOOK('restart_level', true, function(args) {if (!src.cmd.lastCommand
 
 src.cmd.getConvar('help').callback = function(args) {
 	if (args.length !== 2) {
-		return sar.println('Prints help string of cvar. Usage: help <cvar>\n');
+		return sar.println('help <cvar> - prints information about a cvar.\n');
 	}
 	let cvar = src.cmd.getConvar(args[1]);
 	if (cvar) {
