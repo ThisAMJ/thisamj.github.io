@@ -3,7 +3,7 @@
  */
  
 const sar = {
-	version: '1.12.8-pre5',
+	version: '1.12.8-pre7',
 	built: '12:22:37 Nov 12 2022',
 	
 	category: {
@@ -313,6 +313,7 @@ const sar = {
 		if (ticks <= 0) {
 			src.cmd.executeCommand(cmd);
 		} else {
+			if (src.cmd.cvar('sv_alternateticks') != '0') ticks = Math.ceil(ticks / 2) * 2;
 			sar.hwaits.push({
 				ticks: ticks,
 				cmd: cmd
@@ -320,7 +321,7 @@ const sar = {
 		}
 	});
 	
-	CON_COMMAND('seq', 'seq <commands>... - runs a sequence of commands one tick after one another\n', function(args) {
+	CON_COMMAND_F('seq', 'seq <commands>... - runs a sequence of commands one tick after one another\n', FCVAR_DONTRECORD, function(args) {
 		if (args.length < 2) {
 			return sar.printHelp(args);
 		}

@@ -21,7 +21,9 @@ let examples = [
                 __fetchcfg cats/fullgame "https://raw.githubusercontent.com/p2sr/srconfigs/master/cats/fullgame.cfg"
                 __fetchcfg cats/il "https://raw.githubusercontent.com/p2sr/srconfigs/master/cats/il.cfg"
                 __fetchcfg cats/reverse "https://raw.githubusercontent.com/p2sr/srconfigs/master/cats/reverse.cfg"
+                __fetchcfg cats/solocoop "https://raw.githubusercontent.com/p2sr/srconfigs/master/cats/solocoop.cfg"
                 __fetchcfg cats/sp_cm "https://raw.githubusercontent.com/p2sr/srconfigs/master/cats/sp_cm.cfg"
+                __fetchcfg cats/workshop "https://raw.githubusercontent.com/p2sr/srconfigs/master/cats/workshop.cfg"
                 __fetchcfg chapter_cats/aptag "https://raw.githubusercontent.com/p2sr/srconfigs/master/chapter_cats/aptag.cfg"
                 __fetchcfg chapter_cats/mel "https://raw.githubusercontent.com/p2sr/srconfigs/master/chapter_cats/mel.cfg"
                 __fetchcfg chapter_cats/portal2 "https://raw.githubusercontent.com/p2sr/srconfigs/master/chapter_cats/portal2.cfg"
@@ -34,6 +36,10 @@ let examples = [
                 __fetchcfg map_detect/mel "https://raw.githubusercontent.com/p2sr/srconfigs/master/map_detect/mel.cfg"
                 __fetchcfg map_detect/portal2 "https://raw.githubusercontent.com/p2sr/srconfigs/master/map_detect/portal2.cfg"
                 __fetchcfg map_detect/reloaded "https://raw.githubusercontent.com/p2sr/srconfigs/master/map_detect/reloaded.cfg"
+                __fetchcfg map_list/aptag "https://raw.githubusercontent.com/p2sr/srconfigs/master/map_list/aptag.cfg"
+                __fetchcfg map_list/mel "https://raw.githubusercontent.com/p2sr/srconfigs/master/map_list/mel.cfg"
+                __fetchcfg map_list/portal2 "https://raw.githubusercontent.com/p2sr/srconfigs/master/map_list/portal2.cfg"
+                __fetchcfg map_list/reloaded "https://raw.githubusercontent.com/p2sr/srconfigs/master/map_list/reloaded.cfg"
                 // no mtriggers, too lazy and it'd take too long to DL
                 __srcstart
             `);
