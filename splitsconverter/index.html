@@ -1,10 +1,10 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Splits Converter</title>
 		<link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/69196954">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta charset="utf-8"/>
 		<link rel="stylesheet" href="stylesheet.css">
 		<script src="../lib/FileSaver.js"></script>
 		<script src="../lib/jszip.js"></script>
@@ -19,7 +19,7 @@
 				This is the LiveSplit/Adrift/SourceLiveTimer speedrun splits converter. Page under construction!<br>
 				Functional below (afaik) is LiveSplit -> Adrift.
 			</div>
-			<input class="width-full" id="drop_zone" type="file" accept=".lss" onchange="fileSelect(event)">
+			<input class="width-full" id="drop_zone" type="file" accept=".lss" onchange="fileSelect(event)" placeholder="Input lss">
 			<button class="width-full" id="button" onclick="saveSplits()">Export Splits</button>
 		</div>
 	</body>

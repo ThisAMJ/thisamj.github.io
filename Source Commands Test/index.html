@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Source Commands Test</title>
 		<link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/69196954">
-		<meta charset="utf-8" />
 		<style>
 			body, textarea {
 				background: #18191a;
@@ -29,11 +30,11 @@
 		<p id="inputtext">
 			Input command(s) here
 		</p>
-		<textarea id="input" spellcheck="false"></textarea>
+		<textarea id="input" spellcheck="false" placeholder="Input"></textarea>
 		<p id="argstext">
 			Argument parsing (identical to source engine)
 		</p>
-		<textarea id="args" readonly></textarea>
+		<textarea id="args" placeholder="Argument parsing" readonly></textarea>
 		<p id="compressedtext">
 			Compression
 		</p>
@@ -47,6 +48,6 @@
 			<!-- <label for="remTrail">   Remove blank trails? </label> -->
 			<!-- <input type="checkbox" id="remTrail" name="remTrail" checked onclick="run()"> -->
 		<!-- </p> -->
-		<textarea id="compressed" readonly spellcheck="false"></textarea>
+		<textarea id="compressed" placeholder="Compressed" readonly spellcheck="false"></textarea>
 	</body>
 </html>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Source Command Runner</title>
 		<link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/69196954">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta charset="utf-8">
 		<link rel="stylesheet" href="stylesheet.css">
 		<script src="../lib/jszip.js"></script>
 		<script src="../lib/prototypes.js"></script>
@@ -33,7 +33,7 @@
 				<div class="width-full content-tab-left" id="content-tab-left-cfg">
 				
 					<button onclick="runSelected()">Run Selected CFG</button>
-					<select name="cfg-example" id="cfg-example" onchange="selectExample()">
+					<select title="cfg-example" name="cfg-example" id="cfg-example" onchange="selectExample()">
 						<option>Use Example</option>
 						<option>(Warning: Will erase current cfg)</option>
 						<option value="0">srconfigs</option>
@@ -54,7 +54,7 @@
 				</div>
 				<div class="width-full content-tab-left" id="content-tab-left-control">
 					<div class="float-left width-half" style="margin-bottom: 0">
-						Playing game: <select id="game-select" onchange="changeGame()">
+						Playing game: <select title="game-select" id="game-select" onchange="changeGame()">
 							<option value="portal2">Portal 2</option>
 							<option value="srm">Speedrun Mod</option>
 							<option value="mel">PS:Mel</option>
@@ -74,7 +74,7 @@
 					<textarea class="width-full" id="bindarea" spellcheck="false" onkeydown="bindKeyPress(event, true)" onkeyup="bindKeyPress(event, false)" placeholder="Keyboard Input"></textarea>
 					<div class="width-full" id="console"></div>
 					<div class="width-full stack">
-						<textarea class="width-full" id="liveconsole-complete"></textarea>
+						<textarea class="width-full" id="liveconsole-complete" placeholder="Console Autocomplete"></textarea>
 						<textarea class="width-full" id="liveconsole" spellcheck="false" onkeydown="consoleKeyPress(event, true)" onkeyup="consoleKeyPress(event, false)" placeholder="Live Console" data-placeholder="Live Console"></textarea>
 					</div>
 					<div class="width-full" id="console-autocomplete"></div>
