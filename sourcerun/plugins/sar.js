@@ -3,8 +3,8 @@
  */
  
 const sar = {
-	version: '1.12.8-pre7',
-	built: '12:22:37 Nov 12 2022',
+	version: '1.12.8-pre10',
+	built: '00:03:33 Mar 16 2023',
 	
 	category: {
 		current: '',
@@ -356,7 +356,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 	CON_CVAR('sar_hud_rainbow', -1, 'Enables the rainbow HUD mode. -1 = default, 0 = disable, 1 = enable.\n', FCVAR_NEVER_AS_STRING | FCVAR_DONTRECORD, -1, 1);
 	sar.hud.rainbow = false;
 	if (new Date().getMonth() === 5) { // June
-		if (Math.floor(Math.random() * 50 + 1)) {
+		if (Math.floor(Math.random() * 50 + 1) == 1) {
 			sar.hud.rainbow = true;
 		}
 	}
@@ -415,7 +415,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		}
 	});
 	
-	CON_COMMAND_F('sar_hud_show_text', 'sar_hud_show_text <id> - shows the nth text value in the HUD\n', FCVAR_DONTRECORD, function(args) {
+	CON_COMMAND_F('sar_hud_show_text', 'sar_hud_show_text <id|all> - shows the nth text value in the HUD\n', FCVAR_DONTRECORD, function(args) {
 		if (args.length < 2) {
 			return sar.printHelp(args);
 		}
@@ -426,7 +426,7 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		if (existing) existing.shown = true;
 	});
 
-	CON_COMMAND_F('sar_hud_hide_text', 'sar_hud_hide_text <id> - hides the nth text value in the HUD\n', FCVAR_DONTRECORD, function(args) {
+	CON_COMMAND_F('sar_hud_hide_text', 'sar_hud_hide_text <id|all> - hides the nth text value in the HUD\n', FCVAR_DONTRECORD, function(args) {
 		if (args.length < 2) {
 			return sar.printHelp(args);
 		}
@@ -435,6 +435,14 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		}
 		let existing = sar.hud.texts.find(e => e.id === sar.atoi(args[1]));
 		if (existing) existing.shown = false;
+	});
+
+	CON_COMMAND_F('sar_hud_toggle_text', 'sar_hud_toggle_text <id> - toggles the nth text value in the HUD\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length < 2) {
+			return sar.printHelp(args);
+		}
+		let existing = sar.hud.texts.find(e => e.id === sar.atoi(args[1]));
+		if (existing) existing.shown = !existing.shown;
 	});
 	
 	CON_COMMAND_F('sar_hud_order_bottom', 'sar_hud_order_bottom <name> - orders hud element to bottom\n', FCVAR_DONTRECORD, function(args) {
@@ -959,6 +967,8 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 			AND: 10,
 			OR: 11,
 			SVAR: 12,
+			CVAR: 13,
+			STRING: 14,
 		},
 	
 		eval: function(c) {
@@ -976,6 +986,8 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 				case this.conditions.AND: return this.eval(c.binop_l) && this.eval(c.binop_r);
 				case this.conditions.OR: return this.eval(c.binop_l) || this.eval(c.binop_r);
 				case this.conditions.SVAR: return sar.GetSvar(c.svar) == c.val;
+				case this.conditions.CVAR: return src.cmd.cvar(c.cvar) == c.val;
+				case this.conditions.STRING: return c.str == c.val;
 			}
 			return false;
 		},
@@ -1055,7 +1067,13 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 								c.type = this.conditions.MENU;
 								break;
 							default:
-								if (t[1] == 'map' || t[1] == 'prev_map' || t[1] == 'game' || t[1].startsWith('var:') || t[1][0] == '?') {
+								if (
+									t[1] == 'map' ||
+									t[1] == 'prev_map' ||
+									t[1] == 'game' ||
+									t[1].startsWith('var:') ||
+									t[1].startsWith('cvar:') ||
+									t[1][0] == '?' || t[1][0] == '#' || t[1][0] == '%') {
 
 									if (toks.length == 0 || toks[0][0] != this.tokens.TOK_EQUALS) {
 										src.con.err(`Expected = after '${t[1]}'\n`);
@@ -1073,12 +1091,20 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 									if (t[1].startsWith('var:') || t[1][0] == '?') {
 										c.type = this.conditions.SVAR;
 										c.svar = t[1].substr(t[1][0] == '?' ? 1 : 4);
+									} else if (t[1].startsWith('cvar:' || t[1][0] == '#')) {
+										c.type = this.conditions.CVAR;
+										c.cvar = t[1].substr(t[1][0] == '#' ? 1 : 5);
+									} else if (t[1][0] == '%') {
+										c.type = this.conditions.STRING;
+										c.str = t[1].substr(1);
 									} else {
 										c.type = this.conditions[t[1].toUpperCase()];
 									}
 									
 									c.val = (compare_tok[1].startsWith('var:') || compare_tok[1][0] == '?')
 											? sar.GetSvar(compare_tok[1].substr(compare_tok[1][0] == '?' ? 1 : 4))
+											: compare_tok[1].startsWith('cvar:') || compare_tok[1][0] == '#'
+											? src.cmd.cvar(compare_tok[1].substr(compare_tok[1][0] == '#' ? 1 : 5)).toString()
 											: compare_tok[1];
 
 								} else {
@@ -1769,7 +1795,7 @@ CON_COMMAND('sar_togglewait', 'sar_togglewait - enables or disables "wait" for t
 });
 
 CON_COMMAND('sar_delete_alias_cmds', 'sar_delete_alias_cmds - deletes all alias commands\n', function(args) {
-	src.aliases = [];
+	src.cmd.aliases = [];
 });
 
 CON_COMMAND_F('sar_fast_load_preset', 'sar_fast_load_preset <preset> - sets all loading fixes to preset values\n', FCVAR_DONTRECORD, function(args) {
