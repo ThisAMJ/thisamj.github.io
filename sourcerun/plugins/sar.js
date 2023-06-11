@@ -659,6 +659,21 @@ CON_COMMAND_F('nop', 'nop [args]... - nop ignores all its arguments and does not
 		sar.println(`${args[1]} = ${sar.GetSvar(args[1])}\n`);
 	});
 
+	CON_COMMAND_F('svar_count', 'svar_count - prints a count of all the defined svars\n', FCVAR_DONTRECORD, function(args) {
+		if (args.length !== 1) {
+			return sar.printHelp(args);
+		}
+		sar.println(`${Object.keys(sar.svars).length} svars defined\n`);
+	});
+	
+	// this is more useful for my usecases... lol
+	CON_COMMAND_F('svar_list', 'svar_list - list all svars\n', FCVAR_DONTRECORD, function(args) {
+		sar.println(`SAR variables:\n`);
+		for (let svar in sar.svars) {
+			sar.println(`\t${svar} = ${sar.svars[svar]}\n`);
+		}
+	});
+
 	CON_COMMAND_F('svar_from_cvar', 'svar_from_cvar <variable> <cvar> - capture a cvar\'s value and place it into an svar, removing newlines\n', FCVAR_DONTRECORD, function(args) {
 		if (args.length !== 3) {
 			return sar.printHelp(args);
