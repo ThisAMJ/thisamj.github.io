@@ -95,6 +95,7 @@ src.cfg.set = function(name, value = '') {
 function addCFG(name, value, init = false) {
 	name = name.replaceAll('.cfg', '').toLowerCase();
 	src.cfg.cfgs[name] = value;
+	saveCFG();
 	for (let child of q('cfg-tabs').childNodes) {
 		if (child.innerText === name) return;
 	}
@@ -106,7 +107,6 @@ function addCFG(name, value, init = false) {
 	btn.classList.add('cfg-tab');
 	q('cfg-tabs').appendChild(btn);
 	q('remove-cfg').hidden = false;
-	saveCFG();
 
 	if (q('cfg-tabs').childElementCount == 1 && !init) {
 		viewCFG(name)
