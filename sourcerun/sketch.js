@@ -25,7 +25,10 @@ function changeGame(live = true) {
 
 function bindKeyPress(event, down) {
 	src.key.keyPress(event, down);
-	q('bindarea').value = src.key.list.pressed.filter(pressed => src.key.binds.find(e => e.cmd === 'toggleconsole').key !== pressed).join(' ');
+	let toggleconsolekey = src.key.binds.find(e => e.cmd === 'toggleconsole').key;
+	if (toggleconsolekey) {
+		q('bindarea').value = src.key.list.pressed.filter(pressed => toggleconsolekey !== pressed).join(' ');
+	}
 }
 
 function selectExample() {
