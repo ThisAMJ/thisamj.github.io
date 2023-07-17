@@ -110,6 +110,7 @@ function addCFG(name, value, init = false) {
 	btn.classList.add('cfg-tab');
 	q('cfg-tabs').appendChild(btn);
 	q('remove-cfg').hidden = false;
+	q('remove-all-cfgs').hidden = false;
 
 	if (q('cfg-tabs').childElementCount == 1 && !init) {
 		viewCFG(name)
@@ -178,6 +179,7 @@ src.cfg.remove = function(name) {
 		viewedCFG = null;
 		q('cfg-content').innerText = '';
 		q('remove-cfg').hidden = true;
+		q('remove-all-cfgs').hidden = true;
 	}
 }
 
@@ -185,7 +187,12 @@ function removeCFG() {
 	src.cfg.remove(viewedCFG);
 }
 
+function removeAllCFGs() {
+	src.cmd.executeCommand('__deleteallcfgs');
+}
+
 function exportCFGs() {
+	if (Object.keys(src.cfg.cfgs).length == 0) return;
 	let zip = new JSZip();
 	for (let cfg in src.cfg.cfgs) {
 		zip.file(`cfg/${cfg}.cfg`, src.cfg.cfgs[cfg]);
