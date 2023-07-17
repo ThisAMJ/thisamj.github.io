@@ -42,7 +42,7 @@ select:hover, button:hover, button.active, .content-tab-selected, .cfg-tab-selec
 	transition: 0.3s;
 }
 
-#new-cfg, #remove-cfg, #cfg-tabs button, #cfg-example {
+#new-cfg, #remove-cfg, #export-cfgs, #cfg-tabs button, #cfg-example {
 	padding: 0 0.5em;
 	border-right: 1px solid #444;
 }

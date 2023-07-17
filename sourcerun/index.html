@@ -6,6 +6,7 @@
 		<title>Source Command Runner</title>
 		<link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/69196954">
 		<link rel="stylesheet" href="stylesheet.css">
+		<script src="../lib/FileSaver.js"></script>
 		<script src="../lib/jszip.js"></script>
 		<script src="../lib/prototypes.js"></script>
 		<script src="../lib/source.js"></script>
@@ -43,10 +44,9 @@
 					<!-- TODO: Tree view of cfg -->
 					<div class="width-full nav" id="cfg-drop" ondrop="cfgDrop(event);" ondragover="cfgDragOver(event);" ondragleave="cfgDragLeave(event);">
 						<button class="btn-cfg" id="new-cfg" onclick="newCFG()">+</button>
-						
-						<span id="cfg-tabs"></span>
-						
+						<button class="btn-cfg" id="export-cfgs" onclick="exportCFGs()">⤓</button>
 						<button class="btn-cfg" id="remove-cfg" onclick="removeCFG()" hidden>-</button>
+						<span id="cfg-tabs"></span>
 					</div>
 					
 					<div class="width-full" id="cfg-content" spellcheck="false" contenteditable oninput="editCFG()"></div>

@@ -185,6 +185,16 @@ function removeCFG() {
 	src.cfg.remove(viewedCFG);
 }
 
+function exportCFGs() {
+	let zip = new JSZip();
+	for (let cfg in src.cfg.cfgs) {
+		zip.file(`cfg/${cfg}.cfg`, src.cfg.cfgs[cfg]);
+	}
+	zip.generateAsync({type:"blob"}).then(function(content) {
+		saveAs(content, "cfg.zip");
+	});
+}
+
 function viewCFG(name) {
 	name = name.replaceAll('.cfg', '').toLowerCase()
 	if (src.cfg.cfgs.hasOwnProperty(name)) {
