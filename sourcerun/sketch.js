@@ -128,7 +128,16 @@ async function cfgDrop(event) {
 					file.arrayBuffer().then(e => {
 						if (file.type == 'application/zip' || file.name.endsWith('.zip')) {
 							JSZip.loadAsync(e).then(e => {
-								console.log(e);
+								for (let file of Object.values(e.files)) {
+									if (file.dir) continue;
+									while (file.name.startsWith('cfg/')) file.name = file.name.slice(4);
+									if (file.name.startsWith('mtriggers/')) continue; // Skip mtriggers for now, if tree view implemented don't.
+									if (file.name.endsWith('.cfg')) {
+										file.async("string").then(e => {
+											addCFG(file.name, e);
+										})
+									}
+								}
 							})
 						} else if (file.name.endsWith('.cfg')) {
 							addCFG(file.name, decoder.decode(e));
