@@ -125,29 +125,33 @@ async function cfgDrop(event) {
 			if (item.kind === 'file') {
 				let file = item.getAsFile();
 				if (file.size != 0) {
-					file.arrayBuffer().then(e => {
-						if (file.type == 'application/zip' || file.name.endsWith('.zip')) {
-							JSZip.loadAsync(e).then(e => {
-								for (let file of Object.values(e.files)) {
-									if (file.dir) continue;
-									while (file.name.startsWith('cfg/')) file.name = file.name.slice(4);
-									if (file.name.startsWith('mtriggers/')) continue; // Skip mtriggers for now, if tree view implemented don't.
-									if (file.name.endsWith('.cfg')) {
-										file.async("string").then(e => {
-											addCFG(file.name, e);
-										})
-									}
-								}
-							})
-						} else if (file.name.endsWith('.cfg')) {
-							addCFG(file.name, decoder.decode(e));
-						}
-					});
+					readFile(file);
 				}
 			}
 		})
 	}
 	q('cfg-drop').classList.remove('dragging')
+}
+
+async function readFile(fileinfo, arrayBuffer = 0) {
+	if (arrayBuffer == 0) arrayBuffer = await fileinfo.arrayBuffer();
+	let decoder = new TextDecoder();
+	if (fileinfo.type == 'application/zip' || fileinfo.name.endsWith('.zip')) {
+		JSZip.loadAsync(arrayBuffer).then(e => {
+			for (let fileinfo of Object.values(e.files)) {
+				if (fileinfo.dir) continue;
+				while (fileinfo.name.startsWith('cfg/')) fileinfo.name = fileinfo.name.slice(4);
+				if (fileinfo.name.startsWith('mtriggers/')) continue; // Skip mtriggers for now, if tree view implemented don't.
+				if (fileinfo.name.endsWith('.cfg')) {
+					fileinfo.async("string").then(e => {
+						addCFG(fileinfo.name, e);
+					})
+				}
+			}
+		})
+	} else if (fileinfo.name.endsWith('.cfg')) {
+		addCFG(fileinfo.name, decoder.decode(arrayBuffer));
+	}
 }
 
 function cfgDragOver(event) {
@@ -164,7 +168,7 @@ function editCFG() {
 	if (viewedCFG === null) {
 		addCFG('autoexec', '');
 	}
-	src.cfg.set(viewedCFG, q('cfg-content').innerText);
+	src.cfg.set(viewedCFG, q('cfg-content').value);
 	saveCFG();
 }
 
@@ -186,7 +190,7 @@ src.cfg.remove = function(name) {
 	}
 	if (!tabs.firstChild) {
 		viewedCFG = null;
-		q('cfg-content').innerText = '';
+		q('cfg-content').value = '';
 		q('remove-cfg').hidden = true;
 		q('remove-all-cfgs').hidden = true;
 	}
@@ -215,7 +219,7 @@ function viewCFG(name) {
 	name = name.replaceAll('.cfg', '').toLowerCase()
 	if (src.cfg.cfgs.hasOwnProperty(name)) {
 		viewedCFG = name;
-		q('cfg-content').innerText = src.cfg.get(name);
+		q('cfg-content').value = src.cfg.get(name);
 		
 		for (let child of q('cfg-tabs').childNodes) {
 			child.classList[child.innerText === name ? 'add' : 'remove']('cfg-tab-selected');
