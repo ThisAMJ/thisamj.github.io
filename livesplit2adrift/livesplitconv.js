@@ -97,21 +97,25 @@ function saveSplits() {
          for (let j = 0; j < attempts.length; j++) {
             let ind = completedRunIDs.indexOf(parseInt(attempts[j]["@id"]));
             if (ind > -1) {
+               if (!attempts[j].hasOwnProperty("GameTime")) {
+                  out[ind].push(-1);
+                  continue;
+               }
                out[ind].push(convertTime(attempts[j].GameTime, 1));
             }
          }
       }
       out = out.map(e => {
          for (let i = 1; i < e.length; i++) {
-            e[i] += e[i - 1];
+            if (e[i] != -1) e[i] += e[i - 1];
          }
          return e;
-      });
+      }).filter(e => !e.some(e => e == -1)); // if any times are missing, disregard
 
       let pad = function(e) {return e.toString().padStart(2, "0");}
       for (let i = 0; i < out.length; i++) {
          let name = completedRunDate[i].getFullYear();
-         name += "-" + pad(completedRunDate[i].getMonth());
+         name += "-" + pad(completedRunDate[i].getMonth() + 1);
          name += "-" + pad(completedRunDate[i].getDate());
          name += "_" + pad(completedRunDate[i].getHours());
          name += "." + pad(completedRunDate[i].getMinutes());
