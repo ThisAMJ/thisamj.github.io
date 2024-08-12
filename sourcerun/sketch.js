@@ -28,6 +28,12 @@ function bindKeyPress(event, down) {
 	let toggleconsolekey = src.key.binds.find(e => e.cmd === 'toggleconsole').key;
 	if (toggleconsolekey) {
 		q('bindarea').value = src.key.list.pressed.filter(pressed => toggleconsolekey !== pressed).join(' ');
+		if (toggleconsolekey === event.key) {
+			event.preventDefault();
+			if (down) {
+				q('liveconsole').focus();
+			}
+		}
 	}
 }
 

@@ -1,8 +1,8 @@
 let examples = [
     {
         "name": "srconfigs",
-        "run": function() {
-            src.cmd.reset();
+        "run": async function() {
+            await src.cmd.reset();
             src.cmd.executeCommand(`
                 clear
                 __deleteallcfgs
@@ -25,8 +25,8 @@ let examples = [
         }
     }, {
         "name": "sartris classic",
-        "run": function() {
-            src.cmd.reset();
+        "run": async function() {
+            await src.cmd.reset();
             src.cmd.executeCommand('clear; __deleteallcfgs');
             src.cfg.set('autoexec', `
             plugin_load sar
