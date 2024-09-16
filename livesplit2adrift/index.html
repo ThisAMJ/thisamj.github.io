@@ -1,17 +1,57 @@
 <!DOCTYPE HTML>
+
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Livesplit To Adrift Converter</title>
+		<title>LiveSplit To Adrift Converter</title>
 		<script src="../lib/FileSaver.js"></script>
 		<script src="../lib/jszip.js"></script>
 		<script src="../lib/xml2json.js"></script>
 		<script src="livesplitconv.js"></script>
+		<link rel="stylesheet" href="../stylesheet.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+		<link rel="icon" href="https://avatars.githubusercontent.com/u/69196954">
+		<script src="../common.js"></script>
+		<style>
+			img {
+				margin: 5%;
+				width: 30%;
+				transition: 0s;
+			}
+
+			@media screen and (min-width: 1500px) {
+				img {
+					width: 20em;
+					transition: 0s;
+				}
+			}
+
+			@media screen and (max-width: 1200px) {
+				img	{
+					display: none;
+				}
+			}
+
+		</style>
 	</head>
 	
 	<body>
-		<input id="file-input" type="file" accept=".lss" onchange="fileSelect(event)" placeholder="Input LSS file"/>
-		<button onclick="saveSplits()">Export Splits</button>
+		<div id="background" class="tiles"></div>
+		<div id="shadow"></div>
+		<div id="top-right">
+			<a id="github-link" href="https://github.com/ThisAMJ/thisamj.github.io" target="_blank" class="fab fa-github"></a>
+			<button id="dark-mode-toggle" class="fa"></button>
+		</div>
+		<h1>LiveSplit To Adrift Converter</h1>
+		<img src="img/livesplit.jpg" style="float: left">
+		<img src="img/adrift.jpg" style="float: right">
+			<div style="margin: auto; width: 100%; text-align: center">
+			<p>Converts LiveSplit splits to Adrift splits.</p>
+			<p>1. Select your <code>.lss</code> splits file.</p>
+			<input id="file-input" type="file" accept=".lss" onchange="fileSelect(event)" placeholder="Input LSS file"/>
+			<p>2. Download the converted <code>.zip</code> Adrift instance.</p>
+			<button onclick="saveSplits()">Download</button>
+		</div>
 	</body>
 </html>

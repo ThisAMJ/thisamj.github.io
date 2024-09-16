@@ -1,0 +1,124 @@
+
+:root {
+    --primary-color: black;
+    --a-color: #2828FF;
+
+    /* BG */
+    --bg-color-primary: white;
+
+    --bg-color-primary-light: white;
+    --bg-color-secondary-light: #f8f8f8;
+    --bg-color-primary-dark: #202020;
+    --bg-color-secondary-dark: #181818;
+    --bg-tile-border-width: 2px;
+}
+
+[data-theme="dark"] {
+    --primary-color: white;
+    --a-color: #7777FF;
+
+    --bg-color-primary: #202020;
+}
+
+* {
+    transition: 1s ease;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0px;
+    color: var(--primary-color);
+}
+
+#background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background: var(--bg-color-primary);
+    transition: 0s, background 1s ease;
+}
+
+#background.tiles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2;
+    background-repeat: round round;
+    background: linear-gradient(90deg, var(--bg-color-secondary-light) var(--bg-tile-border-width), transparent var(--bg-tile-border-width)),
+                linear-gradient(0deg, var(--bg-color-secondary-light) var(--bg-tile-border-width), var(--bg-color-primary-light) var(--bg-tile-border-width));
+    background-size: 80px 80px;
+    box-shadow: inset 0 0 1vw #0008;
+}
+
+#background.tiles::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background-repeat: round round;
+    background: linear-gradient(90deg, var(--bg-color-primary-dark) var(--bg-tile-border-width), transparent var(--bg-tile-border-width)),
+                linear-gradient(0deg, var(--bg-color-primary-dark) var(--bg-tile-border-width), var(--bg-color-secondary-dark) var(--bg-tile-border-width));
+    background-size: 80px 80px;
+    box-shadow: inset 0 0 1vw #0008;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+[data-theme="dark"] #background.tiles::before {
+    opacity: 1;
+}
+
+h1 {
+    width: calc(100% - 4em);
+    margin-top: 0px;
+    padding-top: 0.5em;
+    font-size: 3rem;
+    text-align: center;
+}
+
+main {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 1em;
+}
+
+a {
+    color: var(--a-color);
+}
+
+pre {
+    display: block;
+    font-family: monospace;
+    overflow: auto;
+    white-space: preserve-breaks;
+    background: #BBB
+}
+
+#top-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1.0em;
+}
+
+#top-right > * {
+    border: none;
+    background: none;
+    font-size: 2.5em;
+    width: 1.5em;
+    height: 1.5em;
+    margin: 0.25em;
+    padding: none;
+    text-align: center;
+    color: var(--primary-color);
+    cursor: pointer;
+    text-decoration: none;
+}
