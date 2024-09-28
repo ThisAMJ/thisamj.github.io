@@ -49,6 +49,7 @@ function saveSplits() {
 		zip.file("config", out.join("\n"));
 	} // create config
 
+	let splitNames = [];
 	{
 		let segs = [], segments = splits.Run.Segments.Segment;
 		for (let i = 0; i < segments.length; i++) {
@@ -64,14 +65,14 @@ function saveSplits() {
 				}
 				inside.push(getName(segments[i].Name));
 				segs.push(segments[i].Name.substring(1, segments[i].Name.indexOf("}")));
+				inside.forEach(e => splitNames.push(e));
 				inside.forEach(e => segs.push(`\t${e}`));
 			} else {
 				segs.push(segments[i].Name);
 			}
 		}
 		segs = segs.map(e => e.replaceAll("&amp;", "&"));
-		segs.push("")
-		zip.file("splits", segs.join("\n"));
+		zip.file("splits", segs.join("\n") + "\n");
 	} // get splits
 
 	{
@@ -122,6 +123,44 @@ function saveSplits() {
 			name += "." + pad(completedRunDate[i].getSeconds());
 			runs.file(name, out[i].join("\n"));
 		}
+
+		console.log("Data for Jaio's No-Reset sheet: (Control+Shift+V on Run # A1 to paste)");
+		let len = out.map(e => e.length).reduce((a, b) => Math.max(a, b), 0);
+		let fullruns = out.filter(e => e.length == len);
+		text = (Array.from({length: len}, (_, f) => f).map(e => fullruns.map((_, i, g) => {
+			if (isNaN(g[i][e])) return "";
+			let microseconds = (g[i][e] - (e == 0 ? 0 : g[i][e - 1]))
+			let secs = microseconds / 1000000;
+			let mins = Math.floor(secs / 60);
+			secs -= mins * 60;
+			let hours = Math.floor(mins / 60);
+			mins -= hours * 60;
+			return `${hours}:${mins.toString().padStart(2, "0")}:${secs.toFixed(3).padStart(6, "0")}`;
+		}).join("\t")).map((e, f) => `${splitNames[f]}\t${e}`).join("\n"));
+		text = "Run #\t" + fullruns.map((_, i) => i + 1).join("\t")
+			+ "\n" + "Date\t" + fullruns.map((_, i) => completedRunDate[i].toLocaleString()).join("\t")
+			+ "\n" + "Final Time\t" + fullruns.map((e, i) => {
+				let col = num => {
+					let str = '';
+					while (num > 0) {
+						let remainder = num % 26;
+						num = Math.floor(num / 26);
+						if (remainder == 0) {
+							remainder = 26;
+							num--;
+						}
+						str = String.fromCharCode(64 + remainder) + str;
+					}
+					return str;
+				}
+				return `=IF(ISBLANK(${col(i + 2)}5), "", SECSTOTIME(SUM(${col(i + 2)}$205:${col(i + 2)}$354)))`
+			}).join("\t")
+			+ "\n" + "Comment"
+			+ "\n" + text;
+		// copy to clipboard
+		navigator.clipboard.writeText(text);
+		console.log(text);
+		console.log("Copied to clipboard!");
 	} // get runs
 
 	{
