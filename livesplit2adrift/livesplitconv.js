@@ -129,7 +129,8 @@ function saveSplits() {
 		let fullruns = out.filter(e => e.length == len);
 		text = (Array.from({length: len}, (_, f) => f).map(e => fullruns.map((_, i, g) => {
 			if (isNaN(g[i][e])) return "";
-			let microseconds = (g[i][e] - (e == 0 ? 0 : g[i][e - 1]))
+			// let microseconds = (g[i][e] - (e == 0 ? 0 : g[i][e - 1]))
+			let microseconds = g[i][e];
 			let secs = microseconds / 1000000;
 			let mins = Math.floor(secs / 60);
 			secs -= mins * 60;
