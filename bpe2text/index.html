@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Best Split Times to Text</title>
+		<script src="../lib/xml2json.js"></script>
+		<script src="bpe2text.js"></script>
+	</head>
+	
+	<body>
+		<input id="file-input" type="file" accept=".lss" onchange="fileSelect(event)" placeholder="Input LSS file"/>
+		<pre id="output"></pre>
+		<button id="copy" onclick="copyThing()" style="display:none">Copy</button><span id="copytext" style="opacity: 0; padding-left: 1em">Splits copied!</span>
+	</body>
+</html>
