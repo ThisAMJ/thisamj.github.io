@@ -12,9 +12,9 @@ function fileSelect(event) {
 			return;
 		}
 		if (splits.Run.hasOwnProperty("GameIcon")) delete splits.Run.GameIcon;
+		console.log(splits);
 		document.getElementById('output').innerText = convertThing(splits);
 		document.getElementById('copy').style.display = "inline-block";
-		console.log(splits);
 	});
 	reader.readAsText(file);
 }
@@ -65,8 +65,17 @@ function convertThing(splits) {
 		}
 		attemptData[i++] = {id: attempt, segments: segmentHistory};
 	}
-	console.log(segments.map(e => e.SplitTimes.SplitTime.filter(e => e["@name"] == "Personal Best").map(e => convertTime(e.GameTime))));
-	attemptData[i++] = {id: "pb", segments: segments.map(e => e.SplitTimes.SplitTime.filter(e => e["@name"] == "Personal Best").map(e => convertTime(e.GameTime))[0])};
+	attemptData[i++] = {id: "pb", segments: segments.map(e => {
+		console.log(e);
+		let target = e.SplitTimes.SplitTime;
+		if (target.hasOwnProperty('length')) {
+			target = target.find(e => e["@name"] == "Personal Best");
+		}
+		if (!target.hasOwnProperty("GameTime")) {
+			if (!target.hasOwnProperty("RealTime")) return 0;
+		}
+		return convertTime(target.GameTime);
+	})};
 	bestpaceever = [];
 	i = 0;
 	for (let segment of segments) {
