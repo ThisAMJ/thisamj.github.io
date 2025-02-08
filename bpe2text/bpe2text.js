@@ -51,7 +51,8 @@ function convertThing(splits) {
 	for (let attempt of attemptHistory) {
 		let segmentHistory = segments.map(e => e.SegmentHistory.Time.filter(e => e["@id"] == attempt).map(e => e.hasOwnProperty("GameTime") ? convertTime(e.GameTime) : -1));
 		if (!segmentHistory.some(e => e.length > 0)) continue;
-		segmentHistory = segmentHistory.filter(e => e.length > 0).map(e => e[0]);
+		segmentHistory = segmentHistory.map(e => e.length > 0 ? e[0] : -1);
+		while (segmentHistory[segmentHistory.length - 1] == -1) segmentHistory.pop();
 		if (segmentHistory.some(e => e == -1)) continue;
 		for (let i = 1; i < segmentHistory.length; i++) {
 			segmentHistory[i] += segmentHistory[i - 1];
@@ -59,20 +60,31 @@ function convertThing(splits) {
 		attemptData[i++] = {id: attempt, segments: segmentHistory};
 	}
 	attemptData[i++] = {id: "pb", segments: segments.map(e => {
-		console.log(e);
 		let target = e.SplitTimes.SplitTime;
 		if (target.hasOwnProperty('length')) {
 			target = target.find(e => e["@name"] == "Personal Best");
 		}
 		if (!target.hasOwnProperty("GameTime")) {
-			if (!target.hasOwnProperty("RealTime")) return 0;
+			return 0;
 		}
 		return convertTime(target.GameTime);
 	})};
 	bestpaceever = [];
 	i = 0;
 	for (let segment of segments) {
-		let best = Math.min(...attemptData.map(e => e.segments.length > i ? e.segments[i] : Infinity));
+		let best = Infinity;
+		if (i == 0) {
+			let gold = segment.BestSegmentTime;
+			if (gold.hasOwnProperty("GameTime")) {
+				best = convertTime(gold.GameTime);
+			}
+		}
+		for (let attempt of attemptData) {
+			if (attempt.segments.length <= i) continue;
+			if (attempt.segments[i] == 0) continue;
+			if (i > 0 && attempt.segments[i - 1] == attempt.segments[i]) continue;
+			if (attempt.segments[i] < best) best = attempt.segments[i];
+		}
 		bestpaceever.push(best);
 		i++;
 	}
