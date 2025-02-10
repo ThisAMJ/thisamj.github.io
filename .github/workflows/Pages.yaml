@@ -19,8 +19,14 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
-            - name: Minify files
-              uses: jossydevers/minify-js@v1.0.0
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                node-version: '16'
+            - run: npm install -g terser csso-cli html-minifier
+            - run: for file in $(find . -name '*.html'); do html-minifier --collapse-whitespace --remove-comments --remove-attribute-quotes --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true --file-ext html --output $file $file; done
+            - run: for file in $(find . -name '*.css'); do csso $file $file; done
+            - run: for file in $(find . -name '*.js'); do terser $file --output $file; done
 
             - name: Setup Pages
               uses: actions/configure-pages@v5
