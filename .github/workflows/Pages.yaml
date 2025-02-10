@@ -19,14 +19,6 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
-            - name: Set up minifier
-              uses: amireshoon/minifyAction@v1.1
-              with:
-                repo: $prepo
-            - name: Minify files
-              run: |
-                minifier.sh $prepo
-
             - name: Setup Pages
               uses: actions/configure-pages@v5
 
