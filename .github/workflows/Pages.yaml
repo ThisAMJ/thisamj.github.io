@@ -19,19 +19,6 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v3
-
-            - name: Install Dependencies
-              run: npm install -g minify
-
-            - name: Minify Files
-              run: |
-                for file in $(find . -name '*.html' -o -name '*.css' -o -name '*.js'); do
-                  echo "Minifying $file"
-                  minify "$file" -o "$file"
-                done
-
             - name: Setup Pages
               uses: actions/configure-pages@v5
 
