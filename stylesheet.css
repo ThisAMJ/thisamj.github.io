@@ -1,0 +1,13 @@
+html {
+    background: #18191A;
+    color: #CCCCCC;
+    margin: 1% 10%;
+    word-wrap: break-word;
+}
+h1 {
+    font-size: 5em;
+    text-align: center;
+}
+a {
+    color: #7777FF;
+}
