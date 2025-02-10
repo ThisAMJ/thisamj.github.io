@@ -28,6 +28,7 @@ jobs:
             - name: Minify Files
               run: |
                 for file in $(find . -name '*.html' -o -name '*.css' -o -name '*.js'); do
+                  echo "Minifying $file"
                   minify "$file" -o "$file"
                 done
 
