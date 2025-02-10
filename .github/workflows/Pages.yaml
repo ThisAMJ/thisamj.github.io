@@ -19,10 +19,13 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
-            - name: Minify files
-              uses: nizarmah/auto-minify@v3.0.0
+            - name: Set up minifier
+              uses: amireshoon/minifyAction@v1.1
               with:
-                overwrite: true
+                repo: $prepo
+            - name: Minify files
+              run: |
+                minifier.sh $prepo
 
             - name: Setup Pages
               uses: actions/configure-pages@v5
